@@ -1,0 +1,152 @@
+:root{
+
+  --bs-blue:#00afef;
+  --bs-indigo:#1f5ca9;
+  --bs-purple:#6f42c1;
+  --bs-pink:#d63384;
+  --bs-red:#FA896B;
+  --bs-orange:#fd7e14;
+  --bs-yellow:#Fbef21;
+  --bs-green:#13DEB9;
+  --bs-teal:#20c997;
+  --bs-cyan:#539BFF;
+  --bs-black:#000;
+  --bs-white:#fff;
+  --bs-gray:#2A3547;
+  --bs-gray-dark:#343a40;
+  --bs-gray-100:#F6F9FC;
+  --bs-gray-200:#EAEFF4;
+  --bs-gray-300:#DFE5EF;
+  --bs-gray-400:#7C8FAC;
+  --bs-gray-500:#5A6A85;
+  --bs-gray-600:#2A3547;
+  --bs-gray-700:#495057;
+  --bs-gray-800:#343a40;
+  --bs-gray-900:#212529;
+  --bs-primary:#00afef;
+  --bs-secondary:#84ccf4;
+  --bs-success:#13DEB9;
+  --bs-info:#539BFF;
+  --bs-warning:#Fbef21;
+  --bs-danger:#FA896B;
+  --bs-light:#F6F9FC;
+  --bs-dark:#2A3547;
+  --bs-muted:#5A6A85;
+  --bs-indigo:#1f5ca9;
+  --bs-light-primary:#ECF2FF;
+  --bs-light-secondary:#E8F7FF;
+  --bs-light-info:#EBF3FE;
+  --bs-light-success:#E6FFFA;
+  --bs-light-warning:#FEF5E5;
+  --bs-light-danger:#FBF2EF;
+  --bs-light-indigo:#EBF3FE;
+  --bs-dark-light:#2A3547;
+  --bs-light-gray:#F6F9FC;
+  --bs-primary-text:#4a6ccc;
+  --bs-secondary-text:#2A3547;
+  --bs-success-text:#0fb294;
+  --bs-info-text:#325d99;
+  --bs-warning-text:#996813;
+  --bs-danger-text:#c86e56;
+  --bs-light-text:#2A3547;
+  --bs-dark-text:#495057;
+  --bs-primary-bg-subtle:#dfe7ff;
+  --bs-secondary-bg-subtle:#F6F9FC;
+  --bs-success-bg-subtle:#d0f8f1;
+  --bs-info-bg-subtle:#ddebff;
+  --bs-warning-bg-subtle:#ffefd2;
+  --bs-danger-bg-subtle:#fee7e1;
+  --bs-light-bg-subtle:#fbfcfe;
+  --bs-dark-bg-subtle:#7C8FAC;
+  --bs-primary-border-subtle:#becfff;
+  --bs-secondary-border-subtle:#EAEFF4;
+  --bs-success-border-subtle:#a1f2e3;
+  --bs-info-border-subtle:#bad7ff;
+  --bs-warning-border-subtle:#ffdfa5;
+  --bs-danger-border-subtle:#fdd0c4;
+  --bs-light-border-subtle:#EAEFF4;
+  --bs-dark-border-subtle:#5A6A85;
+}
+
+.nav-search{
+    width: 50rem;
+    height: 40px; 
+    margin: auto;
+}
+
+@media (max-width: 1260px) {
+    .nav-search {
+        width: 30rem;
+    }
+  }
+
+@media (max-width: 767px) {
+    .nav-search {
+      display: none !important;
+    }
+
+    .search-toggler {
+      display: block !important;
+    }
+  }
+
+  a .badge:hover {
+    background-color: #84ccf4 !important;
+}
+
+/* Message */
+#chat .form-control {
+  border-color: transparent;
+}
+
+#chat .form-control:focus {
+  border-color: transparent;
+  box-shadow: inset 0px 0px 0px 1px transparent;
+}
+
+.badge-dot {
+  border-radius: 50%;
+  height: 10px;
+  width: 10px;
+  margin-left: 2.9rem;
+  margin-top: -.75rem;
+}
+
+.scroll-chat {
+  max-height: 320px; /* Đặt chiều cao tối đa cho phần scroll-chat */
+  overflow-y: auto; /* Kích hoạt cuộn dọc nếu nội dung vượt quá kích thước */
+}
+
+.friend-chat{
+  background-color: #f5f6f7;
+}
+
+
+/* Noti */
+.noti-item:hover {
+  color: var(--bs-body-color) !important;
+  background-color: #F6F9FC !important;
+}
+
+
+/* Sidebar */
+.nav-small-cap {
+  font-weight: bold; 
+  cursor: pointer; 
+}
+
+/* Thêm */
+
+.position-center {
+  width: 75%;
+  margin: 0 auto;
+}
+
+.form-group {
+  padding-bottom: 12px;
+}
+
+.form-group label{
+  font-weight: bold;
+  margin-bottom: 5px;
+}
