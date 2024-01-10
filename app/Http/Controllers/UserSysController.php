@@ -18,6 +18,8 @@ class UserSysController extends Controller
     /*
     |--------------------------------------------------------------------------
     | NGƯỜI DÙNG
+    | - Đối với cá nhân: Đăng nhập, đăng xuất, đăng ký
+    | - Đối với người dùng khác: 
     |--------------------------------------------------------------------------
     */
 
@@ -36,15 +38,15 @@ class UserSysController extends Controller
     	$ND_EMAIL = $request->ND_EMAIL;
         $ND_MATKHAU = $request->ND_MATKHAU;
         
-        $result = DB::table('NGUOI_DUNG')->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))->first();
+        $result = DB::table('nguoi_dung')->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))->first();
         /*echo '<pre>';
         print_r ($result);
         echo '</pre>';*/
         
         if($result){
             if($result->ND_TRANGTHAI==1){
-                $userLog = DB::table('NGUOI_DUNG')
-                    ->join('VAI_TRO', 'NGUOI_DUNG.VT_MA', '=', 'VAI_TRO.VT_MA')
+                $userLog = DB::table('nguoi_dung')
+                    ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
                     ->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))
                     ->first();
                 Session::put('userLog',$userLog);
@@ -64,7 +66,6 @@ class UserSysController extends Controller
     /**
      * Đăng xuất
      */
-
     public function logout() ///ok
     {
         Session::put('userLog',null);
@@ -92,7 +93,7 @@ class UserSysController extends Controller
         $data['ND_NGAYTHAMGIA'] = Carbon::now('Asia/Ho_Chi_Minh');
 
         //Dò trùng
-        $dsnd=DB::table('NGUOI_DUNG')->get();
+        $dsnd=DB::table('nguoi_dung')->get();
         foreach ($dsnd as $ds){
             if (strtolower($ds->ND_EMAIL)==strtolower($request->ND_EMAIL)) {
                 Session::put('alert', ['type' => 'warning', 'content' => 'Email đã tồn tại trên hệ thống, vui lòng đăng ký với email khác!']);
@@ -100,12 +101,12 @@ class UserSysController extends Controller
             }
         }
 
-        DB::table('NGUOI_DUNG')->insert($data);
+        DB::table('nguoi_dung')->insert($data);
 
         /* 
         //Lấy mã để xử lý ảnh đại diện
-        $ND = DB::table('NGUOI_DUNG')->where('NGUOI_DUNG.ND_EMAIL', $request->ND_EMAIL)
-        ->orderby('NGUOI_DUNG.ND_MA','desc')->first();
+        $ND = DB::table('nguoi_dung')->where('nguoi_dung.ND_EMAIL', $request->ND_EMAIL)
+        ->orderby('nguoi_dung.ND_MA','desc')->first();
         $ND_MA = $ND->ND_MA;
 
         //Xử lý ảnh đại diện
@@ -113,11 +114,11 @@ class UserSysController extends Controller
         if($get_image){
             $new_image =  'nd_'.$ND_MA.'.'.$get_image->getClientOriginalExtension();
             $get_image->move('public/images/users',$new_image);
-            DB::table('NGUOI_DUNG')->where('ND_MA',$ND_MA)->update(['ND_ANHDAIDIEN' => $new_image]);
+            DB::table('nguoi_dung')->where('ND_MA',$ND_MA)->update(['ND_ANHDAIDIEN' => $new_image]);
         }*/
 
-        $userLog = DB::table('NGUOI_DUNG')
-            ->join('VAI_TRO', 'NGUOI_DUNG.VT_MA', '=', 'VAI_TRO.VT_MA')
+        $userLog = DB::table('nguoi_dung')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))
             ->first();
         Session::put('userLog',$userLog);
@@ -125,7 +126,7 @@ class UserSysController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Chi tiết tài khoản cá nhân
      */
     public function u_show(UserSys $userSys)
     {
@@ -133,28 +134,41 @@ class UserSysController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Cập nhật tài khoản cá nhân
      */
     public function u_edit(UserSys $userSys)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function u_update(Request $request, UserSys $userSys)
     {
         //
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Vô hiệu hoá tài khoản cá nhân
      */
     public function u_destroy(UserSys $userSys)
     {
         //
     }
+
+    //TÁC ĐỘNG TÀI KHOẢN HỆ THỐNG
+
+    /**
+     * Chặn người dùng
+     */
+
+
+     /**
+     * Danh sách gợi ý người dùng
+     */
+
+
+     /**
+     * Theo dõi người dùng khác
+     */
 
     /*
     |--------------------------------------------------------------------------

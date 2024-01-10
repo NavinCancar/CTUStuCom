@@ -32,3 +32,6 @@ Route::post('/kiem-tra-dang-nhap', 'App\Http\Controllers\UserSysController@login
 //--Đăng ký
 Route::get('/dang-ky', 'App\Http\Controllers\UserSysController@u_create'); ///ok
 Route::post('/kiem-tra-dang-ky', 'App\Http\Controllers\UserSysController@u_store'); ///ok
+
+//Post: Bài đăng
+Route::resource('/bai-dang', 'App\Http\Controllers\PostController');

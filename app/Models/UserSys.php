@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserSys extends Model
 {
     //Định nghĩa ban đầu
-    protected $table = 'NGUOI_DUNG';
+    protected $table = 'nguoi_dung';
     protected $primaryKey = 'ND_MA';
 
     public $timestamps = false;
