@@ -13,15 +13,6 @@ session_start();
 class HomeController extends Controller
 {
     public function index(){
-        return view('welcome');
+        return view('main_content.home');
     }
-
-    public function login(){
-    	return view('login');
-    }
-
-    public function register (){
-    	return view('register');
-    }
-    
 }

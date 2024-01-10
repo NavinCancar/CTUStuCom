@@ -13,8 +13,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+/*
+|--------------------------------------------------------------------------
+| NGƯỜI DÙNG
+|--------------------------------------------------------------------------
+*/
+
+//Trang chủ
 Route::get('/','App\Http\Controllers\HomeController@index'); 
 Route::get('/trang-chu', 'App\Http\Controllers\HomeController@index'); 
 
-Route::get('/dang-nhap', 'App\Http\Controllers\HomeController@login'); 
-Route::get('/dang-ky', 'App\Http\Controllers\HomeController@register'); 
+//UserSys: Người dùng hệ thống
+//--Đăng nhập
+Route::get('/dang-nhap', 'App\Http\Controllers\UserSysController@login'); 
+Route::get('/dang-xuat', 'App\Http\Controllers\UserSysController@logout'); 
+Route::post('/kiem-tra-dang-nhap', 'App\Http\Controllers\UserSysController@login_check'); 
+
+//--Đăng ký
+Route::get('/dang-ky', 'App\Http\Controllers\UserSysController@u_create'); 
+Route::post('/kiem-tra-dang-ky', 'App\Http\Controllers\UserSysController@u_store');

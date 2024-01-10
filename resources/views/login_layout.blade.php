@@ -52,22 +52,18 @@
                 <a href="{{URL::to('/')}}" class="text-nowrap logo-img text-center d-block py-1 w-100">
                   <img src="{{('public/images/logos/logo2.png')}}" width="300px" alt="">
                 </a>
-                <form>
-                  <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Họ tên:</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                  </div>
-                  <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Email:</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                  </div>
-                  <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label">Mật khẩu:</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1">
-                  </div>
-                  <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-2 rounded-2">Đăng ký</button>
-                </form>
-                <a href="{{URL::to('/dang-nhap')}}" class="btn btn-outline-primary w-100 py-8 fs-4 mb-2 rounded-2">Đăng nhập</a>
+
+                <?php
+                  $alert = Session::get('alert');
+                  if ($alert && is_array($alert)) {
+                      echo '<div class="alert alert-' . $alert['type'] . '">';
+                      echo $alert['content'];
+                      echo '</div>';
+                      Session::put('alert', null);
+                  }
+                ?>
+
+                @yield('content')
               </div>
             </div>
           </div>
