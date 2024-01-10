@@ -4,11 +4,11 @@
                   {{ csrf_field() }}
                   <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Email:</label>
-                    <input type="email" class="form-control" name="ND_EMAIL" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <input type="email" class="form-control" name="ND_EMAIL" required="" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" id="exampleInputEmail1" aria-describedby="emailHelp">
                   </div>
                   <div class="mb-3">
                     <label for="exampleInputPassword1" class="form-label">Mật khẩu:</label>
-                    <input type="password" class="form-control" name="ND_MATKHAU" id="exampleInputPassword1">
+                    <input type="password" class="form-control" name="ND_MATKHAU" required="" id="exampleInputPassword1">
                   </div>
                   <div class="d-flex align-items-center justify-content-between mb-3">
                     <a class="text-primary fw-bold" href="javascript:void(0)">Quên mật khẩu?</a>

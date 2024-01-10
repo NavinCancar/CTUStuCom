@@ -27,6 +27,7 @@
                   </div>
                 </div>
               </li>
+              @if($userLog)
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop3" data-bs-toggle="dropdown"
                   aria-expanded="false">
@@ -54,7 +55,7 @@
                       </span>
                     </a>
                     <hr>
-                    <div class="text-center mb-1"><a href="./mess.php" class="card-link">Xem thêm</a></div>
+                    <div class="text-center mb-1"><a href="javascript:void(0)" class="card-link">Xem thêm</a></div>
                   </div>
                 </div>
               </li>
@@ -83,18 +84,18 @@
                       </p>
                     </a>
                     <hr>
-                    <div class="text-center mb-1"><a href="./noti.php" class="card-link">Xem thêm</a></div>
+                    <div class="text-center mb-1"><a href="javascript:void(0)" class="card-link">Xem thêm</a></div>
                   </div>
                 </div>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown"
                   aria-expanded="false">
-                  <img src="{{('public/images/profile/user-1.jpg')}}" alt="" width="35" height="35" class="rounded-circle">
+                  <img src="public/images/users/<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo 'macdinh.png'?>" alt="" width="35" height="35" class="rounded-circle">
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
                   <div class="message-body">
-                    <a href="./account.php" class="d-flex align-items-center gap-2 dropdown-item">
+                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
                       <i class="fa fa-user"></i>
                       <p class="mb-0 fs-3">Trang cá nhân</p>
                     </a>
@@ -106,10 +107,16 @@
                       <i class="fas fa-lock"></i>
                       <p class="mb-0 fs-3">Đổi mật khẩu</p>
                     </a>
-                    <a href="{{URL::to('/dang-nhap')}}" class="btn btn-outline-danger mx-3 mt-2 d-block">Logout</a>
+                    <a href="{{URL::to('/dang-xuat')}}" class="btn btn-outline-danger mx-3 mt-2 d-block">Đăng xuất</a>
                   </div>
                 </div>
               </li>
+              @else
+              <li class="nav-item d-flex">
+                <a href="{{URL::to('/dang-nhap')}}" class="btn btn-primary px-2 me-2">Đăng nhập</a>
+                <a href="{{URL::to('/dang-ky')}}" class="btn btn-outline-primary px-2">Đăng ký</a>
+              </li>
+              @endif
             </ul>
           </div>
         </nav>

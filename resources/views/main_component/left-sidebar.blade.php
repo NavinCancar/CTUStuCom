@@ -1,7 +1,7 @@
     <aside class="left-sidebar">
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
-          <a href="./index.php" class="text-nowrap logo-img">
+          <a href="{{URL::to('/')}}" class="text-nowrap logo-img">
             <img src="{{('public/images/logos/logo2.png')}}" width="230" alt="" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
@@ -17,7 +17,7 @@
             </li>
             <div id="trangchu" class="collapse show">
               <li class="sidebar-item">
-                <a class="sidebar-link" href="./index.php" aria-expanded="false">
+                <a class="sidebar-link" href="{{URL::to('/')}}" aria-expanded="false">
                   <span>
                     <i class="fas fa-home"></i>
                   </span>
@@ -26,13 +26,14 @@
               </li>
             </div>
 
+            @if($userLog && ($userLog->VT_MA==1 || $userLog->VT_MA==2))
             <!-- Kiểm duyệt -->
             <li class="nav-small-cap" data-bs-toggle="collapse" data-bs-target="#kiemduyet">
               <span class="hide-menu">Kiểm duyệt</span>
             </li>
-            <div id="kiemduyet" class="collapse">
+            <div id="kiemduyet" class="collapse show">
               <li class="sidebar-item">
-                <a class="sidebar-link" href="#" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fa fa-comment-alt"></i>
                   </span>
@@ -40,7 +41,7 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="#" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fas fa-comments"></i>
                   </span>
@@ -48,15 +49,17 @@
                 </a>
               </li>
             </div>
+            @endif
 
 
+            @if($userLog && $userLog->VT_MA==1)
             <!-- Quản trị -->
             <li class="nav-small-cap" data-bs-toggle="collapse" data-bs-target="#quantri">
               <span class="hide-menu">Quản trị</span>
             </li>
-            <div id="quantri" class="collapse">
+            <div id="quantri" class="collapse show">
               <li class="sidebar-item">
-                <a class="sidebar-link" href="./truong-khoa.php" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fas fa-school"></i>
                   </span>
@@ -64,7 +67,7 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="#" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fas fa-folder"></i>
                   </span>
@@ -72,7 +75,7 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="#" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fa fa-users"></i>
                   </span>
@@ -80,7 +83,7 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="#" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fas fa-user-tag"></i>
                   </span>
@@ -88,7 +91,7 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="./thong-ke.php" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fas fa-chart-bar"></i>
                   </span>
@@ -96,14 +99,18 @@
                 </a>
               </li>
             </div>
+            @endif
+            
             
             <!-- Khám phá -->
             <li class="nav-small-cap" data-bs-toggle="collapse" data-bs-target="#khampha">
               <span class="hide-menu">Khám phá</span>
             </li>
-            <div id="khampha" class="collapse show">
+            <div id="khampha" class="collapse 
+              <?php if(!$userLog || ($userLog && $userLog->VT_MA==3)) echo "show";?>
+            ">
               <li class="sidebar-item">
-                <a class="sidebar-link" href="./hashtag.php" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fa fa-hashtag"></i>
                   </span>
@@ -111,7 +118,7 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="./khoa-truong.php" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fa fa-school"></i>
                   </span>
@@ -119,7 +126,7 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="./users.php" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fa fa-user-tag"></i>
                   </span>
@@ -128,13 +135,16 @@
               </li>
             </div>
 
+            @if($userLog)
             <!-- Tài khoản -->
             <li class="nav-small-cap" data-bs-toggle="collapse" data-bs-target="#taikhoan">
               <span class="hide-menu">Tài khoản</span>
             </li>
-            <div id="taikhoan" class="collapse show">
+            <div id="taikhoan" class="collapse
+              <?php if($userLog->VT_MA==3) echo "show";?>
+            ">
               <li class="sidebar-item">
-                <a class="sidebar-link" href="./follow.php" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fas fa-layer-group"></i>
                   </span>
@@ -142,7 +152,7 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="./follow.php" aria-expanded="false">
+                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <i class="fa fa-portrait"></i>
                   </span>
@@ -150,6 +160,7 @@
                 </a>
               </li>
             </div>
+            @endif
           </ul>
         </nav>
         <!-- End Sidebar navigation -->

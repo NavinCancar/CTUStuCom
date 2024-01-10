@@ -1,5 +1,6 @@
 @extends('welcome')
 @section('content')
+<?php $userLog= Session::get('userLog'); ?>
     <div class="container-fluid">
         <div class="row">
           <div class="col-lg-8">
@@ -8,12 +9,15 @@
             </div>
             <hr>
             <div class="d-block">
+              @if($userLog)
               <button class="btn btn-primary me-2 mb-3" data-bs-toggle="collapse" data-bs-target="#thembaiviet"><i
                   class="fas fa-plus"></i> Thêm bài viết</button>
+              @endif
               <button class="btn btn-outline-primary me-2 mb-3" data-bs-toggle="collapse" data-bs-target="#loc"><i
                   class="fa fa-filter"></i> Lọc bài viết</button>
             </div>
 
+            @if($userLog)
             <!-- Thêm bài viết Start -->
             <div id="thembaiviet" class="collapse">
               <div class="card">
@@ -51,6 +55,7 @@
                 </div>
               </div>
             </div>
+            @endif
             <!-- Thêm bài viết End -->
             <!-- Lọc Start -->
             <div id="loc" class="collapse">
@@ -137,108 +142,34 @@
             </div>
             <!-- Lọc End -->
 
-            <!--  Bài 1  -->
+            <!--  Bài viết  -->
             <div class="card">
               <div class="card-body p-4">
                 <div class="mb-3 mb-sm-0">
                   <p>
-                    <a href="#" class="text-body">
+                    <a href="javascript:void(0)" class="text-body">
                       <img src="{{('public/images/profile/user-1.jpg')}}" alt="" width="20" height="20" class="rounded-circle">
                       <b>Lý Thị Lan</b> 
                     </a>
                     đã đăng vào 15:20 ngày 29/12/2023
                   </p>
-                  <a href="./bai-viet.php" class="text-dark">
+                  <a href="javascript:void(0)" class="text-dark">
                     <h5 class="card-title fw-semibold">Ứng dụng mới</h5>
                     <p>Xin chào mọi người!
                       Hiện tại nhóm của mình có phát triển ứng dụng nhằm hỗ trợ sinh viên #CTU trong quá trình lập thời
                       khóa biểu để đăng ký học phần.
                       Nên rất mong nhận được sự phản hồi của mn để phát triển ứng dụng hơn nữa ạ...
-                      <a href="./bai-viet.php" class="card-link">Xem thêm</a>
+                      <a href="javascript:void(0)" class="card-link">Xem thêm</a>
                     </p>
                   </a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1">#ung_dung</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1">#lay_y_kien</span></a>
-                </div>
-              </div>
-            </div>
-            <!--  Bài 1  -->
-            <div class="card">
-              <div class="card-body p-4">
-                <div class="mb-3 mb-sm-0">
-                  <p>
-                    <a href="#" class="text-body">
-                      <img src="{{('public/images/profile/user-1.jpg')}}" alt="" width="20" height="20" class="rounded-circle">
-                      <b>Lý Thị Lan</b> 
-                    </a>
-                    đã đăng vào 15:20 ngày 29/12/2023
-                  </p>
-                  <a href="#" class="text-dark">
-                    <h5 class="card-title fw-semibold">Ứng dụng mới</h5>
-                    <p>Xin chào mọi người!
-                      Hiện tại nhóm của mình có phát triển ứng dụng nhằm hỗ trợ sinh viên #CTU trong quá trình lập thời
-                      khóa biểu để đăng ký học phần.
-                      Nên rất mong nhận được sự phản hồi của mn để phát triển ứng dụng hơn nữa ạ...
-                      <a href="#" class="card-link">Xem thêm</a>
-                    </p>
-                  </a>
-                  <p><a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1"><i class="fa fa-folder"></i> CT101 Kỹ năng
+                  <p><a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1"><i class="fa fa-folder"></i> CT101 Kỹ năng
                       đại học</span></a></p>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1">#ung_dung</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1">#lay_y_kien</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1">#ung_dung</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1">#lay_y_kien</span></a>
                 </div>
               </div>
             </div>
-            <!--  Bài 1  -->
-            <div class="card">
-              <div class="card-body p-4">
-                <div class="mb-3 mb-sm-0">
-                  <p>
-                    <a href="#" class="text-body">
-                      <img src="{{('public/images/profile/user-1.jpg')}}" alt="" width="20" height="20" class="rounded-circle">
-                      <b>Lý Thị Lan</b> 
-                    </a>
-                    đã đăng vào 15:20 ngày 29/12/2023
-                  </p>
-                  <a href="#" class="text-dark">
-                    <h5 class="card-title fw-semibold">Ứng dụng mới</h5>
-                    <p>Xin chào mọi người!
-                      Hiện tại nhóm của mình có phát triển ứng dụng nhằm hỗ trợ sinh viên #CTU trong quá trình lập thời
-                      khóa biểu để đăng ký học phần.
-                      Nên rất mong nhận được sự phản hồi của mn để phát triển ứng dụng hơn nữa ạ...
-                      <a href="#" class="card-link">Xem thêm</a>
-                    </p>
-                  </a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1">#ung_dung</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1">#lay_y_kien</span></a>
-                </div>
-              </div>
-            </div>
-            <!--  Bài 1  -->
-            <div class="card">
-              <div class="card-body p-4">
-                <div class="mb-3 mb-sm-0">
-                  <p>
-                    <a href="#" class="text-body">
-                      <img src="{{('public/images/profile/user-1.jpg')}}" alt="" width="20" height="20" class="rounded-circle">
-                      <b>Lý Thị Lan</b> 
-                    </a>
-                    đã đăng vào 15:20 ngày 29/12/2023
-                  </p>
-                  <a href="#" class="text-dark">
-                    <h5 class="card-title fw-semibold">Ứng dụng mới</h5>
-                    <p>Xin chào mọi người!
-                      Hiện tại nhóm của mình có phát triển ứng dụng nhằm hỗ trợ sinh viên #CTU trong quá trình lập thời
-                      khóa biểu để đăng ký học phần.
-                      Nên rất mong nhận được sự phản hồi của mn để phát triển ứng dụng hơn nữa ạ...
-                      <a href="#" class="card-link">Xem thêm</a>
-                    </p>
-                  </a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1">#ung_dung</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1">#lay_y_kien</span></a>
-                </div>
-              </div>
-            </div>
+
           </div>
 
           <div class="col-lg-4">
@@ -273,15 +204,15 @@
                 <div class="mb-3 mb-sm-0">
                   <h5 class="card-title fw-semibold">Hashtag</h5>
                   <a href="./tag.php"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-                  <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
                 </div>
               </div>
             </div>
@@ -291,13 +222,13 @@
                   <h5 class="card-title fw-semibold">Học phần</h5>
                   <a href="hoc-phan.php"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Kỹ
                     năng đại học</span></a><br>
-                  <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Nền
+                  <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Nền
                     tảng công nghệ thông tin</span></a><br>
-                  <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Triết
+                  <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Triết
                     Mác Lênin</span></a><br>
-                  <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Lịch
+                  <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Lịch
                     sử Đảng</span></a><br>
-                  <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Chủ
+                  <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Chủ
                     nghĩa xã hội khoa học</span></a><br>
                 </div>
               </div>

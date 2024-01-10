@@ -26,26 +26,28 @@ class UserSysController extends Controller
     /**
      * Đăng nhập
      */
-    public function login()
+    public function login() ///ok
     {
         return view('login_content.login');
     }
 
-    public function login_check(Request $request)
+    public function login_check(Request $request) ////ok
     {
     	$ND_EMAIL = $request->ND_EMAIL;
         $ND_MATKHAU = $request->ND_MATKHAU;
         
-        $result = DB::table('nguoi_dung')->where('ND_EMAIL', $ND_EMAIL)->where('ND_MATKHAU', $ND_MATKHAU)->first();
+        $result = DB::table('NGUOI_DUNG')->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))->first();
         /*echo '<pre>';
         print_r ($result);
         echo '</pre>';*/
         
         if($result){
             if($result->ND_TRANGTHAI==1){
-                Session::put('ND_HOTEN',$result->ND_HOTEN);
-                Session::put('ND_MA',$result->ND_MA);
-                Session::put('ND_ANHDAIDIEN',$result->ND_ANHDAIDIEN);
+                $userLog = DB::table('NGUOI_DUNG')
+                    ->join('VAI_TRO', 'NGUOI_DUNG.VT_MA', '=', 'VAI_TRO.VT_MA')
+                    ->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))
+                    ->first();
+                Session::put('userLog',$userLog);
                 return Redirect::to('/trang-chu');
             }
             else{
@@ -63,27 +65,63 @@ class UserSysController extends Controller
      * Đăng xuất
      */
 
-    public function logout()
+    public function logout() ///ok
     {
-        $this->AuthLogin();
-        Session::put('ND_HOTEN',null);
-        Session::put('ND_MA',null);
-        Session::put('ND_ANHDAIDIEN',null);
+        Session::put('userLog',null);
         return Redirect::to('/trang-chu');
     }
     
-
     /**
      * Đăng ký
      */
-    public function u_create()
+    public function u_create() ///ok
     {
         return view('login_content.register');
     }
 
-    public function u_store(Request $request)
+    public function u_store(Request $request) ///ok
     {
-        //
+        //Ghi nhận đăng ký, chưa xử lý ảnh đại diện
+        $data = array();
+        $data['VT_MA'] = 3;  
+        $data['ND_HOTEN'] = $request->ND_HOTEN;
+        $data['ND_EMAIL'] = $request->ND_EMAIL;
+        $data['ND_MATKHAU'] = md5($request->ND_MATKHAU);
+        $data['ND_DIEMCONGHIEN'] = 0;
+        $data['ND_TRANGTHAI'] = 1;
+        $data['ND_NGAYTHAMGIA'] = Carbon::now('Asia/Ho_Chi_Minh');
+
+        //Dò trùng
+        $dsnd=DB::table('NGUOI_DUNG')->get();
+        foreach ($dsnd as $ds){
+            if (strtolower($ds->ND_EMAIL)==strtolower($request->ND_EMAIL)) {
+                Session::put('alert', ['type' => 'warning', 'content' => 'Email đã tồn tại trên hệ thống, vui lòng đăng ký với email khác!']);
+                return Redirect::to('/dang-ky');
+            }
+        }
+
+        DB::table('NGUOI_DUNG')->insert($data);
+
+        /* 
+        //Lấy mã để xử lý ảnh đại diện
+        $ND = DB::table('NGUOI_DUNG')->where('NGUOI_DUNG.ND_EMAIL', $request->ND_EMAIL)
+        ->orderby('NGUOI_DUNG.ND_MA','desc')->first();
+        $ND_MA = $ND->ND_MA;
+
+        //Xử lý ảnh đại diện
+        $get_image= $request->file('ND_ANHDAIDIEN');
+        if($get_image){
+            $new_image =  'nd_'.$ND_MA.'.'.$get_image->getClientOriginalExtension();
+            $get_image->move('public/images/users',$new_image);
+            DB::table('NGUOI_DUNG')->where('ND_MA',$ND_MA)->update(['ND_ANHDAIDIEN' => $new_image]);
+        }*/
+
+        $userLog = DB::table('NGUOI_DUNG')
+            ->join('VAI_TRO', 'NGUOI_DUNG.VT_MA', '=', 'VAI_TRO.VT_MA')
+            ->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))
+            ->first();
+        Session::put('userLog',$userLog);
+        return Redirect::to('/trang-chu');
     }
 
     /**
