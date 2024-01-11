@@ -24,7 +24,7 @@
                 <div class="card-body p-4">
                   <div class="mb-3 mb-sm-0">
                     <h5 class="card-title fw-semibold">Thêm bài viết mới</h5>
-                    <form id="form" action="{{URL::to('/bai-dang')}}" method="post">
+                    <form id="form" action="{{URL::to('/bai-dang')}}" method="post" enctype="multipart/form-data">
                       {{ csrf_field() }}
                       <div class="mb-3 mt-3">
                         <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
@@ -39,7 +39,7 @@
                         </div>
                         <div class="mb-3">
                           <label for="formFileMultiple" class="form-label">Các file đính kèm (nếu có):</label>
-                          <input class="form-control" type="file" id="formFileMultiple" multiple name="FILE">
+                          <input class="form-control" type="file" id="formFileMultiple" multiple name="FDK[]">
                         </div>
                         <label for="exampleDataList" class="form-label">Học phần liên quan (nếu có):</label>
                         <input class="form-control" list="datalistOptions" id="exampleDataList"

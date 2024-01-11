@@ -105,31 +105,28 @@ class PostController extends Controller
         //File đính kèm
         $data3 = array();
         $data3['BV_MA']=$bai_viet->BV_MA;
-        if ($request->hasFile('FILE')) { //In dữ liệu ra không phải mảng
-            // Lặp qua mảng các tệp tin được gửi
-            foreach ($request->file('FILE') as $file) {
-                // Lấy tên tệp tin để lưu vào cơ sở dữ liệu
-                $fileName = $file->getClientOriginalName();
-
-                /*
+        
+        if($request->hasFile('FDK'))
+        {   
+            $files = $request->file('FDK');
+            foreach ($files as $file) {
                 // Lấy thời gian hiện tại để thêm vào tên file
                 $currentDateTime = now()->format('YmdHis');
-
+        
                 // Lấy tên file gốc
                 $originalFileName = $file->getClientOriginalName();
-
+        
                 // Tạo tên file mới bằng cách thêm ngày tháng và giờ
                 $newFileName = pathinfo($originalFileName, PATHINFO_FILENAME) . '_' . $bai_viet->BV_MA .'_'. $currentDateTime . '.' . $file->getClientOriginalExtension();
-                */
-                $file->move('public/file',$fileName);
+                
+                $file->move('public/file', $newFileName); 
+        
                 // Lưu thông tin tệp tin vào cơ sở dữ liệu
-                $data3['FDK_TEN']=$fileName;
+                $data3['FDK_TEN'] = $newFileName;
                 DB::table('file_dinh_kem')->insert($data3);
             }
         }
-        /*echo '<pre>';
-        print_r ($data);
-        echo '</pre>';*/
+        
         return Redirect::to('trang-chu');
     }
 
