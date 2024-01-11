@@ -105,7 +105,7 @@ class PostController extends Controller
         //File đính kèm
         $data3 = array();
         $data3['BV_MA']=$bai_viet->BV_MA;
-        if ($request->hasFile('FILE')) {
+        if ($request->hasFile('FILE')) { //In dữ liệu ra không phải mảng
             // Lặp qua mảng các tệp tin được gửi
             foreach ($request->file('FILE') as $file) {
                 // Lấy tên tệp tin để lưu vào cơ sở dữ liệu

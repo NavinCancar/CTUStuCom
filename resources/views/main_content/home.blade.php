@@ -144,47 +144,24 @@
             <!-- Lọc End -->
 
             <!--  Bài viết  -->
-            @foreach($bai_viet as $key => $bv)
-            <div class="card">
-              <div class="card-body p-4">
-                <div class="mb-3 mb-sm-0">
-                  <p>
-                    <a href="javascript:void(0)" class="text-body">
-                      <img src="public/images/users/<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'macdinh.png'?>" alt="" width="20" height="20" class="rounded-circle">
-                      <b>{{$bv->ND_HOTEN}}</b> 
-                    </a>
-                    đã đăng vào {{date('H:i d/m/Y', strtotime($bv->BV_THOIGIANDANG))}}
-                  </p>
-                  <a href="javascript:void(0)" class="text-dark mb-2">
-                    <h5 class="card-title fw-semibold post-title">{{$bv->BV_TIEUDE}}</h5>
-
-                    <span class="limited-lines">{{$bv->BV_NOIDUNG}}</span>
-                  </a>
-                  <div class="d-flex justify-content-end mt-2">
-                      <a class="ms-3 text-muted"><i class="fas fa-eye"></i> Lượt xem: <b>{{$bv->BV_LUOTXEM}}</b></a>
-                      <?php
-                        $count_thich_tim= $count_thich->where('BV_MA',$bv->BV_MA)->first();
-                        $count_binh_luan_tim= $count_binh_luan->where('BV_MA',$bv->BV_MA)->first();
-                      ?>
-                      <a class="ms-3 text-muted"><i class="fas fa-heart"></i> Thích: <b><?php if($count_thich_tim) echo $count_thich_tim->count; else echo 0;?></b></a>
-                      <a class="ms-3 text-muted"><i class="fas fa-reply"></i> Trả lời: <b><?php if($count_binh_luan_tim) echo $count_binh_luan_tim->count; else echo 0;?></b></a>
-                  </div>
-                  @if($bv->HP_MA)
-                  <?php
-                    $hoc_phan_tim= $hoc_phan->where('HP_MA',$bv->HP_MA)->first();
-                  ?>
-                  <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1"><i class="fa fa-folder"></i> {{$hoc_phan_tim->HP_MA}} {{$hoc_phan_tim->HP_TEN}}</span></a>
-                  @endif
-
-                  @foreach($hashtag_bai_viet as $key => $hbv)
-                    @if($bv->BV_MA==$hbv->BV_MA)
-                    <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#{{$hbv->H_HASHTAG}}</span></a>
-                    @endif
-                  @endforeach
-                </div>
-              </div>
+            <div id="post_container">
+              @include('main_component.post_loadmore')
             </div>
-            @endforeach
+
+            <div class="text-center">
+                <button class="btn btn-primary load-more-data"><i class="fa fa-refresh"></i> Xem thêm</button>
+            </div>
+            <!-- Data Loader -->
+            <div class="auto-load text-center" style="display: none;">
+                <svg version="1.1" id="L9" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                    x="0px" y="0px" height="60" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+                    <path fill="#000"
+                          d="M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50">
+                        <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s"
+                                          from="0 50 50" to="360 50 50" repeatCount="indefinite" />
+                    </path>
+                </svg>
+            </div>
           </div>
 
           <div class="col-lg-4">
@@ -433,4 +410,44 @@
       });
   </script>
   <!--Xử lý hashtag End-->
+
+  <!--Xử lý load more Start-->
+  <script>
+      var ENDPOINT = "{{ URL::to('/') }}"
+      var page = 1;
+
+      $(".load-more-data").click(function(){
+          page++;
+          infinteLoadMore(page);
+      });
+
+      /*------------------------------------------
+      --------------------------------------------
+      call infinteLoadMore()
+      --------------------------------------------
+      --------------------------------------------*/
+      function infinteLoadMore(page) {
+          $.ajax({
+              url: ENDPOINT + "?page=" + page,
+              datatype: "html",
+              type: "get",
+              beforeSend: function () {
+                  $('.auto-load').show();
+              }
+          })
+              .done(function (response) {
+                  if (response.html == '') {
+                      $('.auto-load').html("Rất tiếc! Không còn bài viết để hiển thị :(");
+                      $('.load-more-data').hide();
+                      return;
+                  }
+                  $('.auto-load').hide();
+                  $("#post_container").append(response.html);
+              })
+              .fail(function (jqXHR, ajaxOptions, thrownError) {
+                  console.log('Server error occured');
+              });
+      }
+  </script>
+  <!--Xử lý load more End-->
 @endsection
