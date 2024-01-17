@@ -113,8 +113,8 @@
 }
 
 .scroll-chat {
-  max-height: 320px; /* Đặt chiều cao tối đa cho phần scroll-chat */
-  overflow-y: auto; /* Kích hoạt cuộn dọc nếu nội dung vượt quá kích thước */
+  height: 320px; 
+  overflow-y: auto; 
 }
 
 .friend-chat{

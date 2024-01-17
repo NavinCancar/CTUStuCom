@@ -55,7 +55,7 @@
                       </span>
                     </a>
                     <hr>
-                    <div class="text-center mb-1"><a href="javascript:void(0)" class="card-link">Xem thêm</a></div>
+                    <div class="text-center mb-1"><a href="{{URL::to('/tin-nhan')}}" class="card-link">Xem thêm</a></div>
                   </div>
                 </div>
               </li>
