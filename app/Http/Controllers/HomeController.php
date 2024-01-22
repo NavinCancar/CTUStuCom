@@ -12,6 +12,27 @@ session_start();
 
 class HomeController extends Controller
 {
+    /*
+    |--------------------------------------------------------------------------
+    | NGƯỜI DÙNG
+    | - Hiển thị trang chủ
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Kiểm tra đăng nhập người dùng
+     */
+    public function AuthLogin_ND(){
+        $userLog = Session::get('userLog');
+        if($userLog){
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
+
+    /**
+     * Hiển thị trang chủ
+     */
     public function index(Request $request){
         //Bài viết Start
         $bai_viet = DB::table('bai_viet')

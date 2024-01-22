@@ -37,4 +37,4 @@ Route::post('/kiem-tra-dang-ky', 'App\Http\Controllers\UserSysController@u_store
 Route::resource('/bai-dang', 'App\Http\Controllers\PostController');
 
 
-Route::get('/tin-nhan', 'App\Http\Controllers\MessageController_FB@u_index');
+Route::resource('/tin-nhan', 'App\Http\Controllers\MessageController_FB')->only(['index', 'show']);

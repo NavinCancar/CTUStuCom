@@ -165,3 +165,11 @@
   text-overflow: ellipsis;
   max-width: 100%;
 }
+
+.disabled-link{
+  color: var(--bs-dark-text);
+}
+
+.disabled-link:hover{
+  color: var(--bs-dark-text);
+}

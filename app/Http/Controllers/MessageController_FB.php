@@ -16,9 +16,43 @@ session_start();
 
 class MessageController_FB extends Controller
 {
-    public function u_index()
+    /*
+    |--------------------------------------------------------------------------
+    | NGƯỜI DÙNG
+    | - Nhắn tin(*)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Kiểm tra đăng nhập người dùng
+     */
+    public function AuthLogin_ND(){
+        $userLog = Session::get('userLog');
+        if($userLog){
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
+
+    /**
+     * Nhắn tin
+     */
+
+    public function index()
     {
+        $this->AuthLogin_ND();
         return view('main_content.message');
     }
 
+    public function show(string $id)
+    {
+        $this->AuthLogin_ND();
+        
+        $userChat = DB::table('nguoi_dung')
+        ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+        ->where('ND_MA', $id)->first();
+
+        Session::put('userChat',$userChat);
+        return view('main_content.message');
+    }
 }

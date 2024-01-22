@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CTU Student Community</title>
-  <link rel="shortcut icon" type="image/png" href="{{('public/images/logos/logo.png')}}" />
+  <link rel="shortcut icon" type="image/png" href="{{asset('public/images/logos/logo.png')}}" />
 
   <!-- css -->
   <link rel="stylesheet" href="{{asset('public/css/bootstrap.min.css')}}" />

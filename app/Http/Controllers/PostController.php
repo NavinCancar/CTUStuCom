@@ -18,16 +18,17 @@ class PostController extends Controller
     /*
     |--------------------------------------------------------------------------
     | NGƯỜI DÙNG
+    | - Tạo bài đăng mới(*),
     |--------------------------------------------------------------------------
     */
 
     /**
      * Kiểm tra đăng nhập
      */
-    public function AuthLogin(){
+    public function AuthLogin_ND(){
         $userLog = Session::get('userLog');
-        if($userLog){}
-        else{
+        if($userLog){
+        }else{
             return Redirect::to('dang-nhap')->send();
         }
     }
@@ -42,7 +43,7 @@ class PostController extends Controller
 
     public function store(Request $request)
     {
-        $this->AuthLogin();
+        $this->AuthLogin_ND();
 
         $userLog = Session::get('userLog');
         //Bài viết

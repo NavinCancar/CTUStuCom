@@ -2,7 +2,7 @@
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="{{URL::to('/')}}" class="text-nowrap logo-img">
-            <img src="{{('public/images/logos/logo2.png')}}" width="230" alt="" />
+            <img src="{{asset('public/images/logos/logo2.png')}}" width="230" alt="" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="fa fa-times fs-8"></i>

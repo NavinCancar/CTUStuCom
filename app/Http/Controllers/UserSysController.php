@@ -18,10 +18,21 @@ class UserSysController extends Controller
     /*
     |--------------------------------------------------------------------------
     | NGƯỜI DÙNG
-    | - Đối với cá nhân: Đăng nhập, đăng xuất, đăng ký
+    | - Đối với cá nhân: Đăng nhập, đăng xuất(*), đăng ký
     | - Đối với người dùng khác: 
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * Kiểm tra đăng nhập người dùng
+     */
+    public function AuthLogin_ND(){
+        $userLog = Session::get('userLog');
+        if($userLog){
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
 
     //TÁC ĐỘNG TÀI KHOẢN CÁ NHÂN
 
@@ -33,7 +44,7 @@ class UserSysController extends Controller
         return view('login_content.login');
     }
 
-    public function login_check(Request $request) ////ok
+    public function login_check(Request $request) ///ok
     {
     	$ND_EMAIL = $request->ND_EMAIL;
         $ND_MATKHAU = $request->ND_MATKHAU;
@@ -68,6 +79,7 @@ class UserSysController extends Controller
      */
     public function logout() ///ok
     {
+        $this->AuthLogin_ND();
         Session::put('userLog',null);
         return Redirect::to('/trang-chu');
     }
@@ -175,21 +187,6 @@ class UserSysController extends Controller
     |   QUẢN TRỊ
     |--------------------------------------------------------------------------
     */
-
-    /**
-     * Kiểm tra vai trò
-     */
-    public function AuthLogin(){
-        $NV_MA = Session::get('NV_MA');
-        $CV_MA = DB::table('nhan_vien')->where('NV_MA',$NV_MA)->first();
-        if($NV_MA){
-            if($CV_MA->CV_MA != 1){
-                return Redirect::to('dashboard')->send();
-            }
-        }else{
-            return Redirect::to('admin')->send();
-        }
-    }
 
     /**
      * Display a listing of the resource.

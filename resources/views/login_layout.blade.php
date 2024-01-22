@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CTU Student Community</title>
-  <link rel="shortcut icon" type="image/png" href="{{('public/images/logos/logo.png')}}" />
+  <link rel="shortcut icon" type="image/png" href="{{asset('public/images/logos/logo.png')}}" />
 
   <!--css-->
   <link rel="stylesheet" href="{{asset('public/css/bootstrap.min.css')}}" />
@@ -50,7 +50,7 @@
             <div class="card mb-0">
               <div class="card-body">
                 <a href="{{URL::to('/')}}" class="text-nowrap logo-img text-center d-block py-1 w-100">
-                  <img src="{{('public/images/logos/logo2.png')}}" width="300px" alt="">
+                  <img src="{{asset('public/images/logos/logo2.png')}}" width="300px" alt="">
                 </a>
 
                 <?php
