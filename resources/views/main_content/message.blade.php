@@ -129,7 +129,7 @@
         //|KHAI BÁO FIRESTORE
         //|-----------------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, setDoc, addDoc, doc, collection, serverTimestamp, getDocs, query,  where, orderBy, limit, or } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, setDoc, addDoc, doc, collection, serverTimestamp, getDocs, query,  where, orderBy, limit, or, onSnapshot  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // TODO: Add SDKs for Firebase products that you want to use
         // https://firebase.google.com/docs/web/setup#available-libraries
@@ -151,7 +151,7 @@
 
 
         $(document).ready(function() {
-        
+            var justLoad = new Date();
             //|-----------------------------------------------------
             //|KIỂM TRA ĐƯỜNG DẪN
             //|-----------------------------------------------------
@@ -262,25 +262,26 @@
                 //|GỬI TIN NHẮN
                 //|-----------------------------------------------------
                 $("#message-btn").on("click", function(e) {
-                    //e.preventDefault();
+                    e.preventDefault();
 
                     var messForm = document.getElementById('message-form');
                     var TN_NOIDUNG = messForm.querySelector('textarea[name="TN_NOIDUNG"]').value;
 
-                    addDoc(collection(db, "messages"), {
-                        ND_GUI_MA: <?php echo $userLog->ND_MA; ?>,
-                        ND_NHAN_MA: <?php echo $userChat->ND_MA; ?>,
-                        TN_REALTIME: serverTimestamp(),
-                        TN_THOIGIANGUI: '<?php echo Carbon::now('Asia/Ho_Chi_Minh')->format("H:i d/m/Y"); ?>',
-                        TN_NOIDUNG: TN_NOIDUNG, // Use the value of the textarea
-                        TN_TRANGTHAI: 0,
-                    }).then(function(docRef) {
-                        console.log('Message đã gửi with ID: ', docRef.id);
-                        messForm.querySelector('textarea[name="TN_NOIDUNG"]').value = "";
-                    }).catch(function(error) {
-                        console.error('Error adding document: ', error);
-                    });
-                    
+                    if(TN_NOIDUNG!=""){
+                        addDoc(collection(db, "messages"), {
+                            ND_GUI_MA: <?php echo $userLog->ND_MA; ?>,
+                            ND_NHAN_MA: <?php echo $userChat->ND_MA; ?>,
+                            TN_REALTIME: serverTimestamp(),
+                            TN_THOIGIANGUI: '<?php echo Carbon::now('Asia/Ho_Chi_Minh')->format("H:i d/m/Y"); ?>',
+                            TN_NOIDUNG: TN_NOIDUNG, // Use the value of the textarea
+                            TN_TRANGTHAI: 0,
+                        }).then(function(docRef) {
+                            console.log('Message đã gửi with ID: ', docRef.id);
+                            messForm.querySelector('textarea[name="TN_NOIDUNG"]').value = "";
+                        }).catch(function(error) {
+                            console.error('Error adding document: ', error);
+                        });
+                    }
                 });
 
                 //|-----------------------------------------------------
@@ -387,6 +388,115 @@
                 });
             }
 
+
+            //|-----------------------------------------------------
+            //|BẮT SỰ KIỆN REALTIME
+            //|-----------------------------------------------------
+            //console.log(justLoad);
+
+            //NGHE TỪ BẢN THÂN GỬI ĐI
+            const userLogId = <?php echo $userLog->ND_MA; ?>;
+            const q4 = query(
+                collection(db, "messages"),
+                where("ND_GUI_MA", "==", userLogId),
+                where("TN_REALTIME", ">", justLoad),
+                orderBy("TN_REALTIME", "desc")
+            );
+
+            //console.log("Before onSnapshot");
+            const unsubscribe = onSnapshot(q4, (querySnapshot) => {
+                //console.log("Snapshot event received");
+
+                //const messages = [];
+                //Bắt tất cả dữ liệu đã có
+                /*querySnapshot.forEach((doc) => {
+
+                    const data = doc.id; //doc.data().TN_REALTIME
+                    if (data) {
+                        messages.push(data);
+                    } else {
+                        console.error("Document is missing 'id' field:", data);
+                    }
+                }*/
+
+                querySnapshot.docChanges().forEach((change) => {
+                    const data = change.doc.data(); // Cũng có thể dùng change.doc.id / change.doc.data().TN_REALTIME
+                    // Kiểm tra loại thay đổi
+                    if (change.type === "added") { //Tương tự có thể dùng modified hoặc removed
+                        //console.log("Document added:", data);
+
+                        //Người dùng đang trong cuộc trò chuyện cùng
+                        if(data.ND_NHAN_MA == <?php echo $userChat->ND_MA; ?>){
+                            var divData = 
+                                '<div class="d-flex flex-row justify-content-end">'+
+                                '    <div>'+
+                                '        <p class="fs-3 p-2 me-3 mb-1 text-white rounded-3 bg-primary">'+data.TN_NOIDUNG+'</p>'+
+                                '        <p class="fs-2 me-3 mb-3 rounded-3 text-muted">'+data.TN_THOIGIANGUI+'</p>'+
+                                '    </div>'+
+                                '    <img src="../public/images/users/<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo 'macdinh.png'?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
+                                '</div>';
+                            var chatbox = document.getElementById('chat-box');
+                            chatbox.insertAdjacentHTML('beforeend', divData);
+                            var messDiv = $('#chat-box');
+                            messDiv.scrollTop(messDiv[0].scrollHeight);
+                        }
+
+                    }
+                });
+                //console.log("Current data: ", messages.join(", "));
+            });
+
+            //NGHE TỪ CÁC BÊN GỬI ĐẾN
+            const q5 = query(
+                collection(db, "messages"),
+                where("ND_NHAN_MA", "==", userLogId),
+                where("TN_REALTIME", ">", justLoad),
+                orderBy("TN_REALTIME", "desc")
+            );
+
+            console.log("Before onSnapshot");
+            const unsubscribe2 = onSnapshot(q5, (querySnapshot) => {
+                console.log("Snapshot event received");
+
+                querySnapshot.docChanges().forEach((change) => {
+                    const data = change.doc.data(); 
+                    // Kiểm tra loại thay đổi
+                    if (change.type === "added") { 
+                        console.log("Document added:", data);
+
+                        //Người dùng đang trong cuộc trò chuyện cùng
+                        if(data.ND_GUI_MA == <?php echo $userChat->ND_MA; ?>){
+                            var divData = 
+                                '<div class="d-flex flex-row justify-content-start">'+
+                                '    <img src="../public/images/users/<?php if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'macdinh.png'?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
+                                '    <div>'+
+                                '        <p class="fs-3 p-2 ms-1 mb-1 rounded-3 friend-chat">'+data.TN_NOIDUNG+'</p>'+
+                                '        <p class="fs-2 ms-3 mb-3 rounded-3 text-muted float-end">'+data.TN_THOIGIANGUI+'</p>'+
+                                '    </div>'+
+                                '</div>';
+                            var chatbox = document.getElementById('chat-box');
+                            chatbox.insertAdjacentHTML('beforeend', divData);
+                            var messDiv = $('#chat-box');
+                            messDiv.scrollTop(messDiv[0].scrollHeight);
+                        }
+                    }
+
+                });
+            });
+
+            //Lệnh để dọn dẹp các sự kiện Realtime
+            /*const cleanup = () => {
+                console.log("Unsubscribing");
+                unsubscribe();
+            };
+
+            cleanup();
+            */
+
+
+            //|-----------------------------------------------------
+            //|HÀM XỬ LÝ KHÁC
+            //|-----------------------------------------------------
             function secondsDifference(realtime){
                 // Ngày giờ hiện tại
                 var currentDate = new Date();
