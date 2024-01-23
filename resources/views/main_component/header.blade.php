@@ -150,7 +150,7 @@
             <?php if($userLog) {?>//Không có dòng này navbar sẽ gây lỗi
 
               (async () => {
-                const q = query(
+                const qchat = query(
                   collection(db, "messages"), 
                   or(where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
                     where('ND_GUI_MA', '==', <?php echo $userLog->ND_MA; ?>)
@@ -158,10 +158,10 @@
                   orderBy("TN_REALTIME", "desc")
                 );
 
-                const querySnapshot = await getDocs(q);
+                const querySnapshotchat = await getDocs(qchat);
                 
                 //KHÔNG TỒN TẠI TIN NHẮN CŨ
-                if (querySnapshot.empty) {
+                if (querySnapshotchat.empty) {
                   //console.log('no data');
                   var divData = `<p class="text-center p-2">Bạn chưa có cuộc trò chuyện nào trước đây!</p>`;
 
@@ -176,7 +176,7 @@
                   //console.log('have data');
 
                   var user =[];
-                  querySnapshot.forEach((doc) => {
+                  querySnapshotchat.forEach((doc) => {
                       //doc.data() is never undefined for query doc snapshots
                       //console.log(doc.id, " => ", doc.data());
 
@@ -203,14 +203,14 @@
                       if (user.indexOf(checkUser) === -1 && user.length <= 5) {
                           user.push(checkUser);
                           (async () => {
-                            const q2 = query(
+                            const qufimg = query(
                               collection(db, "user_images"), 
                               where('ND_MA', '==', checkUser)
                             );
 
-                            const querySnapshot2 = await getDocs(q2);
+                            const querySnapshotufimg = await getDocs(qufimg);
                           
-                            querySnapshot2.forEach((doc) => {
+                            querySnapshotufimg.forEach((doc) => {
                               ND_ANHDAIDIEN2 = doc.data().ND_ANHDAIDIEN;
                               ND_HOTEN2 = doc.data().ND_HOTEN;
                             });
