@@ -122,7 +122,7 @@
         //|KHAI BÁO FIRESTORE
         //|-----------------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, collection, getDocs, query, where, orderBy, limit, or } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, collection, getDocs, query, where, orderBy, limit, or, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // TODO: Add SDKs for Firebase products that you want to use
         // https://firebase.google.com/docs/web/setup#available-libraries
@@ -144,11 +144,14 @@
 
 
         $(document).ready(function() {
-            //|-----------------------------------------------------
-            //|HIỆN CÁC THÔNG BÁO CHAT GẦN NHẤT
-            //|-----------------------------------------------------
-            <?php if($userLog) {?>//Không có dòng này navbar sẽ gây lỗi
 
+            <?php if($userLog) {?>//Không có dòng này navbar sẽ gây lỗi
+              var justLoad = new Date();
+              var userFormList = [];
+
+              //|-----------------------------------------------------
+              //|HIỆN CÁC THÔNG BÁO CHAT GẦN NHẤT
+              //|-----------------------------------------------------
               (async () => {
                 const qchat = query(
                   collection(db, "messages"), 
@@ -175,7 +178,6 @@
                 else{
                   //console.log('have data');
 
-                  var user =[];
                   querySnapshotchat.forEach((doc) => {
                       //doc.data() is never undefined for query doc snapshots
                       //console.log(doc.id, " => ", doc.data());
@@ -200,8 +202,8 @@
                       
                       var linkChat = <?php echo (json_encode(URL::to('/tin-nhan')).';'); ?>
                       //Checkuser chưa tồn tại trong mảng
-                      if (user.indexOf(checkUser) === -1 && user.length <= 5) {
-                          user.push(checkUser);
+                      if (userFormList.indexOf(checkUser) === -1 && userFormList.length < 5) {
+                          userFormList.push(checkUser);
                           (async () => {
                             const qufimg = query(
                               collection(db, "user_images"), 
@@ -217,12 +219,25 @@
                             //console.log(querySnapshot2);
                             //console.log(ND_ANHDAIDIEN2 +'-'+ ND_HOTEN2);
                             
+                            //Đếm số lượng tin nhắn chưa xem
+                            const qnocheck = query(
+                                collection(db, "messages"), 
+                                where("ND_NHAN_MA", "==", <?php echo $userLog->ND_MA ?>),
+                                where("ND_GUI_MA", "==", checkUser),
+                                where("TN_TRANGTHAI", "==", 0)
+                            );
+                            const querySnapshotnocheck = await getDocs(qnocheck);
+                            //console.log(querySnapshotnocheck);
+                            var noCheckMess = querySnapshotnocheck.size;
+
                             var divData = 
-                                '<a href="'+linkChat+'/'+checkUser+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1" style="flex-wrap: wrap;">'+
+                                '<a data-value="'+checkUser+'" href="'+linkChat+'/'+checkUser+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1" style="flex-wrap: wrap;">'+
                                 '  <img src="public/images/users/'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'macdinh.png') +'" alt="" width="35" height="35"'+
                                 '    class="rounded-circle">'+
                                 '  <span class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">'+
-                                '  <b>'+ND_HOTEN2+'</b><br>' + (checkUser == doc.data().ND_NHAN_MA ? '<i>Bạn: </i>' : '') + doc.data().TN_NOIDUNG+
+                                '  <b>'+ND_HOTEN2+'</b>' +
+                                ((noCheckMess == 0)? '' : '<span class="badge bg-primary rounded-pill float-end fs-1 ms-2">'+ noCheckMess +'</span>' ) + '<br>'+
+                                (checkUser == doc.data().ND_NHAN_MA ? '<i>Bạn: </i>' : '') + doc.data().TN_NOIDUNG+
                                 '  </span>'+
                                 '</a>';
 
@@ -233,7 +248,7 @@
                               console.error("Error in script: ", error);
                           });
                       }
-                      else if(user.length > 5){
+                      else if(userFormList.length >= 5){
                         return; //forEach không cho break
                       }
                       else{}
@@ -243,6 +258,129 @@
               })().catch((error) => {
                   console.error("Error in script: ", error);
               });
+
+
+              //|-----------------------------------------------------
+              //|BẮT SỰ KIỆN REALTIME
+              //|-----------------------------------------------------
+              //console.log(justLoad);
+
+              const qrealchat = query(
+                  collection(db, "messages"),
+                  (or(where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
+                      where('ND_GUI_MA', '==', <?php echo $userLog->ND_MA; ?>)),
+                  where("TN_REALTIME", ">", justLoad)),
+                  orderBy("TN_REALTIME", "desc")
+              );
+
+              //console.log("Before onSnapshot");
+              const unsubscriberealchat = onSnapshot(qrealchat, (querySnapshot) => {
+                  //console.log("Snapshot event received");
+                  //console.log(userFormList);
+                  querySnapshot.docChanges().forEach((change) => {
+                      const data = change.doc.data(); // Cũng có thể dùng change.doc.id / change.doc.data().TN_REALTIME
+                      // Kiểm tra loại thay đổi
+                      if (change.type === "added") { //Tương tự có thể dùng modified hoặc removed
+                          //console.log("Document added:", data);
+                          //console.log(userFormList);
+                          //|-----------------------------------------------------
+                          //|LẮNG NGHE SỰ KIỆN TRÊN KHUNG LIST FRIEND NOTI
+                          //|-----------------------------------------------------
+                          var ND_ANHDAIDIEN2 ="";
+                          var ND_HOTEN2 = "";
+                          var linkChat = <?php echo (json_encode(URL::to('/tin-nhan')).';'); ?>
+                          var checkUser =0;
+                              //|-----------------------------------------------------
+                              //|LẤY MÃ NGƯỜI NHẮN TIN CÙNG
+                              //|-----------------------------------------------------
+                              if(data.ND_NHAN_MA == <?php echo $userLog->ND_MA; ?>){ 
+                                  checkUser = data.ND_GUI_MA
+                              }
+                              else{
+                                  checkUser = data.ND_NHAN_MA
+                              }
+
+                          //Người vừa nhắn tin chưa tồn tại trong mảng
+                          if (userFormList.indexOf(checkUser) === -1) {
+                            if (userFormList.length >= 5) {
+                              var lastElement = userFormList[4];
+                              //console.log(lastElement);
+                              removeAByValue(lastElement);
+                              // Xoá phần tử cuối cùng
+                              userFormList.pop();
+                            }
+                            //thêm đầu mảng, push là thêm cuối mảng
+                            userFormList.unshift(checkUser);
+                          }
+                          //Có tồn tại trong mảng rồi
+                          else{
+                              removeAByValue(checkUser);
+                          }
+                          
+                          (async () => {
+                              //Lấy tên và ảnh người dùng
+                              const qfriend = query(
+                                  collection(db, "user_images"), 
+                                  where('ND_MA', '==', checkUser)
+                              );
+
+                              const querySnapshotfriend = await getDocs(qfriend);
+                          
+                              querySnapshotfriend.forEach((doc) => {
+                                  ND_ANHDAIDIEN2 = doc.data().ND_ANHDAIDIEN;
+                                  ND_HOTEN2 = doc.data().ND_HOTEN;
+                              });
+
+                              //Đếm số lượng tin nhắn chưa xem
+                              const qnocheck = query(
+                                  collection(db, "messages"), 
+                                  where("ND_NHAN_MA", "==", <?php echo $userLog->ND_MA ?>),
+                                  where("ND_GUI_MA", "==", checkUser),
+                                  where("TN_TRANGTHAI", "==", 0)
+                              );
+                              const querySnapshotnocheck = await getDocs(qnocheck);
+                              //console.log(querySnapshotnocheck);
+                              var noCheckMess = querySnapshotnocheck.size;
+                              
+                              var divData = 
+                                '<a data-value="'+checkUser+'" href="'+linkChat+'/'+checkUser+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1" style="flex-wrap: wrap;">'+
+                                '  <img src="public/images/users/'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'macdinh.png') +'" alt="" width="35" height="35"'+
+                                '    class="rounded-circle">'+
+                                '  <span class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">'+
+                                '  <b>'+ND_HOTEN2+'</b>' +
+                                ((noCheckMess == 0)? '' : '<span class="badge bg-primary rounded-pill float-end fs-1 ms-2">'+ noCheckMess +'</span>' ) + '<br>'+
+                                (checkUser == data.ND_NHAN_MA ? '<i>Bạn: </i>' : '') + data.TN_NOIDUNG +
+                                '  </span>'+
+                                '</a>';
+
+                              var chatmess = document.getElementById('chat-message');
+                              chatmess.insertAdjacentHTML('afterbegin', divData);
+                          })().catch((error) => {
+                              console.error("Error in script: ", error);
+                          });
+                      }
+                  });
+                  //console.log("Current data: ", messages.join(", "));
+              });
+
+              //|-----------------------------------------------------
+              //|HÀM XỬ LÝ KHÁC
+              //|-----------------------------------------------------
+
+              //XOÁ LI CÓ DATA-VALUE YÊU CẦU
+              function removeAByValue(value) {
+                  var div = document.getElementById('chat-message');
+
+                  var as = div.querySelectorAll('a[data-value]');
+
+                  // Lặp qua từng li để tìm li có data-value trùng với giá trị cần xoá
+                  as.forEach(function(a) {
+                      var aValue = parseInt(a.getAttribute('data-value'));
+                      if (aValue === value) {
+                          a.parentNode.removeChild(a);
+                      }
+                  });
+              }
 
             <?php } ?>
         });

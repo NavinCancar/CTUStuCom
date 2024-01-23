@@ -87,7 +87,7 @@
                             </form>
                         </div>
 
-                        <div class="scroll-chat">
+                        <div class="scroll-chat" id="list-scroll">
                             <ul class="list-unstyled mb-0" id="list-friend">
                                 <!--<li class="p-2 border-bottom">
                                     <a href="#" class="d-flex justify-content-between">
@@ -146,6 +146,7 @@
 
         $(document).ready(function() {
             var justLoad = new Date();
+            var userFormList = [];
             //|-----------------------------------------------------
             //|KIỂM TRA ĐƯỜNG DẪN
             //|-----------------------------------------------------
@@ -307,7 +308,6 @@
                     }
                     //TỒN TẠI TIN NHẮN CŨ
                     else{
-                    var user =[];
                     querySnapshotlist.forEach((doc) => {
                         var checkUser =0;
                         var ND_ANHDAIDIEN2 ="";
@@ -329,8 +329,8 @@
                         
                         var linkChat = <?php echo (json_encode(URL::to('/tin-nhan')).';'); ?>
                         //Checkuser chưa tồn tại trong mảng
-                        if (user.indexOf(checkUser) === -1 && user.length <= 5) {
-                            user.push(checkUser);
+                        if (userFormList.indexOf(checkUser) === -1) {
+                            userFormList.push(checkUser);
                             (async () => {
                                 //Lấy tên và ảnh người dùng
                                 const qfriend = query(
@@ -351,15 +351,16 @@
                                 //Đếm số lượng tin nhắn chưa xem
                                 const qnocheck = query(
                                     collection(db, "messages"), 
+                                    where("ND_NHAN_MA", "==", <?php echo $userLog->ND_MA ?>),
                                     where("ND_GUI_MA", "==", checkUser),
                                     where("TN_TRANGTHAI", "==", 0)
                                 );
                                 const querySnapshotnocheck = await getDocs(qnocheck);
-                                //console.log('count: ', querySnapshotnocheck.size);
+                                //console.log(querySnapshotnocheck);
                                 var noCheckMess = querySnapshotnocheck.size;
                                 
                                 var divData = 
-                                    '<li class="p-2 border-bottom">'+
+                                    '<li data-value="'+checkUser+'" class="p-2 border-bottom">'+
                                     '    <a href="'+linkChat+'/'+checkUser+'" class="d-flex justify-content-between">'+
                                     '        <div class="d-flex flex-row" style="max-width:200px">'+
                                     '            <div>'+
@@ -385,9 +386,6 @@
                                 console.error("Error in script: ", error);
                             });
                         }
-                        else if(user.length > 5){
-                            return; //forEach không cho break
-                        }
                         else{}
                     });
                     }
@@ -402,17 +400,16 @@
                 //|-----------------------------------------------------
                 //console.log(justLoad);
 
-                //NGHE TỪ BẢN THÂN GỬI ĐI => HIỆN TIN NHẮN BẢN THÂN
-                const userLogId = <?php echo $userLog->ND_MA; ?>;
-                const quchat = query(
+                const qrealchat = query(
                     collection(db, "messages"),
-                    where("ND_GUI_MA", "==", userLogId),
-                    where("TN_REALTIME", ">", justLoad),
+                    (or(where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
+                        where('ND_GUI_MA', '==', <?php echo $userLog->ND_MA; ?>)),
+                    where("TN_REALTIME", ">", justLoad)),
                     orderBy("TN_REALTIME", "desc")
                 );
 
                 //console.log("Before onSnapshot");
-                const unsubscribeuchat = onSnapshot(quchat, (querySnapshot) => {
+                const unsubscriberealchat = onSnapshot(qrealchat, (querySnapshot) => {
                     //console.log("Snapshot event received");
 
                     //const messages = [];
@@ -433,7 +430,7 @@
                         if (change.type === "added") { //Tương tự có thể dùng modified hoặc removed
                             //console.log("Document added:", data);
 
-                            //Người dùng đang trong cuộc trò chuyện cùng
+                            //NGHE TỪ BẢN THÂN GỬI ĐI => HIỆN TIN NHẮN BẢN THÂN => NGƯỜI ĐANG CÙNG TRÒ CHUYỆN
                             if(data.ND_NHAN_MA == <?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>){
                                 var divData = 
                                     '<div class="d-flex flex-row justify-content-end">'+
@@ -449,30 +446,7 @@
                                 messDiv.scrollTop(messDiv[0].scrollHeight);
                             }
 
-                        }
-                    });
-                    //console.log("Current data: ", messages.join(", "));
-                });
-
-                //NGHE TỪ CÁC BÊN GỬI ĐẾN => HIỆN TIN NHẮN MỌI NGƯỜI
-                const qufchat = query(
-                    collection(db, "messages"),
-                    where("ND_NHAN_MA", "==", userLogId),
-                    where("TN_REALTIME", ">", justLoad),
-                    orderBy("TN_REALTIME", "desc")
-                );
-
-                console.log("Before onSnapshot");
-                const unsubscribeufchat = onSnapshot(qufchat, (querySnapshot) => {
-                    console.log("Snapshot event received");
-
-                    querySnapshot.docChanges().forEach((change) => {
-                        const data = change.doc.data(); 
-                        // Kiểm tra loại thay đổi
-                        if (change.type === "added") { 
-                            console.log("Document added:", data);
-
-                            //Người dùng đang trong cuộc trò chuyện cùng
+                            //NGHE TỪ CÁC BÊN GỬI ĐẾN => HIỆN TIN NHẮN NGƯỜI ĐANG CHAT CÙNG
                             if(data.ND_GUI_MA == <?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>){
                                 var divData = 
                                     '<div class="d-flex flex-row justify-content-start">'+
@@ -488,19 +462,89 @@
                                 messDiv.scrollTop(messDiv[0].scrollHeight);
                                 seenChat(<?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>);
                             }
+                                
+                            //|-----------------------------------------------------
+                            //|LẮNG NGHE SỰ KIỆN TRÊN KHUNG LIST FRIEND
+                            //|-----------------------------------------------------
+                            var ND_ANHDAIDIEN2 ="";
+                            var ND_HOTEN2 = "";
+                            var linkChat = <?php echo (json_encode(URL::to('/tin-nhan')).';'); ?>
+                            var checkUser =0;
+                                //|-----------------------------------------------------
+                                //|LẤY MÃ NGƯỜI NHẮN TIN CÙNG
+                                //|-----------------------------------------------------
+                                if(data.ND_NHAN_MA == <?php echo $userLog->ND_MA; ?>){ 
+                                    checkUser = data.ND_GUI_MA
+                                }
+                                else{
+                                    checkUser = data.ND_NHAN_MA
+                                }
+
+                            //Người vừa nhắn tin chưa tồn tại trong mảng
+                            if (userFormList.indexOf(checkUser) === -1) {
+                                userFormList.push(checkUser);
+                            }
+                            //Có tồn tại trong mảng rồi
+                            else{
+                                removeLiByValue(checkUser);
+                            }
+                            
+                            (async () => {
+                                //Lấy tên và ảnh người dùng
+                                const qfriend = query(
+                                    collection(db, "user_images"), 
+                                    where('ND_MA', '==', checkUser)
+                                );
+
+                                const querySnapshotfriend = await getDocs(qfriend);
+                            
+                                querySnapshotfriend.forEach((doc) => {
+                                    ND_ANHDAIDIEN2 = doc.data().ND_ANHDAIDIEN;
+                                    ND_HOTEN2 = doc.data().ND_HOTEN;
+                                });
+
+                                //Đếm số lượng tin nhắn chưa xem
+                                const qnocheck = query(
+                                    collection(db, "messages"), 
+                                    where("ND_NHAN_MA", "==", <?php echo $userLog->ND_MA ?>),
+                                    where("ND_GUI_MA", "==", checkUser),
+                                    where("TN_TRANGTHAI", "==", 0)
+                                );
+                                const querySnapshotnocheck = await getDocs(qnocheck);
+                                //console.log(querySnapshotnocheck);
+                                var noCheckMess = querySnapshotnocheck.size;
+                                
+                                var divData = 
+                                    '<li data-value="'+checkUser+'" class="p-2 border-bottom">'+
+                                    '    <a href="'+linkChat+'/'+checkUser+'" class="d-flex justify-content-between">'+
+                                    '        <div class="d-flex flex-row" style="max-width:200px">'+
+                                    '            <div>'+
+                                    '                <img src="../public/images/users/'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'macdinh.png') +'" alt="" '+
+                                    '                    width="40" height="40" class="rounded-circle me-2">'+
+                                    '            </div>'+
+                                    '            <div class="pt-1">'+
+                                    '                <p class="fw-bold mb-0">'+ND_HOTEN2+'</p>'+
+                                    '                <p class="small text-muted">' + (checkUser == data.ND_NHAN_MA ? '<i>Bạn: </i>' : '') + data.TN_NOIDUNG +'</p>'+
+                                    '            </div>'+
+                                    '        </div>'+
+                                    '        <div class="pt-1">'+
+                                    '            <p class="small text-muted mb-0">'+ (secondsDifference(data.TN_REALTIME.toDate()) == -1 ? data.TN_THOIGIANGUI : secondsDifference(data.TN_REALTIME.toDate())) +'</p>'+
+                                    ((noCheckMess == 0)? '' : '<span class="badge bg-primary rounded-pill float-end fs-1">'+ noCheckMess +'</span>' ) +
+                                    '        </div>'+
+                                    '    </a>'+
+                                    '</li>';
+
+                                var chatmess = document.getElementById('list-friend');
+                                chatmess.insertAdjacentHTML('afterbegin', divData);
+                                var listDiv = $('#list-scroll');
+                                listDiv.scrollTop(0);
+                            })().catch((error) => {
+                                console.error("Error in script: ", error);
+                            });
                         }
-
                     });
+                    //console.log("Current data: ", messages.join(", "));
                 });
-
-                //Lệnh để dọn dẹp các sự kiện Realtime
-                /*const cleanup = () => {
-                    console.log("Unsubscribing");
-                    unsubscribe();
-                };
-                cleanup();
-                */
-
             }
 
             //|-----------------------------------------------------
@@ -534,6 +578,7 @@
 
             //ĐÁNH DẤU ĐÃ ĐỌC TIN NHẮN
             function seenChat(userChat){
+                //console.log(userChat);
                 (async () => {
                     const qupdatett = query(
                         collection(db, "messages"),
@@ -561,6 +606,24 @@
                     // The updates are complete
                 })().catch((error) => {
                     console.error("Error in script: ", error);
+                });
+            }
+
+            //XOÁ LI CÓ DATA-VALUE YÊU CẦU
+            function removeLiByValue(value) {
+                // Lấy thẻ ul
+                var ul = document.getElementById('list-friend');
+
+                // Lấy tất cả các li có data-value bên trong ul
+                var lis = ul.querySelectorAll('li[data-value]');
+
+                // Lặp qua từng li để tìm li có data-value trùng với giá trị cần xoá
+                lis.forEach(function(li) {
+                    var liValue = parseInt(li.getAttribute('data-value'));
+                    if (liValue === value) {
+                        // Nếu tìm thấy, xoá li
+                        li.parentNode.removeChild(li);
+                    }
                 });
             }
         });
