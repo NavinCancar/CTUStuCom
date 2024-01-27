@@ -33,7 +33,8 @@
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop3" data-bs-toggle="dropdown"
                   aria-expanded="false">
                   <i class="fab fa-facebook-messenger"></i>
-                  <div class="notification bg-primary rounded-circle"></div>
+                  <!--<div class="notification bg-primary rounded-circle" id="message-circle" style="display:none"></div>-->
+                  <span class="badge rounded-pill bg-primary float-end fs-1 px-2" id="message-circle" style="display:none; position: relative;top: -10px; left: -7px"></span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop3">
                   <div class="message-body">
@@ -85,7 +86,7 @@
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown"
                   aria-expanded="false">
-                  <img src="public/images/users/<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo 'macdinh.png'?>" alt="" width="35" height="35" class="rounded-circle">
+                  <img src="<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="35" height="35" class="rounded-circle">
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
                   <div class="message-body">
@@ -154,7 +155,7 @@
               //|-----------------------------------------------------
               (async () => {
                 const qchat = query(
-                  collection(db, "messages"), 
+                  collection(db, "TIN_NHAN"), 
                   or(where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
                     where('ND_GUI_MA', '==', <?php echo $userLog->ND_MA; ?>)
                   ),
@@ -177,6 +178,22 @@
                 //TỒN TẠI TIN NHẮN CŨ
                 else{
                   //console.log('have data');
+                  //|-----------------------------------------------------
+                  //|ICON MESSAGE
+                  //|-----------------------------------------------------
+                  const qiconmess = query(
+                    collection(db, "TIN_NHAN"), 
+                    where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
+                    where("TN_TRANGTHAI", "==", 0)
+                  );
+                  const querySnapshoticonmess = await getDocs(qiconmess);
+                  //console.log(querySnapshotnocheck);
+                  var noCheckMessSum = querySnapshoticonmess.size;
+                  if (noCheckMessSum != 0){
+                    var messcircle = document.getElementById('message-circle');
+                    messcircle.innerHTML = noCheckMessSum;
+                    messcircle.style.display = "block";
+                  }
 
                   querySnapshotchat.forEach((doc) => {
                       //doc.data() is never undefined for query doc snapshots
@@ -206,7 +223,7 @@
                           userFormList.push(checkUser);
                           (async () => {
                             const qufimg = query(
-                              collection(db, "user_images"), 
+                              collection(db, "ANH_DAI_DIEN"), 
                               where('ND_MA', '==', checkUser)
                             );
 
@@ -221,7 +238,7 @@
                             
                             //Đếm số lượng tin nhắn chưa xem
                             const qnocheck = query(
-                                collection(db, "messages"), 
+                                collection(db, "TIN_NHAN"), 
                                 where("ND_NHAN_MA", "==", <?php echo $userLog->ND_MA ?>),
                                 where("ND_GUI_MA", "==", checkUser),
                                 where("TN_TRANGTHAI", "==", 0)
@@ -232,12 +249,12 @@
 
                             var divData = 
                                 '<a data-value="'+checkUser+'" href="'+linkChat+'/'+checkUser+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1" style="flex-wrap: wrap;">'+
-                                '  <img src="public/images/users/'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'macdinh.png') +'" alt="" width="35" height="35"'+
+                                '  <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
                                 '    class="rounded-circle">'+
                                 '  <span class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">'+
                                 '  <b>'+ND_HOTEN2+'</b>' +
                                 ((noCheckMess == 0)? '' : '<span class="badge bg-primary rounded-pill float-end fs-1 ms-2">'+ noCheckMess +'</span>' ) + '<br>'+
-                                (checkUser == doc.data().ND_NHAN_MA ? '<i>Bạn: </i>' : '') + doc.data().TN_NOIDUNG+
+                                (checkUser == doc.data().ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (doc.data().TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : doc.data().TN_NOIDUNG) +
                                 '  </span>'+
                                 '</a>';
 
@@ -266,7 +283,7 @@
               //console.log(justLoad);
 
               const qrealchat = query(
-                  collection(db, "messages"),
+                  collection(db, "TIN_NHAN"),
                   (or(where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
                       where('ND_GUI_MA', '==', <?php echo $userLog->ND_MA; ?>)),
                   where("TN_REALTIME", ">", justLoad)),
@@ -278,6 +295,29 @@
                   //console.log("Snapshot event received");
                   //console.log(userFormList);
                   querySnapshot.docChanges().forEach((change) => {
+
+                      //|-----------------------------------------------------
+                      //|ICON MESSAGE
+                      //|-----------------------------------------------------
+                      (async () => {
+                        const qiconmess = query(
+                          collection(db, "TIN_NHAN"), 
+                          where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
+                          where("TN_TRANGTHAI", "==", 0)
+                        );
+                        const querySnapshoticonmess = await getDocs(qiconmess);
+                        //console.log(querySnapshotnocheck);
+                        var noCheckMessSum = querySnapshoticonmess.size;
+                        if (noCheckMessSum != 0){
+                          var messcircle = document.getElementById('message-circle');
+                          messcircle.innerHTML = noCheckMessSum;
+                          messcircle.style.display = "block";
+                        }
+                      })().catch((error) => {
+                          console.error("Error in script: ", error);
+                      });
+                      
+
                       const data = change.doc.data(); // Cũng có thể dùng change.doc.id / change.doc.data().TN_REALTIME
                       // Kiểm tra loại thay đổi
                       if (change.type === "added") { //Tương tự có thể dùng modified hoặc removed
@@ -320,7 +360,7 @@
                           (async () => {
                               //Lấy tên và ảnh người dùng
                               const qfriend = query(
-                                  collection(db, "user_images"), 
+                                  collection(db, "ANH_DAI_DIEN"), 
                                   where('ND_MA', '==', checkUser)
                               );
 
@@ -333,7 +373,7 @@
 
                               //Đếm số lượng tin nhắn chưa xem
                               const qnocheck = query(
-                                  collection(db, "messages"), 
+                                  collection(db, "TIN_NHAN"), 
                                   where("ND_NHAN_MA", "==", <?php echo $userLog->ND_MA ?>),
                                   where("ND_GUI_MA", "==", checkUser),
                                   where("TN_TRANGTHAI", "==", 0)
@@ -344,12 +384,12 @@
                               
                               var divData = 
                                 '<a data-value="'+checkUser+'" href="'+linkChat+'/'+checkUser+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1" style="flex-wrap: wrap;">'+
-                                '  <img src="public/images/users/'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'macdinh.png') +'" alt="" width="35" height="35"'+
+                                '  <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
                                 '    class="rounded-circle">'+
                                 '  <span class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">'+
                                 '  <b>'+ND_HOTEN2+'</b>' +
                                 ((noCheckMess == 0)? '' : '<span class="badge bg-primary rounded-pill float-end fs-1 ms-2">'+ noCheckMess +'</span>' ) + '<br>'+
-                                (checkUser == data.ND_NHAN_MA ? '<i>Bạn: </i>' : '') + data.TN_NOIDUNG +
+                                (checkUser == data.ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (data.TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : data.TN_NOIDUNG) +
                                 '  </span>'+
                                 '</a>';
 
@@ -367,7 +407,7 @@
               //|HÀM XỬ LÝ KHÁC
               //|-----------------------------------------------------
 
-              //XOÁ LI CÓ DATA-VALUE YÊU CẦU
+              //XOÁ A CÓ DATA-VALUE YÊU CẦU
               function removeAByValue(value) {
                   var div = document.getElementById('chat-message');
 

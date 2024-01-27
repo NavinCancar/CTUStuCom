@@ -173,3 +173,8 @@
 .disabled-link:hover{
   color: var(--bs-dark-text);
 }
+
+.disabled-mess{
+  pointer-events: none;
+  color: var(--bs-dark-text);
+}

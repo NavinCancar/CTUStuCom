@@ -5,7 +5,7 @@
                   <div class="mb-3 mb-sm-0">
                     <p>
                       <a href="javascript:void(0)" class="text-body">
-                        <img src="public/images/users/<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'macdinh.png'?>" alt="" width="20" height="20" class="rounded-circle">
+                        <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="20" height="20" class="rounded-circle">
                         <b>{{$bv->ND_HOTEN}}</b> 
                       </a>
                       đã đăng vào {{date('H:i d/m/Y', strtotime($bv->BV_THOIGIANDANG))}}
