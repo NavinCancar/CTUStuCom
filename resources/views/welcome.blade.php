@@ -41,7 +41,7 @@
   </style>
 </head>
 
-<body>
+<body id="main-body">
   <?php $userLog= Session::get('userLog'); ?>
 
   <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"

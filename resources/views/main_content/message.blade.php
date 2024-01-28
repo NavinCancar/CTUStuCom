@@ -51,17 +51,17 @@
                                     <i class="fas fa-paperclip"></i>
                                 </label>
                                 <!-- Input type file ẩn -->
-                                <input name="TN_FDK[]" type="file" id="file-input" style="display: none" multiple accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .xls, .xlsx"/>
+                                <input name="TN_FDK[]" type="file" id="file-input" style="display: none" multiple accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx"/>
                                 <button type="submit" id="message-btn" class="btn text-primary"><i class="fas fa-paper-plane"></i></button>
                             </form>
                             <!-- File Container -->
                             <div id="selected-files-container" class=" m-2 ">
-                                <!--<span class="badge bg-danger rounded-3 fw-semiboldms-0 p-1 px-3">
+                                <!--<span class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3">
                                     <a class="text-white" href="../assets/file/TB4823-DHCT_Thong bao Vv dang ky hoc cung luc hai chuong trinh nam 2024.pdf">
                                     <i class="far fa-file-pdf"></i>
                                         TB4823-DHCT_Thong bao Vv dang ky hoc cung luc hai chuong trinh nam 2024.pdf
                                     </a>
-                                    <button class="btn btn-danger btn-sm"><i class="fas fa-bookmark"></i></button>
+                                    <button class="btn btn-secondary btn-sm"><i class="fas fa-bookmark"></i></button>
                                 </span>-->
                             </div>
                             <!-- Images Container -->
@@ -78,23 +78,108 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <button class="btn btn-primary btn-block me-2 mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#kholuutru">
+                <button class="btn btn-primary btn-block me-2 mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#kholuutru" id="kholuutru-btn">
                     <i class="fas fa-box"></i> Kho lưu trữ
                 </button>
                 <!-- Kho lưu trữ Start-->
                 <div class="offcanvas offcanvas-end" id="kholuutru">
                     <div class="offcanvas-header">
-                        <h1 class="offcanvas-title">Heading</h1>
+                        <h1 class="offcanvas-title">Kho lưu trữ</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
                     </div>
                     <div class="offcanvas-body">
-                        <p>Some text lorem ipsum.</p>
-                        <p>Some text lorem ipsum.</p>
-                        <p>Some text lorem ipsum.</p>
-                        <button class="btn btn-secondary" type="button">A Button</button>
+                        
+                        <div class="card">
+                            <div class="card-body p-3">
+                                <h4>Ảnh</h4>
+                                <ul class="list-unstyled mb-0 row" id="list-images">
+                                    <!--<span class="col-md-3 col-sm-4 rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block mb-3">
+                                        <a target="_blank" href="https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/files%2F1706364777868_screenshot_1705728200.png?alt=media&amp;token=d49a6560-f0c5-4208-ba42-50ae8fd39e03" previewlistener="true">
+                                            <img src="https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/files%2F1706364777868_screenshot_1705728200.png?alt=media&amp;token=d49a6560-f0c5-4208-ba42-50ae8fd39e03" width="100px" height="100px" alt="1706364777868_screenshot_1705728200.png" class="d-block mx-auto">
+                                        </a>
+                                        <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);">
+                                            <i class="fas fa-bookmark"></i>
+                                        </button>
+                                    </span>
+                                    <div class="text-center">
+                                        <button class="btn btn-secondary mt-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#kholuutrudetail"> Xem thêm</button>
+                                    </div>-->
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body p-3">
+                                <h4>File</h4>
+                                <ul class="list-unstyled mb-0 row" id="list-documents">
+                                    <!--<li data-value="4" class="p-2 border-bottom">
+                                        <a href="http://localhost/ctustucom/tin-nhan/4" class="d-flex justify-content-between">
+                                            <div class="d-flex flex-row" style="max-width:200px">
+                                                <div>
+                                                    <i class="fas fa-file-pdf me-2 document-icon"></i>
+                                                </div>
+                                                <div class="pt-1">
+                                                    <p class="fw-bold mb-0"> 1706363718753_Book1.pdf</p>
+                                                    <p class="small text-muted"><i>Từ: </i><i>Hoàng Mai Trang</i></p>
+                                                </div>
+                                            </div>
+                                            <div class="pt-1">            
+                                                <button class="btn btn-secondary btn-sm"><i class="fas fa-bookmark"></i></button>       
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <div class="text-center">
+                                        <button class="btn btn-secondary mt-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#kholuutrudetail"> Xem thêm</button>
+                                    </div>-->
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body p-3">
+                                <h4>Link</h4>
+                                <ul class="list-unstyled mb-0 row"  id="list-links">
+                                    <!--<li data-value="4" class="p-2 border-bottom">
+                                        <a href="http://localhost/ctustucom/tin-nhan/4" class="d-flex justify-content-between">
+                                            <div class="d-flex flex-row" style="max-width:200px">
+                                                <div>
+                                                    <i class="fas fa-link me-2 document-icon"></i>
+                                                </div>
+                                                <div class="pt-1">
+                                                    <p class="fw-bold mb-0"> 1706363718753_Book1.pdf</p>
+                                                    <p class="small text-muted"><i>Từ: </i><i>Hoàng Mai Trang</i></p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <div class="text-center">
+                                        <button class="btn btn-secondary mt-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#kholuutrudetail"> Xem thêm</button>
+                                    </div>-->
+                                </ul>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 <!-- Kho lưu trữ End-->
+                
+                <!-- Kho lưu trữ Detail Start-->
+                <div class="offcanvas offcanvas-end" id="kholuutrudetail">
+                    <div class="offcanvas-header">
+                        <h1 class="offcanvas-title" id="detail-title"></h1>
+                        <button type="button" class="btn-close" data-bs-toggle="offcanvas" data-bs-target="#kholuutru"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <div class="card">
+                            <div class="card-body p-3">
+                                <ul class="list-unstyled mb-0 row" id="detail-body">
+                                    
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Kho lưu trữ Detail End-->
+
+                
                 <!-- DS bạn Start -->
                 <div class="card">
                     <div class="card-body p-3">
@@ -290,7 +375,7 @@
                                         const fileName = doc2.data().FDK_TEN;
                                         const fileLink = doc2.data().FDK_DUONGDAN;
                                         
-                                        divData += '<div class="d-flex flex-row justify-content-end">' + showFileMessage(fileName, fileLink) + '</div>';
+                                        divData += '<div class="d-flex flex-row justify-content-end">' + showFileMessage(fileName, fileLink, '') + '</div>';
                                     });
 
                                     divData +=
@@ -326,7 +411,7 @@
                                         const fileName = doc2.data().FDK_TEN;
                                         const fileLink = doc2.data().FDK_DUONGDAN;
                                         
-                                        divData += '<div class="d-flex flex-row justify-content-start">' + showFileMessage(fileName, fileLink) + '</div>';
+                                        divData += '<div class="d-flex flex-row justify-content-start">' + showFileMessage(fileName, fileLink, 'friend-chat') + '</div>';
                                     });
 
                                     divData +=
@@ -654,7 +739,7 @@
                                             const fileName = doc2.data().FDK_TEN;
                                             const fileLink = doc2.data().FDK_DUONGDAN;
                                             
-                                            divData += '<div class="d-flex flex-row justify-content-end">' + showFileMessage(fileName, fileLink) + '</div>';
+                                            divData += '<div class="d-flex flex-row justify-content-end">' + showFileMessage(fileName, fileLink, '') + '</div>';
                                         });
 
                                         divData +=
@@ -683,6 +768,10 @@
                                     }
                                     //Tin nhắn file
                                     else{
+                                        //Tắt khung kho lưu trữ
+                                        $('#kholuutru').offcanvas('hide');
+                                        $('#kholuutrudetail').offcanvas('hide');
+
                                         var divData = 
                                             '<div class="d-flex flex-row justify-content-start">'+
                                             '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76';}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
@@ -692,7 +781,7 @@
                                             const fileName = doc2.data().FDK_TEN;
                                             const fileLink = doc2.data().FDK_DUONGDAN;
                                             
-                                            divData += '<div class="d-flex flex-row justify-content-start">' + showFileMessage(fileName, fileLink) + '</div>';
+                                            divData += '<div class="d-flex flex-row justify-content-start">' + showFileMessage(fileName, fileLink, 'friend-chat') + '</div>';
                                         });
 
                                         divData +=
@@ -872,9 +961,19 @@
             }
 
             //SHOW FILE TRONG TIN NHẮN
-            function showFileMessage(fileName, fileLink){
+            function showFileMessage(fileName, fileLink, addStyle){
                 const fileExtension = fileName.split('.').pop().toLowerCase();
                 var string;
+                if(addStyle == ''){
+                    var bg = 'bg-primary';
+                    var txt = 'class="text-white"';
+                    var btn = 'btn-primary';
+                }
+                else{
+                    var bg = 'friend-chat';
+                    var txt = 'class="text-dark"';
+                    var btn = 'friend-chat text-dark';
+                }
                 if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
                     // Image
                     string =
@@ -882,37 +981,35 @@
                         '    <a target="_blank" href="'+fileLink+'">' +
                         '        <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                         '    </a>' +
-                        '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);"><i class="fas fa-bookmark"></i></button>' +
+                        '    <button class="btn '+btn+' btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);"><i class="fas fa-bookmark"></i></button>' +
                         '</span>';
-                } else if (['pdf'].includes(fileExtension)) {
-                    // PDF
-                    string =
-                        '<span class="badge bg-danger rounded-3 fw-semiboldms-0 p-1 px-3 mb-2">' +
-                        '    <a class="text-white" href="'+fileLink+'">' +
-                        '    <i class="far fa-file-pdf"></i> ' +fileName+
-                        '    </a>' +
-                        '    <button class="btn btn-danger btn-sm"><i class="fas fa-bookmark"></i></button>' +
-                        '</span>';
-                } else if (['docx', 'doc'].includes(fileExtension)) {
-                    // Word
-                    string =
-                        '<span class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3 mb-2">' +
-                        '    <a class="text-white" href="'+fileLink+'">' +
-                        '    <i class="far fa-file-word"></i> ' +fileName+
-                        '    </a>' +
-                        '    <button class="btn btn-secondary btn-sm"><i class="fas fa-bookmark"></i></button>' +
-                        '</span>';
-                } else if (['xlsx', 'xls'].includes(fileExtension)) {
-                    // Excel
-                    string =
-                        '<span class="badge bg-success rounded-3 fw-semiboldms-0 p-1 px-3 mb-2">' +
-                        '    <a class="text-white" href="'+fileLink+'">' +
-                        '    <i class="far fa-file-excel"></i> ' +fileName+
-                        '    </a>' +
-                        '    <button class="btn btn-success btn-sm"><i class="fas fa-bookmark"></i></button>' +
-                        '</span>';
-                }  else {
                 }
+                else{
+                    string =
+                        '<span class="badge '+bg+' rounded-3 fw-semiboldms-0 p-1 px-3 mb-2">' +
+                        '    <a target="_blank" '+txt+' href="'+fileLink+'">';
+
+                    if (['pdf'].includes(fileExtension)){
+                        string += '    <i class="fas fa-file-pdf fs-5 me-2"></i> ';
+                    }
+                    else if (['docx', 'doc'].includes(fileExtension)) {
+                        string += '    <i class="fas fa-file-word fs-5 me-2"></i> ';
+                    }
+                    else if (['xlsx', 'xls'].includes(fileExtension)) {
+                        string += '    <i class="fas fa-file-excel fs-5 me-2"></i> ';
+                    }
+                    else if (['ppt', 'pptx'].includes(fileExtension)) {
+                        string += '    <i class="fas fa-file-powerpoint fs-5 me-2"></i> ';
+                    }
+                    else {
+                        string += '    <i class="fas fa-file fs-5 me-2"></i> ';
+                    }
+                        
+                    string += fileName +
+                        '    </a>' +
+                        '    <button class="btn '+btn+' btn-sm"><i class="fas fa-bookmark"></i></button>' +
+                        '</span>';
+                } 
                 return string;
             }
 
@@ -957,37 +1054,31 @@
                             var divData = 
                                 '<span data-value="'+i+'" class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
                                 '    <img src="'+imageUrl+'" width="100px" height="100px" alt="Banner Image" class="d-block mx-auto">' +
-                                '    <button class="btn btn-danger btn-sm position-absolute start-100 translate-middle file-item-btn" style="transform: translateX(-50%);"><i class="fas fa-times"></i></button>' +
+                                '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn" style="transform: translateX(-50%);"><i class="fas fa-times"></i></button>' +
                                 '</span>';
                             selectedImagesContainer.insertAdjacentHTML('beforeend', divData);
-                        } else if (fileType.startsWith('application/pdf')) {
-                            // PDF
+                        } else{
                             var divData = 
-                                '<span data-value="'+i+'" class="badge bg-danger rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">' +
-                                '    <i class="far fa-file-pdf"></i> ' + file.name + 
-                                '    <button class="btn btn-danger btn-sm file-item-btn"><i class="fas fa-times"></i></button>' +
-                                '</span>';
-                            selectedFilesContainer.insertAdjacentHTML('beforeend', divData);
-                        } else if (fileType.startsWith('application/msword') || fileType.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
-                            // Word
-                            var divData = 
-                                '<span data-value="'+i+'" class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">' +
-                                '    <i class="far fa-file-word"></i> ' + file.name + 
+                                '<span data-value="'+i+'" class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">';
+                            if (fileType.startsWith('application/pdf')) {// PDF
+                                divData += '    <i class="fas fa-file-pdf fs-5 me-2"></i> ';
+                            }
+                            else if (fileType.startsWith('application/msword') || fileType.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) { //Word
+                                divData += '    <i class="fas fa-file-word fs-5 me-2"></i> ';
+                            }
+                            else if (fileType.startsWith('application/vnd.ms-excel') || fileType.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {// Excel
+                                divData += '    <i class="fas fa-file-excel fs-5 me-2"></i> ';
+                            }
+                            else if (fileType.startsWith('application/vnd.ms-powerpoint') || fileType.startsWith('application/vnd.openxmlformats-officedocument.presentationml.presentation')) {// Powerpoint
+                                divData += '    <i class="fas fa-file-powerpoint fs-5 me-2"></i> ';
+                            }
+                            else{
+                                divData += '    <i class="fas fa-file fs-5 me-2"></i> ';
+                            }
+                                divData += file.name + 
                                 '    <button class="btn btn-secondary btn-sm file-item-btn"><i class="fas fa-times"></i></button>' +
                                 '</span>';
                             selectedFilesContainer.insertAdjacentHTML('beforeend', divData);
-                        } else if (fileType.startsWith('application/vnd.ms-excel') || fileType.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-                            // Excel
-                            var divData = 
-                                '<span data-value="'+i+'" class="badge bg-success rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">' +
-                                '    <i class="far fa-file-excel"></i> ' + file.name + 
-                                '    <button class="btn btn-success btn-sm file-item-btn"><i class="fas fa-times"></i></button>' +
-                                '</span>';
-                            selectedFilesContainer.insertAdjacentHTML('beforeend', divData);
-                        }
-                        else {
-                            console.log ('Unsupported file type: ' + file.name);
-                            continue;
                         }
                     }
                 }
@@ -1004,6 +1095,209 @@
             });
             //|*****************************************************
             //|UPLOAD FILE END
+            //|*****************************************************
+            //|*****************************************************
+            //|KHO LƯU TRỮ START
+            //|*****************************************************
+
+            const qklt = query(
+                collection(db, "FILE_DINH_KEM"), 
+                where("ND_NHAN_MA", "in", [<?php if($userChat) echo $userChat->ND_MA; ?>, <?php echo $userLog->ND_MA; ?>]),
+                where("ND_GUI_MA", "in", [<?php if($userChat) echo $userChat->ND_MA; ?>, <?php echo $userLog->ND_MA; ?>]),
+                orderBy("TN_REALTIME", "desc")
+            );
+
+            //KHO LƯU TRỮ TỔNG
+            $('#kholuutru-btn').on('click', function() {
+                (async () => {
+
+                    const querySnapshotklt = await getDocs(qklt);
+
+                    var imagecount = 0;
+                    var documentcount = 0;
+                    var linkcount = 0;
+                    var listimages = document.getElementById('list-images');
+                    var listdocuments = document.getElementById('list-documents');
+                    var listlinks = document.getElementById('list-links');
+                    
+                    listimages.innerHTML = '';
+                    listdocuments.innerHTML = '';
+                    listlinks.innerHTML = '';
+
+                    querySnapshotklt.forEach((doc) => {
+                        const fileName = doc.data().FDK_TEN;
+                        const fileLink = doc.data().FDK_DUONGDAN;
+                        const fileExtension = fileName.split('.').pop().toLowerCase();
+                        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension) && imagecount < 5) {
+                            var divData = 
+                                '<span class="col-md-3 col-sm-4 rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block mb-3">' +
+                                '    <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
+                                '        <img src="'+fileLink+'"  width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
+                                '    </a>' +
+                                '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);">' +
+                                '        <i class="fas fa-bookmark"></i>' +
+                                '    </button>' +
+                                '</span>';
+                            listimages.insertAdjacentHTML('beforeend', divData);
+                            imagecount++;
+                        }
+                        else if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension) && documentcount < 5){
+                            var divData =
+                                '<li class="p-2 border-bottom d-flex justify-content-between">' +
+                                '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between">' +
+                                '        <div class="d-flex flex-row" style="max-width:200px">' +
+                                '            <div>';
+
+                            if (['pdf'].includes(fileExtension)){
+                                divData += '    <i class="fas fa-file-pdf me-2 document-icon"></i> ';
+                            }
+                            else if (['docx', 'doc'].includes(fileExtension)) {
+                                divData += '    <i class="fas fa-file-word me-2 document-icon"></i> ';
+                            }
+                            else if (['xlsx', 'xls'].includes(fileExtension)) {
+                                divData += '    <i class="fas fa-file-excel me-2 document-icon"></i> ';
+                            }
+                            else if (['ppt', 'pptx'].includes(fileExtension)) {
+                                divData += '    <i class="fas fa-file-powerpoint me-2 document-icon"></i> ';
+                            }
+                            else {
+                                divData += '    <i class="fas fa-file me-2 document-icon"></i> ';
+                            }
+
+                            divData +=
+                                '            </div>' +
+                                '            <div class="pt-1">' +
+                                '                <p class="fw-bold mb-0">'+fileName+'</p>' +
+                                '                <p class="small text-muted"><i>Từ: </i><i>' + 
+                                ((doc.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php echo $userChat->ND_HOTEN?>') +
+                                '                   </i></p>' +
+                                '            </div>' +
+                                '        </div>' +
+                                '    </a>' +
+                                '    <button class="btn btn-secondary btn-sm" style="height: 28px !important;"><i class="fas fa-bookmark"></i></button>' +      
+                                '</li>';
+
+                            listdocuments.insertAdjacentHTML('beforeend', divData);
+                            documentcount++;
+                        }
+                        else if (imagecount >= 5 && documentcount >= 5 ) return;
+                        else{}
+                    })
+
+                    if(imagecount > 0){
+                        var divData = 
+                            '<div class="text-center">' +
+                            '    <button class="btn btn-secondary mt-2" type="button" data-bs-toggle="offcanvas" id="kholuutruimages-btn" data-bs-target="#kholuutrudetail"> Xem thêm</button>' +
+                            '</div>';
+                        listimages.insertAdjacentHTML('beforeend', divData);
+                    }
+                    if(documentcount > 0){
+                        var divData = 
+                            '<div class="text-center">' +
+                            '    <button class="btn btn-secondary mt-2" type="button" data-bs-toggle="offcanvas" id="kholuutrudocuments-btn" data-bs-target="#kholuutrudetail"> Xem thêm</button>' +
+                            '</div>';
+                        listdocuments.insertAdjacentHTML('beforeend', divData);
+                    }
+
+                    //KHO LƯU TRỮ ẢNH
+                    $('#kholuutruimages-btn').on('click', function() {
+                        (async () => {
+                            const querySnapshotklt = await getDocs(qklt);
+
+                            var detailtitle = document.getElementById('detail-title');
+                            var detailbody = document.getElementById('detail-body');
+                            
+                            detailtitle.innerHTML = 'Ảnh';
+                            detailbody.innerHTML = '';
+
+                            querySnapshotklt.forEach((doc) => {
+                                const fileName = doc.data().FDK_TEN;
+                                const fileLink = doc.data().FDK_DUONGDAN;
+                                const fileExtension = fileName.split('.').pop().toLowerCase();
+                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                    var divData = 
+                                        '<span class="col-md-3 col-sm-4 rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block mb-3">' +
+                                        '    <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
+                                        '        <img src="'+fileLink+'"  width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
+                                        '    </a>' +
+                                        '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);">' +
+                                        '        <i class="fas fa-bookmark"></i>' +
+                                        '    </button>' +
+                                        '</span>';
+                                        detailbody.insertAdjacentHTML('beforeend', divData);
+                                }
+                            })
+                        })().catch((error) => {
+                            console.error("Error in script: ", error);
+                        });
+                    });
+
+                    ////KHO LƯU TRỮ FILE
+                    $('#kholuutrudocuments-btn').on('click', function() {
+                        (async () => {
+                            const querySnapshotklt = await getDocs(qklt);
+
+                            var detailtitle = document.getElementById('detail-title');
+                            var detailbody = document.getElementById('detail-body');
+                            
+                            detailtitle.innerHTML = 'File';
+                            detailbody.innerHTML = '';
+
+                            querySnapshotklt.forEach((doc) => {
+                                const fileName = doc.data().FDK_TEN;
+                                const fileLink = doc.data().FDK_DUONGDAN;
+                                const fileExtension = fileName.split('.').pop().toLowerCase();
+                                if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                                    var divData =
+                                        '<li class="p-2 border-bottom d-flex justify-content-between">' +
+                                        '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between">' +
+                                        '        <div class="d-flex flex-row" style="max-width:200px">' +
+                                        '            <div>';
+
+                                    if (['pdf'].includes(fileExtension)){
+                                        divData += '    <i class="fas fa-file-pdf me-2 document-icon"></i> ';
+                                    }
+                                    else if (['docx', 'doc'].includes(fileExtension)) {
+                                        divData += '    <i class="fas fa-file-word me-2 document-icon"></i> ';
+                                    }
+                                    else if (['xlsx', 'xls'].includes(fileExtension)) {
+                                        divData += '    <i class="fas fa-file-excel me-2 document-icon"></i> ';
+                                    }
+                                    else if (['ppt', 'pptx'].includes(fileExtension)) {
+                                        divData += '    <i class="fas fa-file-powerpoint me-2 document-icon"></i> ';
+                                    }
+                                    else {
+                                        divData += '    <i class="fas fa-file me-2 document-icon"></i> ';
+                                    }
+
+                                    divData +=
+                                        '            </div>' +
+                                        '            <div class="pt-1">' +
+                                        '                <p class="fw-bold mb-0">'+fileName+'</p>' +
+                                        '                <p class="small text-muted"><i>Từ: </i><i>' + 
+                                        ((doc.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php echo $userChat->ND_HOTEN?>') +
+                                        '                   </i></p>' +
+                                        '            </div>' +
+                                        '        </div>' +
+                                        '    </a>' +
+                                        '    <button class="btn btn-secondary btn-sm" style="height: 28px !important;"><i class="fas fa-bookmark"></i></button>' +      
+                                        '</li>';
+
+                                    detailbody.insertAdjacentHTML('beforeend', divData);
+                                }
+                            })
+                        })().catch((error) => {
+                            console.error("Error in script: ", error);
+                        });
+                    });
+
+                })().catch((error) => {
+                    console.error("Error in script: ", error);
+                });
+            });
+
+            //|*****************************************************
+            //|KHO LƯU TRỮ END
             //|*****************************************************
         });
     </script>

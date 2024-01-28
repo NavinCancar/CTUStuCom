@@ -178,3 +178,8 @@
   pointer-events: none;
   color: var(--bs-dark-text);
 }
+
+.document-icon{
+  font-size: xx-large;
+  padding: 5px;
+}
