@@ -183,3 +183,10 @@
   font-size: xx-large;
   padding: 5px;
 }
+
+.wrap-friend-text{
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

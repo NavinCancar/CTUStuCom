@@ -113,7 +113,7 @@
                                 <ul class="list-unstyled mb-0 row" id="list-documents">
                                     <!--<li data-value="4" class="p-2 border-bottom">
                                         <a href="http://localhost/ctustucom/tin-nhan/4" class="d-flex justify-content-between">
-                                            <div class="d-flex flex-row" style="max-width:200px">
+                                            <div class="d-flex flex-row" style="max-width:100%">
                                                 <div>
                                                     <i class="fas fa-file-pdf me-2 document-icon"></i>
                                                 </div>
@@ -139,7 +139,7 @@
                                 <ul class="list-unstyled mb-0 row"  id="list-links">
                                     <!--<li data-value="4" class="p-2 border-bottom">
                                         <a href="http://localhost/ctustucom/tin-nhan/4" class="d-flex justify-content-between">
-                                            <div class="d-flex flex-row" style="max-width:200px">
+                                            <div class="d-flex flex-row" style="max-width:100%">
                                                 <div>
                                                     <i class="fas fa-link me-2 document-icon"></i>
                                                 </div>
@@ -184,10 +184,7 @@
                 <div class="card">
                     <div class="card-body p-3">
                         <div class="input-group rounded mb-2">
-                            <form class="d-flex">
-                                <input class="form-control me-2" type="text" placeholder="Search">
-                                <button class="btn btn-outline-primary" type="submit"><i class="fa fa-search"></i></button>
-                            </form>
+                            <input class="form-control me-2" id="search-friend" type="text" placeholder="Tìm bạn bè">
                         </div>
 
                         <div class="scroll-chat" id="list-scroll">
@@ -343,6 +340,8 @@
                                 collection(db, "FILE_DINH_KEM"), 
                                 where('ND_NHAN_MA', '==', doc.data().ND_NHAN_MA),
                                 where('ND_GUI_MA', '==', doc.data().ND_GUI_MA),
+                                where('BV_MA', '==', 0),
+                                where('BL_MA', '==', 0),
                                 where('TN_THOIGIANGUI', '==', doc.data().TN_THOIGIANGUI),
                             );
 
@@ -354,7 +353,7 @@
                             var chatbox = document.getElementById('chat-box');
                             if(doc.data().ND_GUI_MA == <?php echo $userLog->ND_MA; ?>){
                                 //Tin nhắn văn bản
-                                if(doc.data().TN_NOIDUNG !== ""){
+                                if(querySnapshotfile.empty){
                                     var divData = 
                                         '<div class="d-flex flex-row justify-content-end">'+
                                         '    <div>'+
@@ -369,7 +368,8 @@
                                 else {
                                     var divData = 
                                         '<div class="d-flex flex-row justify-content-end">'+
-                                        '    <div>';
+                                        '    <div>'+
+                                        ((doc.data().TN_NOIDUNG=="")?'':'<p class="fs-3 p-2 me-3 mb-1 text-white rounded-3 bg-primary">'+doc.data().TN_NOIDUNG+'</p>');
                                         
                                     querySnapshotfile.forEach((doc2) => {
                                         const fileName = doc2.data().FDK_TEN;
@@ -389,7 +389,7 @@
 
                             else{
                                 //Tin nhắn văn bản
-                                if(doc.data().TN_NOIDUNG !== ""){
+                                if(querySnapshotfile.empty){
                                     var divData = 
                                         '<div class="d-flex flex-row justify-content-start">'+
                                         '    <img src="<?php if($userChat){ if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76';}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
@@ -405,7 +405,8 @@
                                     var divData = 
                                         '<div class="d-flex flex-row justify-content-start">'+
                                         '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76';}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
-                                        '    <div>';
+                                        '    <div>'+
+                                        ((doc.data().TN_NOIDUNG=="")?'':'<p class="fs-3 p-2 ms-1 mb-1 rounded-3 friend-chat">'+doc.data().TN_NOIDUNG+'</p>');
 
                                     querySnapshotfile.forEach((doc2) => {
                                         const fileName = doc2.data().FDK_TEN;
@@ -446,7 +447,7 @@
 
                     var TN_FDK = fileInput.files;
 
-                    if(TN_NOIDUNG!=""){
+                    if(TN_NOIDUNG!="" && TN_FDK.length == 0){//Thuần gửi tin nhắn thôi
                         var now = new Date();
                         var thoigiangui = formatDate(now);
 
@@ -465,7 +466,7 @@
                         });
                     }
 
-                    if(TN_FDK.length > 0 && TN_FDK.length > dontUse.length){
+                    if(TN_FDK.length > 0 && TN_FDK.length > dontUse.length){//Gửi có file
                         (async () => {
                             //Cho nút gửi xoay
                             const messageBtn = document.getElementById('message-btn');
@@ -524,18 +525,35 @@
                             $("input[name^='TN_FDK']").val("");
 
                             //Tin nhắn cần add sau để không gọi sự kiện real time
-                            addDoc(collection(db, "TIN_NHAN"), {
-                                ND_GUI_MA: <?php echo $userLog->ND_MA; ?>,
-                                ND_NHAN_MA: <?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>,
-                                TN_REALTIME: realtime,
-                                TN_THOIGIANGUI: thoigiangui,
-                                TN_NOIDUNG: '', 
-                                TN_TRANGTHAI: 0,
-                            }).then(function(docRef) {
-                                console.log('Message đã gửi with ID: ', docRef.id);
-                            }).catch(function(error) {
-                                console.error('Error adding document: ', error);
-                            });
+                            if(TN_NOIDUNG!=""){//Gửi kèm tin nhắn
+                                addDoc(collection(db, "TIN_NHAN"), {
+                                    ND_GUI_MA: <?php echo $userLog->ND_MA; ?>,
+                                    ND_NHAN_MA: <?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>,
+                                    TN_REALTIME: realtime,
+                                    TN_THOIGIANGUI: thoigiangui,
+                                    TN_NOIDUNG: TN_NOIDUNG, 
+                                    TN_TRANGTHAI: 0,
+                                }).then(function(docRef) {
+                                    console.log('Message đã gửi with ID: ', docRef.id);
+                                }).catch(function(error) {
+                                    console.error('Error adding document: ', error);
+                                });
+                            }
+                            else{//Không có chat kèm theo
+                                addDoc(collection(db, "TIN_NHAN"), {
+                                    ND_GUI_MA: <?php echo $userLog->ND_MA; ?>,
+                                    ND_NHAN_MA: <?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>,
+                                    TN_REALTIME: realtime,
+                                    TN_THOIGIANGUI: thoigiangui,
+                                    TN_NOIDUNG: '', 
+                                    TN_TRANGTHAI: 0,
+                                }).then(function(docRef) {
+                                    console.log('Message đã gửi with ID: ', docRef.id);
+                                }).catch(function(error) {
+                                    console.error('Error adding document: ', error);
+                                });
+                            }
+                            
                         })().catch((error) => {
                             console.error('Error uploading file:', error);
                         });
@@ -629,8 +647,8 @@
                                     '                    width="40" height="40" class="rounded-circle me-2">'+
                                     '            </div>'+
                                     '            <div class="pt-1">'+
-                                    '                <p class="fw-bold mb-0">'+ND_HOTEN2+'</p>'+
-                                    '                <p class="small text-muted">' + (checkUser == doc.data().ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (doc.data().TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : doc.data().TN_NOIDUNG) +'</p>'+
+                                    '                <p class="fw-bold mb-0 friendName">'+ND_HOTEN2+'</p>'+
+                                    '                <p class="small text-muted wrap-friend-text">' + (checkUser == doc.data().ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (doc.data().TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : doc.data().TN_NOIDUNG) +'</p>'+
                                     '            </div>'+
                                     '        </div>'+
                                     '        <div class="pt-1">'+
@@ -699,6 +717,8 @@
                                     collection(db, "FILE_DINH_KEM"), 
                                     where('ND_NHAN_MA', '==', data.ND_NHAN_MA),
                                     where('ND_GUI_MA', '==', data.ND_GUI_MA),
+                                    where('BV_MA', '==', 0),
+                                    where('BL_MA', '==', 0),
                                     where('TN_THOIGIANGUI', '==', data.TN_THOIGIANGUI),
                                 );
 
@@ -712,7 +732,7 @@
                                 if(data.ND_NHAN_MA == <?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>){
 
                                     //Tin nhắn văn bản
-                                    if(data.TN_NOIDUNG != ""){
+                                    if(querySnapshotfile.empty){
                                         var divData = 
                                             '<div class="d-flex flex-row justify-content-end">'+
                                             '    <div>'+
@@ -733,7 +753,8 @@
 
                                         var divData = 
                                             '<div class="d-flex flex-row justify-content-end">'+
-                                            '    <div>';
+                                            '    <div>'+
+                                            ((data.TN_NOIDUNG=="")?'':'<p class="fs-3 p-2 me-3 mb-1 text-white rounded-3 bg-primary">'+data.TN_NOIDUNG+'</p>');
 
                                         querySnapshotfile.forEach((doc2) => {
                                             const fileName = doc2.data().FDK_TEN;
@@ -755,7 +776,18 @@
                                 //NGHE TỪ CÁC BÊN GỬI ĐẾN => HIỆN TIN NHẮN NGƯỜI ĐANG CHAT CÙNG
                                 if(data.ND_GUI_MA == <?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>){
                                     //Tin nhắn văn bản
-                                    if(data.TN_NOIDUNG !== ""){
+                                    if(querySnapshotfile.empty){
+                                        // Biểu thức chính quy để tìm kiếm liên kết trong chuỗi
+                                        const linkRegex = /https?:\/\/[^\s]+/g;
+
+                                        // Sử dụng match để lấy tất cả các liên kết từ chuỗi
+                                        const links = (data.TN_NOIDUNG).match(linkRegex);
+                                        if (links && Array.isArray(links)) {
+                                            //Tắt khung kho lưu trữ
+                                            $('#kholuutru').offcanvas('hide');
+                                            $('#kholuutrudetail').offcanvas('hide');
+                                        }
+
                                         var divData = 
                                             '<div class="d-flex flex-row justify-content-start">'+
                                             '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76';}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
@@ -775,7 +807,8 @@
                                         var divData = 
                                             '<div class="d-flex flex-row justify-content-start">'+
                                             '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76';}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
-                                            '    <div>';
+                                            '    <div>'+
+                                            ((data.TN_NOIDUNG=="")?'':'<p class="fs-3 p-2 ms-1 mb-1 rounded-3 friend-chat">'+data.TN_NOIDUNG+'</p>');
 
                                         querySnapshotfile.forEach((doc2) => {
                                             const fileName = doc2.data().FDK_TEN;
@@ -856,8 +889,8 @@
                                     '                    width="40" height="40" class="rounded-circle me-2">'+
                                     '            </div>'+
                                     '            <div class="pt-1">'+
-                                    '                <p class="fw-bold mb-0">'+ND_HOTEN2+'</p>'+
-                                    '                <p class="small text-muted">' + (checkUser == data.ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (data.TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : data.TN_NOIDUNG) +'</p>'+
+                                    '                <p class="fw-bold mb-0 friendName">'+ND_HOTEN2+'</p>'+
+                                    '                <p class="small text-muted wrap-friend-text">' + (checkUser == data.ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (data.TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : data.TN_NOIDUNG) +'</p>'+
                                     '            </div>'+
                                     '        </div>'+
                                     '        <div class="pt-1">'+
@@ -1107,11 +1140,19 @@
                 orderBy("TN_REALTIME", "desc")
             );
 
+            const qlink = query(
+                collection(db, "TIN_NHAN"), 
+                where("ND_NHAN_MA", "in", [<?php if($userChat) echo $userChat->ND_MA; ?>, <?php echo $userLog->ND_MA; ?>]),
+                where("ND_GUI_MA", "in", [<?php if($userChat) echo $userChat->ND_MA; ?>, <?php echo $userLog->ND_MA; ?>]),
+                orderBy("TN_REALTIME", "desc")
+            );
+
             //KHO LƯU TRỮ TỔNG
             $('#kholuutru-btn').on('click', function() {
                 (async () => {
 
                     const querySnapshotklt = await getDocs(qklt);
+                    const querySnapshotlink = await getDocs(qlink);
 
                     var imagecount = 0;
                     var documentcount = 0;
@@ -1145,7 +1186,7 @@
                             var divData =
                                 '<li class="p-2 border-bottom d-flex justify-content-between">' +
                                 '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between">' +
-                                '        <div class="d-flex flex-row" style="max-width:200px">' +
+                                '        <div class="d-flex flex-row" style="max-width:100%">' +
                                 '            <div>';
 
                             if (['pdf'].includes(fileExtension)){
@@ -1182,21 +1223,62 @@
                         }
                         else if (imagecount >= 5 && documentcount >= 5 ) return;
                         else{}
-                    })
+                    });
 
-                    if(imagecount > 0){
+                    querySnapshotlink.forEach((doc2) => {
+                        // Biểu thức chính quy để tìm kiếm liên kết trong chuỗi
+                        const linkRegex = /https?:\/\/[^\s]+/g;
+
+                        // Sử dụng match để lấy tất cả các liên kết từ chuỗi
+                        const links = (doc2.data().TN_NOIDUNG).match(linkRegex);
+                        if (links && Array.isArray(links)) {
+                            links.forEach((link) => {
+                                if (linkcount < 5){
+                                    var divData =
+                                        '<li data-value="4" class="p-2 border-bottom">'+
+                                        '    <a href="'+link+'" target="_blank" class="d-flex justify-content-between">'+
+                                        '        <div class="d-flex flex-row" style="max-width:100%">'+
+                                        '            <div>'+
+                                        '                <i class="fas fa-link me-2 document-icon"></i>'+
+                                        '            </div>'+
+                                        '            <div class="pt-1" style="overflow: hidden;">'+
+                                        '                <p class="fw-bold mb-0">'+link+'</p>'+
+                                        '                <p class="small text-muted"><i>Từ: </i><i>' + 
+                                        ((doc2.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php echo $userChat->ND_HOTEN?>') +
+                                        '                   </i></p>' +
+                                        '            </div>'+
+                                        '        </div>'+
+                                        '    </a>'+
+                                        '</li>';
+
+                                    listlinks.insertAdjacentHTML('beforeend', divData);
+                                    linkcount++;
+                                }
+                                else return;
+                            });
+                        }
+                    });
+
+                    if(imagecount >= 5){
                         var divData = 
                             '<div class="text-center">' +
                             '    <button class="btn btn-secondary mt-2" type="button" data-bs-toggle="offcanvas" id="kholuutruimages-btn" data-bs-target="#kholuutrudetail"> Xem thêm</button>' +
                             '</div>';
                         listimages.insertAdjacentHTML('beforeend', divData);
                     }
-                    if(documentcount > 0){
+                    if(documentcount >= 5){
                         var divData = 
                             '<div class="text-center">' +
                             '    <button class="btn btn-secondary mt-2" type="button" data-bs-toggle="offcanvas" id="kholuutrudocuments-btn" data-bs-target="#kholuutrudetail"> Xem thêm</button>' +
                             '</div>';
                         listdocuments.insertAdjacentHTML('beforeend', divData);
+                    }
+                    if(linkcount >= 5){
+                        var divData = 
+                            '<div class="text-center">' +
+                            '    <button class="btn btn-secondary mt-2" type="button" data-bs-toggle="offcanvas" id="kholuutrulinks-btn" data-bs-target="#kholuutrudetail"> Xem thêm</button>' +
+                            '</div>';
+                        listlinks.insertAdjacentHTML('beforeend', divData);
                     }
 
                     //KHO LƯU TRỮ ẢNH
@@ -1232,7 +1314,7 @@
                         });
                     });
 
-                    ////KHO LƯU TRỮ FILE
+                    //KHO LƯU TRỮ FILE
                     $('#kholuutrudocuments-btn').on('click', function() {
                         (async () => {
                             const querySnapshotklt = await getDocs(qklt);
@@ -1251,7 +1333,7 @@
                                     var divData =
                                         '<li class="p-2 border-bottom d-flex justify-content-between">' +
                                         '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between">' +
-                                        '        <div class="d-flex flex-row" style="max-width:200px">' +
+                                        '        <div class="d-flex flex-row" style="max-width:100%">' +
                                         '            <div>';
 
                                     if (['pdf'].includes(fileExtension)){
@@ -1291,6 +1373,50 @@
                         });
                     });
 
+                    $('#kholuutrulinks-btn').on('click', function() {
+                        (async () => {
+                            const querySnapshotlink = await getDocs(qlink);
+
+                            var detailtitle = document.getElementById('detail-title');
+                            var detailbody = document.getElementById('detail-body');
+                            
+                            detailtitle.innerHTML = 'Link';
+                            detailbody.innerHTML = '';
+
+                            querySnapshotlink.forEach((doc2) => {
+                                // Biểu thức chính quy để tìm kiếm liên kết trong chuỗi
+                                const linkRegex = /https?:\/\/[^\s]+/g;
+
+                                // Sử dụng match để lấy tất cả các liên kết từ chuỗi
+                                const links = (doc2.data().TN_NOIDUNG).match(linkRegex);
+                                if (links && Array.isArray(links)) {
+                                    links.forEach((link) => {
+                                        var divData =
+                                            '<li data-value="4" class="p-2 border-bottom">'+
+                                            '    <a href="'+link+'" target="_blank" class="d-flex justify-content-between">'+
+                                            '        <div class="d-flex flex-row" style="max-width:100%">'+
+                                            '            <div>'+
+                                            '                <i class="fas fa-link me-2 document-icon"></i>'+
+                                            '            </div>'+
+                                            '            <div class="pt-1" style="overflow: hidden;">'+
+                                            '                <p class="fw-bold mb-0">'+link+'</p>'+
+                                            '                <p class="small text-muted"><i>Từ: </i><i>' + 
+                                            ((doc2.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php echo $userChat->ND_HOTEN?>') +
+                                            '                   </i></p>' +
+                                            '            </div>'+
+                                            '        </div>'+
+                                            '    </a>'+
+                                            '</li>';
+
+                                        detailbody.insertAdjacentHTML('beforeend', divData);
+                                    });
+                                }
+                            });
+                        })().catch((error) => {
+                            console.error("Error in script: ", error);
+                        });
+                    });
+
                 })().catch((error) => {
                     console.error("Error in script: ", error);
                 });
@@ -1298,6 +1424,31 @@
 
             //|*****************************************************
             //|KHO LƯU TRỮ END
+            //|*****************************************************
+            //|*****************************************************
+            //|SEARCH FRIEND START
+            //|*****************************************************
+                // Bắt sự kiện khi người dùng nhập liệu
+                $('#search-friend').on('input', function() {
+                    // Lấy giá trị nhập liệu
+                    const inputValue = $(this).val().trim().toLowerCase();
+
+                    // Lặp qua các phần tử cần tìm kiếm
+                    $('.friendName').each(function() {
+                        const targetText = $(this).text().toLowerCase();
+
+                        // So sánh nếu từ khóa xuất hiện trong nội dung
+                        if (targetText.includes(inputValue)) {
+                            $(this).parent().parent().parent().parent().show();
+                            //console.log('true: ', targetText);
+                        } else {
+                            $(this).parent().parent().parent().parent().hide();
+                            //console.log('False: ', targetText);
+                        }
+                    });
+                });
+            //|*****************************************************
+            //|SEARCH FRIEND END
             //|*****************************************************
         });
     </script>

@@ -251,7 +251,7 @@
                                 '<a data-value="'+checkUser+'" href="'+linkChat+'/'+checkUser+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1" style="flex-wrap: wrap;">'+
                                 '  <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
                                 '    class="rounded-circle">'+
-                                '  <span class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">'+
+                                '  <span class="mb-0 fs-3 wrap-friend-text" style="max-width: 250px;">'+
                                 '  <b>'+ND_HOTEN2+'</b>' +
                                 ((noCheckMess == 0)? '' : '<span class="badge bg-primary rounded-pill float-end fs-1 ms-2">'+ noCheckMess +'</span>' ) + '<br>'+
                                 (checkUser == doc.data().ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (doc.data().TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : doc.data().TN_NOIDUNG) +
@@ -386,7 +386,7 @@
                                 '<a data-value="'+checkUser+'" href="'+linkChat+'/'+checkUser+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1" style="flex-wrap: wrap;">'+
                                 '  <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
                                 '    class="rounded-circle">'+
-                                '  <span class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">'+
+                                '  <span class="mb-0 fs-3 wrap-friend-text" style="max-width: 250px;">'+
                                 '  <b>'+ND_HOTEN2+'</b>' +
                                 ((noCheckMess == 0)? '' : '<span class="badge bg-primary rounded-pill float-end fs-1 ms-2">'+ noCheckMess +'</span>' ) + '<br>'+
                                 (checkUser == data.ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (data.TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : data.TN_NOIDUNG) +
