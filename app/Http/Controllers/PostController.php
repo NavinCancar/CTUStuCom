@@ -10,11 +10,20 @@ use Session;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Redirect;
 
+use MrShan0\PHPFirestore\FirestoreClient;
+
 use Carbon\Carbon;
 session_start();
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->firestoreClient = new FirestoreClient('ctu-student-community', 'AIzaSyCM8jj3tql4LSIaPvjI6D9_BTLYnaspwks', [
+            'database' => '(default)',
+        ]);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | NGƯỜI DÙNG
@@ -47,88 +56,70 @@ class PostController extends Controller
 
         $userLog = Session::get('userLog');
         //Bài viết
-        $data = array();
-        $data['ND_MA'] = $userLog->ND_MA;  
-        $data['BV_TIEUDE'] = $request->BV_TIEUDE;
-        $data['BV_NOIDUNG'] = $request->BV_NOIDUNG;
-        $data['BV_TRANGTHAI'] = 0;
-        $data['BV_THOIGIANTAO'] = Carbon::now('Asia/Ho_Chi_Minh');
-        $data['BV_LUOTXEM'] = 0;
-        if($request->HP_MA) $data['HP_MA'] = $request->HP_MA;
-        DB::table('bai_viet')->insert($data);
+        DB::table('bai_viet')->insert([
+            'ND_MA' => $userLog->ND_MA,
+            'BV_TIEUDE' => $request->BV_TIEUDE,
+            'BV_NOIDUNG' => $request->BV_NOIDUNG,
+            'BV_TRANGTHAI' => 'Chưa duyệt',
+            'BV_THOIGIANTAO' => Carbon::now('Asia/Ho_Chi_Minh'),
+            'BV_LUOTXEM' => 0,
+            'HP_MA' => $request->HP_MA ? $request->HP_MA : null
+        ]);
 
         $bai_viet = DB::table('bai_viet')->where('ND_MA', $userLog->ND_MA)
                 ->orderby('bai_viet.BV_MA','desc')->first();
 
         //Của bài viết
-        $data2 = array();
-        $data2['BV_MA']=$bai_viet->BV_MA;
+        $hashtags = json_decode($request->input('hashtags'), true);
+        $hashtagsNew = json_decode($request->input('hashtagsNew'), true);
 
-        if ($request->has(['items', 'items_new'])) {
-            // Lấy giá trị của "items" và "items_new" từ request
-            $selectedItems = $request->input('items');
-            $addItems = $request->input('items_new');
-
-            foreach ($selectedItems as $item) {
-                $data2['H_HASHTAG'] = $item;
-                DB::table('cua_bai_viet')->insert($data2);
-            }
-            
-            foreach ($addItems as $items_new) {
-                DB::table('hashtag')->insert([
-                    'H_HASHTAG' => $items_new
+        if ($hashtags && is_array($hashtags)) {
+            foreach ($hashtags as $item) {
+                DB::table('cua_bai_viet')->insert([
+                    'BV_MA' => $bai_viet->BV_MA,
+                    'H_HASHTAG' => $item['name']
                 ]);
-                $data2['H_HASHTAG'] = $items_new;
-                DB::table('cua_bai_viet')->insert($data2);
             }
-        } elseif ($request->has('items')) {
-            $selectedItems = $request->input('items');
-
-            foreach ($selectedItems as $item) {
-                $data2['H_HASHTAG'] = $item;
-                DB::table('cua_bai_viet')->insert($data2);
-            }
-        } elseif ($request->has('items_new')) {
-            $addItems = $request->input('items_new');
-            
-            foreach ($addItems as $items_new) {
+        } 
+        if ($hashtagsNew && is_array($hashtagsNew)) {
+            foreach ($hashtagsNew as $items_new) {
                 DB::table('hashtag')->insert([
-                    'H_HASHTAG' => $items_new
+                    'H_HASHTAG' => $items_new['name']
                 ]);
-                $data2['H_HASHTAG'] = $items_new;
-                DB::table('cua_bai_viet')->insert($data2);
+
+                DB::table('cua_bai_viet')->insert([
+                    'BV_MA' => $bai_viet->BV_MA,
+                    'H_HASHTAG' => $items_new['name']
+                ]);
             }
-        } else {
-            // Trường input "items" và "items_new" không được gửi
-            //echo "Không có dữ liệu được gửi";
-        }
+        } 
 
         //File đính kèm
-        $data3 = array();
-        $data3['BV_MA']=$bai_viet->BV_MA;
+        $linkFile = json_decode($request->input('linkFile'), true);
+        $collection = 'FILE_DINH_KEM';
         
-        if($request->hasFile('FDK'))
-        {   
-            $files = $request->file('FDK');
-            foreach ($files as $file) {
-                // Lấy thời gian hiện tại để thêm vào tên file
-                $currentDateTime = now()->format('YmdHis');
-        
-                // Lấy tên file gốc
-                $originalFileName = $file->getClientOriginalName();
-        
-                // Tạo tên file mới bằng cách thêm ngày tháng và giờ
-                $newFileName = pathinfo($originalFileName, PATHINFO_FILENAME) . '_' . $bai_viet->BV_MA .'_'. $currentDateTime . '.' . $file->getClientOriginalExtension();
-                
-                $file->move('public/file', $newFileName); 
-        
-                // Lưu thông tin tệp tin vào cơ sở dữ liệu
-                $data3['FDK_TEN'] = $newFileName;
-                DB::table('file_dinh_kem')->insert($data3);
+        if($linkFile && is_array($linkFile)){   
+            foreach ($linkFile as $file) {
+                $fileSend = $fileSend = $this->firestoreClient->addDocument($collection, [
+                    'BV_MA' =>  $bai_viet->BV_MA,  
+                    'BL_MA' =>  0,
+                    'FDK_DUONGDAN'=> $file['link'],
+                    'FDK_TEN' => $file['name'],
+                    'ND_GUI_MA' => 0,
+                    'ND_NHAN_MA' =>  0,
+                    'TN_REALTIME'=> null,
+                    'TN_THOIGIANGUI' => null,
+                ]);
+                //if($fileSend) ; else báo lỗi
             }
         }
         
         return Redirect::to('trang-chu');
+        
+        /*echo '<pre>';
+        print_r ($dontUseArray);
+        print_r ($request->file('TN_FDK'));
+        echo '</pre>';*/
     }
 
     /**

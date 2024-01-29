@@ -37,6 +37,7 @@ class HomeController extends Controller
         //Bài viết Start
         $bai_viet = DB::table('bai_viet')
         ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+        ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
         ->orderBy('BV_THOIGIANDANG', 'desc')->paginate(5);
         
         $hashtag_bai_viet = DB::table('hashtag')

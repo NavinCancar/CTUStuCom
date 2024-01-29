@@ -24,23 +24,40 @@
                 <div class="card-body p-4">
                   <div class="mb-3 mb-sm-0">
                     <h5 class="card-title fw-semibold">Thêm bài viết mới</h5>
-                    <form id="form" action="{{URL::to('/bai-dang')}}" method="post" enctype="multipart/form-data">
+                    <form id="them" action="{{URL::to('/bai-dang')}}" method="post" enctype="multipart/form-data">
                       {{ csrf_field() }}
                       <div class="mb-3 mt-3">
                         <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
-                        <input type="text" class="form-control mb-3" placeholder="Nhập tiêu đề" id="title" name="BV_TIEUDE" required="">
+                        <input type="text" class="form-control mb-3" placeholder="Nhập tiêu đề" id="title" name="BV_TIEUDE">
+
                         <label class="form-label">Nội dung <span class="text-danger">(*)</span>:</label>
                         <textarea class="form-control mb-3" rows="5" id="comment" name="BV_NOIDUNG"
-                          placeholder="Nhập nội dung" id="desc" required=""></textarea>
+                          placeholder="Nhập nội dung" id="desc"></textarea>
+
                         <div class="mb-3">
                           <label for="hashtag_input" class="form-label">Hashtag đính kèm <span class="text-danger">(tối đa 5 hashtag *)</span>:</label>
                           <div class="output"></div>
                           <input class="basic" placeholder="Hashtag đính kèm"/>
+
+                          <input type="hidden" name="hashtags" id="hashtagsInput" value="">
+                          <input type="hidden" name="hashtagsNew" id="hashtagsNewInput" value="">
                         </div>
+
                         <div class="mb-3">
                           <label for="formFileMultiple" class="form-label">Các file đính kèm (nếu có):</label>
-                          <input class="form-control" type="file" id="formFileMultiple" multiple name="FDK[]">
+
+                          <label for="file-input" class="ms-3 text-muted" style="cursor: pointer;">
+                            <span class="btn btn-link" style="text-decoration: none;"><i class="fas fa-paperclip"></i> Thêm file</span>
+                          </label>
+                          <!-- Input type file ẩn -->
+                          <input name="TN_FDK[]" type="file" id="file-input" style="display: none" multiple accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx"/>
+                          <input type="hidden" name="linkFile" id="linkFileInput" value="">
+                          <!-- Files Container -->
+                          <div id="selected-files-container" class=" m-2"></div>
+                          <!-- Images Container -->
+                          <div  id="selected-images-container" class="m-2 mb-3 position-relative"></div>
                         </div>
+
                         <label for="exampleDataList" class="form-label">Học phần liên quan (nếu có):</label>
                         <input class="form-control" list="datalistOptions" id="exampleDataList"
                           placeholder="Tìm kiếm học phần" name="HP_MA">
@@ -49,8 +66,10 @@
                           <option value="{{$hp->HP_MA}}">{{ $hp->HP_TEN }}</option>
                         @endforeach
                         </datalist>
+                        
                       </div>
-                      <button type="submit" class="btn btn-primary float-sm-end">Đăng bài</button>
+                      <button type="button" class="btn btn-primary float-sm-end" id="dangbai-btn">Đăng bài</button>
+                      <div id="spinner" class="spinner-border text-primary" style="display: none;"></div>
                     </form>
                   </div>
                 </div>
@@ -123,7 +142,7 @@
                         <label for="exampleDataList" class="form-label">Hashtag đi kèm:</label>
                         <div class="mb-3">
                           <div class="output2"></div>
-                          <input class="basic2" placeholder="e.g. HTML, JavaScript, CSS" />
+                          <input class="basic2" placeholder="Hashtag đính kèm" />
                         </div>
 
                         <label for="exampleDataList" class="form-label">Học phần liên quan:</label>
@@ -153,14 +172,7 @@
             </div>
             <!-- Data Loader -->
             <div class="auto-load text-center" style="display: none;">
-                <svg version="1.1" id="L9" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                    x="0px" y="0px" height="60" viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-                    <path fill="#000"
-                          d="M73,50c0-12.7-10.3-23-23-23S27,37.3,27,50 M30.9,50c0-10.5,8.5-19.1,19.1-19.1S69.1,39.5,69.1,50">
-                        <animateTransform attributeName="transform" attributeType="XML" type="rotate" dur="1s"
-                                          from="0 50 50" to="360 50 50" repeatCount="indefinite" />
-                    </path>
-                </svg>
+                <div class="spinner-border text-primary"></div>
             </div>
           </div>
 
@@ -231,7 +243,7 @@
 
 
 
-  <!--Xử lý hashtag Start-->
+  <!--XỬ LÝ HASHTAG START-->
   <script src="{{asset('public/js/tokenfield.web.js')}}"></script>
   
   <script>
@@ -318,8 +330,21 @@
     //******** UPDATE FUTURE: Gợi ý hashtag chọn: Sự kiện thay đổi trạng thái của tokenfield, hiển thị cả item lẫn
     /*instance.on('change', () => {
       const selectedItems = instance.getItems();
+      const inputElement = document.querySelector('.basic');
       const outputDiv = document.querySelector('.output');
-      outputDiv.innerHTML = `Mục đã chọn: ${selectedItems.map(item => item.name).join(', ')}`;
+      //outputDiv.innerHTML = `Mục đã chọn: ${selectedItems.map(item => item.name).join(', ')}`;
+      outputDiv.innerHTML = '';
+      selectedItems.forEach(function(item) {
+        if (item.isNew) {
+            outputDiv.innerHTML += `New: ${item.name}<br>`;
+        } else {
+            outputDiv.innerHTML += `Select: ${item.name}<br>`;
+        }
+      });
+
+      //if(selectedItems!=null){
+      //  inputElement.removeAttribute('required');
+      //}
     });*/
   </script>
 
@@ -409,17 +434,29 @@
         outputDiv2.innerHTML = `Mục đã chọn: ${selectedItems2.map(item => item.name).join(', ')}`;
       });
   </script>
-  <!--Xử lý hashtag End-->
+  <!--XỬ LÝ HASHTAG END-->
 
-  <!--Xử lý load more Start-->
+  <!--XỬ LÝ LOAD MORE START-->
   <script>
       var ENDPOINT = "{{ URL::to('/') }}"
       var page = 1;
 
+      //Load thêm bài: 2 cách
+      //Cách 1: Nhấn nút
       $(".load-more-data").click(function(){
           page++;
           infinteLoadMore(page);
       });
+
+      //Cách 2: Lướt tới cuối tự động load
+      $(window).scroll(function() {
+      // Kiểm tra xem đã đến cuối trang hay chưa
+      if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+        //console.log('Đã đến cuối trang');
+        page++;
+        infinteLoadMore(page);
+      }
+    });
 
       /*------------------------------------------
       --------------------------------------------
@@ -433,6 +470,7 @@
               type: "get",
               beforeSend: function () {
                   $('.auto-load').show();
+                  $('.load-more-data').hide();
               }
           })
               .done(function (response) {
@@ -442,6 +480,7 @@
                       return;
                   }
                   $('.auto-load').hide();
+                  $('.load-more-data').show();
                   $("#post_container").append(response.html);
               })
               .fail(function (jqXHR, ajaxOptions, thrownError) {
@@ -449,5 +488,252 @@
               });
       }
   </script>
-  <!--Xử lý load more End-->
+    <!--XỬ LÝ LOAD MORE END-->
+
+  <!-- MAIN START-->
+  <script type="module">
+    //|-----------------------------------------------------
+    //|KHAI BÁO FIRESTORE
+    //|-----------------------------------------------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, setDoc, addDoc, doc, collection, serverTimestamp, getDocs, query, where, orderBy, limit, or, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyCM8jj3tql4LSIaPvjI6D9_BTLYnaspwks",
+        authDomain: "ctu-student-community.firebaseapp.com",
+        databaseURL: "https://ctu-student-community-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "ctu-student-community",
+        storageBucket: "ctu-student-community.appspot.com",
+        messagingSenderId: "977339665171",
+        appId: "1:977339665171:web:9c200c8bc8907bd9ff28e6"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    //-----------------------------------------------------------------------------------
+    //***********************************************************************************
+    //***********************************************************************************
+
+    //BIẾN CHO UPLOAD ẢNH
+    const fileInput = document.getElementById('file-input');
+    const selectedFilesContainer = document.getElementById('selected-files-container');
+    const selectedImagesContainer = document.getElementById('selected-images-container');
+    var dontUse = [];
+
+    $(document).ready(function() {
+      $('#dangbai-btn').click(function(e) {
+          e.preventDefault();
+
+          const selectedItems = instance.getItems();
+          var form = $(this).closest('form');
+          var BV_TIEUDE = form.find('input[name="BV_TIEUDE"]').val();
+          var BV_NOIDUNG = form.find('textarea[name="BV_NOIDUNG"]').val();
+
+          if(BV_TIEUDE == ""){
+            //Báo lỗi
+            console.log('Báo lỗi chưa tiêu đề');
+          }
+          else if(BV_NOIDUNG == ""){
+            //Báo lỗi
+            console.log('Báo lỗi chưa nội dung');
+          }
+          else if(selectedItems.length==0){
+            //Báo lỗi
+            console.log('Báo lỗi chưa hashtag');
+          }
+          else{
+            //|-----------------------------------------------------
+            //|XỬ LÝ LINK FILE
+            //|-----------------------------------------------------
+            //Cho nút gửi xoay
+            document.getElementById('dangbai-btn').style.display = 'none';
+            document.getElementById('spinner').style.display = 'block';
+
+            var urlFile = [];
+            var TN_FDK = fileInput.files;
+
+            if(TN_FDK.length > 0 && TN_FDK.length > dontUse.length){//Gửi có file
+                (async () => {
+
+                    for (var i = 0; i < TN_FDK.length; i++) {
+                        //console.log("Selected File " + (i) + ": " + TN_FDK[i].name);
+                        if (dontUse.indexOf(i) !== -1) {
+                            // console.log(i + " đã tồn tại trong mảng dontUse.");
+                            //Không xử lý
+                        } else {
+                            //console.log(i + " không tồn tại trong mảng dontUse.");
+                            const file = TN_FDK[i];
+                            
+                            //STORAGE---------------------------------------
+                            const name = `${Date.now()}_${file.name}`;
+                            const folder = 'files';
+                            const fullPath = `${folder}/${name}`;
+
+                            //const storageRef = ref(storage, name); //Đường dẫn trực tiếp
+                            const storageRef = ref(storage, fullPath);
+                            //console.log('file: ',file);
+
+                            await uploadBytes(storageRef, file);
+                            const downloadURL = await getDownloadURL(storageRef); //Link file để add vào csdl
+                            //console.log('Uploaded file:', downloadURL);
+                            urlFile.push({name: name, link: downloadURL});
+                        }
+                    }
+                    document.getElementById('linkFileInput').value = JSON.stringify(urlFile);
+                    
+                    selectedFilesContainer.innerHTML = '';
+                    selectedImagesContainer.innerHTML = '';
+                    $("input[name^='TN_FDK']").val("");
+                    
+                    TagAndForm ()
+                })().catch((error) => {
+                    console.error('Error uploading file:', error);
+                });
+                //console.log("Xoá: ", dontUse);
+            }
+            else{ //Gửi không có file
+              TagAndForm ()
+            }
+  
+            function TagAndForm (){
+              //|-----------------------------------------------------
+              //|XỬ LÝ HASHTAG
+              //|-----------------------------------------------------
+              var hashtagItems = [];
+              var hashtagItemsNew = [];
+
+              selectedItems.forEach(function(hashtag) {
+                if (hashtag.isNew) {
+                  hashtagItemsNew.push(hashtag);
+                } else {
+                  hashtagItems.push(hashtag);
+                }
+              });
+              document.getElementById('hashtagsInput').value = JSON.stringify(hashtagItems);
+              document.getElementById('hashtagsNewInput').value = JSON.stringify(hashtagItemsNew);
+
+              //|-----------------------------------------------------
+              //|GỬI FORM
+              //|-----------------------------------------------------
+              var HP_MA = form.find('input[name="HP_MA"]').val();
+              var linkFile = form.find('input[name="linkFile"]').val();
+              var hashtags = form.find('input[name="hashtags"]').val();
+              var hashtagsNew = form.find('input[name="hashtagsNew"]').val();
+              var _token = $('input[name="_token"]').val(); 
+              /*console.log("BV_TIEUDE:", BV_TIEUDE);
+              console.log("BV_NOIDUNG:", BV_NOIDUNG);
+              console.log("HP_MA:", HP_MA);
+              console.log("linkFile:", linkFile);
+              console.log("hashtags:", hashtags);
+              console.log("hashtagsNew:", hashtagsNew);*/
+              
+              $.ajax({
+                url: '{{URL::to('/bai-dang')}}',
+                type: 'POST',
+                data: {
+                  BV_TIEUDE: BV_TIEUDE,
+                  BV_NOIDUNG: BV_NOIDUNG,
+                  HP_MA: HP_MA,
+                  linkFile: linkFile,
+                  hashtags: hashtags,
+                  hashtagsNew: hashtagsNew,
+                  _token: _token // Include the CSRF token in the data
+                },
+                success: function(response) {
+                    $('#them')[0].reset();
+                    document.getElementById('dangbai-btn').style.display = 'block';
+                    document.getElementById('spinner').style.display = 'none';
+                    console.log('Thành công');
+                },
+                error: function(error) {
+                    // Handle errors here
+                    console.log(error);
+                }
+              });
+
+            }
+
+
+          }
+      });
+
+      
+      //|*****************************************************
+      //|UPLOAD FILE START
+      //|*****************************************************
+      $('#file-input').on('click', function() {
+          $("input[name^='TN_FDK']").val("");
+          dontUse = [];
+      });
+      $('#file-input').on('change', function() {
+
+          selectedFilesContainer.innerHTML = '';
+          selectedImagesContainer.innerHTML = '';
+
+          if (fileInput.files.length > 0) {
+              for (let i = 0; i < fileInput.files.length; i++) {
+                  const file = fileInput.files[i];
+                  const fileType = file.type;
+                  console.log(file);
+                  // Kiểm tra loại file
+                  if (fileType.startsWith('image/')) {
+                      // Image
+                      const imageUrl = URL.createObjectURL(file);
+                      var divData = 
+                          '<span data-value="'+i+'" class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
+                          '    <img src="'+imageUrl+'" width="100px" height="100px" alt="Banner Image" class="d-block mx-auto">' +
+                          '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn" style="transform: translateX(-50%);"><i class="fas fa-times"></i></button>' +
+                          '</span>';
+                      selectedImagesContainer.insertAdjacentHTML('beforeend', divData);
+                  } else{
+                      var divData = 
+                          '<span data-value="'+i+'" class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">';
+                      if (fileType.startsWith('application/pdf')) {// PDF
+                          divData += '    <i class="fas fa-file-pdf fs-5 me-2"></i> ';
+                      }
+                      else if (fileType.startsWith('application/msword') || fileType.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) { //Word
+                          divData += '    <i class="fas fa-file-word fs-5 me-2"></i> ';
+                      }
+                      else if (fileType.startsWith('application/vnd.ms-excel') || fileType.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {// Excel
+                          divData += '    <i class="fas fa-file-excel fs-5 me-2"></i> ';
+                      }
+                      else if (fileType.startsWith('application/vnd.ms-powerpoint') || fileType.startsWith('application/vnd.openxmlformats-officedocument.presentationml.presentation')) {// Powerpoint
+                          divData += '    <i class="fas fa-file-powerpoint fs-5 me-2"></i> ';
+                      }
+                      else{
+                          divData += '    <i class="fas fa-file fs-5 me-2"></i> ';
+                      }
+                          divData += file.name + 
+                          '    <button class="btn btn-secondary btn-sm file-item-btn"><i class="fas fa-times"></i></button>' +
+                          '</span>';
+                      selectedFilesContainer.insertAdjacentHTML('beforeend', divData);
+                  }
+              }
+          }
+
+          $('.file-item-btn').on('click', function() {
+              const fileItem = $(this).closest('.file-item');
+              const dataValue = fileItem.data('value');
+
+              fileItem.remove();
+              dontUse.push(dataValue);
+
+              // Gán giá trị của mảng vào một input ẩn trong form $dontUseArray = json_decode($request->input('dontUse'));
+              // document.getElementById('dontUseInput').value = JSON.stringify(dontUse);
+              console.log("Xoá " + dataValue + ": " + dontUse);
+          });
+      });
+      //|*****************************************************
+      //|UPLOAD FILE END
+      //|*****************************************************  
+    });
+  </script>
+  <!--MIN END-->
 @endsection

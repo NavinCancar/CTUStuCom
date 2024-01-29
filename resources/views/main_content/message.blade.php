@@ -535,6 +535,7 @@
                                     TN_TRANGTHAI: 0,
                                 }).then(function(docRef) {
                                     console.log('Message đã gửi with ID: ', docRef.id);
+                                    messForm.querySelector('textarea[name="TN_NOIDUNG"]').value = "";
                                 }).catch(function(error) {
                                     console.error('Error adding document: ', error);
                                 });
@@ -1210,7 +1211,7 @@
                                 '            <div class="pt-1">' +
                                 '                <p class="fw-bold mb-0">'+fileName+'</p>' +
                                 '                <p class="small text-muted"><i>Từ: </i><i>' + 
-                                ((doc.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php echo $userChat->ND_HOTEN?>') +
+                                ((doc.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php if($userChat) echo $userChat->ND_HOTEN; else echo 0?>') +
                                 '                   </i></p>' +
                                 '            </div>' +
                                 '        </div>' +
@@ -1244,7 +1245,7 @@
                                         '            <div class="pt-1" style="overflow: hidden;">'+
                                         '                <p class="fw-bold mb-0">'+link+'</p>'+
                                         '                <p class="small text-muted"><i>Từ: </i><i>' + 
-                                        ((doc2.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php echo $userChat->ND_HOTEN?>') +
+                                        ((doc2.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php if($userChat) echo $userChat->ND_HOTEN; else echo 0?>') +
                                         '                   </i></p>' +
                                         '            </div>'+
                                         '        </div>'+
@@ -1357,7 +1358,7 @@
                                         '            <div class="pt-1">' +
                                         '                <p class="fw-bold mb-0">'+fileName+'</p>' +
                                         '                <p class="small text-muted"><i>Từ: </i><i>' + 
-                                        ((doc.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php echo $userChat->ND_HOTEN?>') +
+                                        ((doc.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php if($userChat) echo $userChat->ND_HOTEN; else echo 0?>') +
                                         '                   </i></p>' +
                                         '            </div>' +
                                         '        </div>' +
@@ -1401,7 +1402,7 @@
                                             '            <div class="pt-1" style="overflow: hidden;">'+
                                             '                <p class="fw-bold mb-0">'+link+'</p>'+
                                             '                <p class="small text-muted"><i>Từ: </i><i>' + 
-                                            ((doc2.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php echo $userChat->ND_HOTEN?>') +
+                                            ((doc2.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php if($userChat) echo $userChat->ND_HOTEN; else echo 0?>') +
                                             '                   </i></p>' +
                                             '            </div>'+
                                             '        </div>'+
