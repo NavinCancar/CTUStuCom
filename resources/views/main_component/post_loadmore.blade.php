@@ -13,7 +13,7 @@
                     <a href="javascript:void(0)" class="text-dark mb-2">
                       <h5 class="card-title fw-semibold post-title">{{$bv->BV_TIEUDE}}</h5>
 
-                      <span class="limited-lines">{{$bv->BV_NOIDUNG}}</span>
+                      <span class="limited-lines">{!! nl2br(e($bv->BV_NOIDUNG)) !!}</span>
                     </a>
                     <div class="d-flex justify-content-end mt-2">
                         <a class="ms-3 text-muted"><i class="fas fa-eye"></i> Lượt xem: <b>{{$bv->BV_LUOTXEM}}</b></a>

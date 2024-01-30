@@ -17,6 +17,15 @@
                   class="fa fa-filter"></i> Lọc bài viết</button>
             </div>
 
+            <div class="text-notice text-notice-success alert alert-success" id="them-success" style="display: none">
+              Thêm bài viết thành công
+              <button type="button" class="btn btn-link p-0 float-end text-success" onclick="this.parentNode.style.display = 'none'"><i class="fas fa-times-circle"></i></button>
+            </div>
+            <div class="text-notice text-notice-danger alert alert-danger" id="them-danger" style="display: none">
+              Thêm bài viết thất bại
+              <button type="button" class="btn btn-link p-0 float-end text-danger" onclick="this.parentNode.style.display = 'none'"><i class="fas fa-times-circle"></i></button>
+            </div>
+
             @if($userLog)
             <!-- Thêm bài viết Start -->
             <div id="thembaiviet" class="collapse">
@@ -37,7 +46,7 @@
                         <div class="mb-3">
                           <label for="hashtag_input" class="form-label">Hashtag đính kèm <span class="text-danger">(tối đa 5 hashtag *)</span>:</label>
                           <div class="output"></div>
-                          <input class="basic" placeholder="Hashtag đính kèm"/>
+                          <input class="basic" name="BV_HASHTAG" placeholder="Hashtag đính kèm"/>
 
                           <input type="hidden" name="hashtags" id="hashtagsInput" value="">
                           <input type="hidden" name="hashtagsNew" id="hashtagsNewInput" value="">
@@ -536,17 +545,18 @@
           var BV_TIEUDE = form.find('input[name="BV_TIEUDE"]').val();
           var BV_NOIDUNG = form.find('textarea[name="BV_NOIDUNG"]').val();
 
+          form.find('input[name="BV_TIEUDE"]').css('border-color', '');
+          form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
+          form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+
           if(BV_TIEUDE == ""){
-            //Báo lỗi
-            console.log('Báo lỗi chưa tiêu đề');
+            form.find('input[name="BV_TIEUDE"]').css('border-color', '#FA896B');
           }
           else if(BV_NOIDUNG == ""){
-            //Báo lỗi
-            console.log('Báo lỗi chưa nội dung');
+            form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '#FA896B');
           }
           else if(selectedItems.length==0){
-            //Báo lỗi
-            console.log('Báo lỗi chưa hashtag');
+            form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '#FA896B');
           }
           else{
             //|-----------------------------------------------------
@@ -650,10 +660,16 @@
                     $('#them')[0].reset();
                     document.getElementById('dangbai-btn').style.display = 'block';
                     document.getElementById('spinner').style.display = 'none';
-                    console.log('Thành công');
+                    form.find('input[name="BV_TIEUDE"]').css('border-color', '');
+                    form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
+                    form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+                    document.getElementById('thembaiviet').classList.remove("show");
+                    document.getElementById('them-success').style.display = 'block';
+                    //console.log('Thành công');
                 },
                 error: function(error) {
                     // Handle errors here
+                    document.getElementById('them-danger').style.display = 'block';
                     console.log(error);
                 }
               });
@@ -663,7 +679,6 @@
 
           }
       });
-
       
       //|*****************************************************
       //|UPLOAD FILE START

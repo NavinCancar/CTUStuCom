@@ -57,7 +57,7 @@ class HomeController extends Controller
         ->groupBy('bai_viet.BV_MA')->select('bai_viet.BV_MA', DB::raw('count(*) as count'))
         ->get();
 
-        if ($request->ajax()) {
+        if ($request->ajax()) {//Chạy nút load-more
             $view = view('main_component.post_loadmore')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag)
             ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
             ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)->render();

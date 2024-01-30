@@ -56,7 +56,7 @@
                 <?php
                   $alert = Session::get('alert');
                   if ($alert && is_array($alert)) {
-                      echo '<div class="alert alert-' . $alert['type'] . '">';
+                      echo '<div class="text-notice text-notice-' . $alert['type'] . ' alert alert-' . $alert['type'] . '">';
                       echo $alert['content'];
                       echo '</div>';
                       Session::put('alert', null);

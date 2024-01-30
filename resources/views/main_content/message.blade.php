@@ -444,6 +444,8 @@
 
                     var messForm = document.getElementById('message-form');
                     var TN_NOIDUNG = messForm.querySelector('textarea[name="TN_NOIDUNG"]').value;
+                    // Thay thế ký tự xuống hàng bằng thẻ <br>
+                    TN_NOIDUNG = TN_NOIDUNG.replace(/\n/g, '<br>');
 
                     var TN_FDK = fileInput.files;
 
