@@ -31,7 +31,7 @@
                     <form role="form" action="{{URL::to('/tai-khoan/'.$userAcc)}}" method="post" enctype= "multipart/form-data" id="form">
                         {{ csrf_field() }}
                         <div class="form-group text-center">
-                            <label><b>Ảnh đại diện:</b></label>
+                            <label class="form-label">Ảnh đại diện:</label>
                             <input type="hidden" name="ND_ANHDAIDIENshow" disabled value="<?php if($account_info->ND_ANHDAIDIEN) echo $account_info->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" class="form-control">
 
                             <style>
@@ -66,15 +66,34 @@
                             </div>
                         </div>
                         <div class="form-group mb-3">
-                            <label><b>Họ tên:</b> <span class="text-danger">(*)</span>:</label>
+                            <label class="form-label">Họ tên: <span class="text-danger">(*)</span>:</label>
                             <input type="text" name="ND_HOTEN" value="{{$account_info->ND_HOTEN}}" class="form-control" required="">
                         </div>
                         <div class="form-group mb-3">
-                            <label><b>Email:</b> <span class="text-danger">(*)</span>:</label>
+                            <label class="form-label">Email: <span class="text-danger">(*)</span>:</label>
                             <input type="text" name="ND_EMAIL" value="{{$account_info->ND_EMAIL}}" class="form-control" required=""  pattern="/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/">
                         </div> 
                         <div class="form-group mb-3">
-                            <label><b>Mô tả:</b></label>
+                            <label class="form-label">Khoa trường theo học:</label>
+                            <select name="KT_MA" class="form-control">
+                                @if($account_info->KT_MA == NULL)
+                                      <option selected value="">Chọn khoa trường của bạn...</option>
+                                  @foreach($college as $key => $c)
+                                      <option value="{{$c->KT_MA}}">{{ $c->KT_TEN }}</option>
+                                  @endforeach
+                                @else
+                                  @foreach($college as $key => $c)
+                                      @if($account_info->KT_MA == $c->KT_MA)
+                                      <option selected value="{{$c->KT_MA}}">{{ $c->KT_TEN }}</option>
+                                      @else
+                                      <option value="{{$c->KT_MA}}">{{ $c->KT_TEN }}</option>
+                                      @endif
+                                  @endforeach
+                                @endif
+                            </select>
+                        </div> 
+                        <div class="form-group mb-3">
+                            <label class="form-label">Mô tả:</label>
                             <textarea class="form-control mb-3" rows="5" id="comment" name="ND_MOTA"
                             placeholder="Nhập mô tả bản thân..." id="desc">{{$account_info->ND_MOTA}}</textarea>
                         </div> 
@@ -82,6 +101,7 @@
                         <div id="spinner" class="spinner-border text-primary" style="display: none;"></div>
                     </form>
                     <button type="button" style="width: 100%;" class="btn btn-primary" id="non-disabled">Cập nhật thông tin</button>
+                    <button type="button" style="width: 100%;margin-top: 20px;" class="btn btn-danger" id="block-account">Vô hiệu hoá tài khoản</button>
                 </div>
               @endforeach
             </div>
@@ -143,9 +163,80 @@
             for (var i = 0; i < elements.length; i++) {
                 elements[i].disabled = false;
             }
-            
+
+            $('#block-account').hide();
             $('#non-disabled').hide();
             $('#submit-form').show();
+        });
+
+      //VÔ HIỆU HOÁ
+        $('#block-account').click(function(e) {
+            e.preventDefault();
+            // Hiển thị hộp thoại xác nhận
+            var isConfirmed = window.confirm('Bạn có chắc chắn muốn vô hiệu hoá tài khoản này không?');
+
+            if (isConfirmed) {
+                //|-----------------------------------------------------
+                //|LẤY ID
+                //|-----------------------------------------------------
+                (async () => {
+                    const quser = query(
+                      collection(db, "ANH_DAI_DIEN"), 
+                      where('ND_MA', '==', <?php echo $userAcc; ?>)
+                    );
+
+                    const querySnapshotuser = await getDocs(quser);
+                    querySnapshotuser.forEach((doc) => {
+                      //console.log(doc.id, " => ", doc.data());
+                      
+                      $.ajax({
+                        url: '{{URL::to('/tai-khoan/'.$userAcc)}}',
+                        type: 'DELETE',
+                        data: {
+                          idFirestore: doc.id,
+                          _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            $('#form')[0].reset();
+                            for (var i = 0; i < elements.length; i++) {
+                                elements[i].disabled = true;
+                            }
+                            
+                            $('#block-account').show();
+                            $('#non-disabled').show();
+                            $('#submit-form').hide();
+                            $('#spinner').hide();
+
+                            //console.log('Thành công');
+                            //console.log(response.message);
+                            window.location.href = '{{URL::to('/trang-chu')}}';
+                        },
+                        error: function(error) {
+                            // Handle errors here
+                            $('#form')[0].reset();
+                            for (var i = 0; i < elements.length; i++) {
+                                elements[i].disabled = true;
+                            }
+                            
+                            $('#block-account').show();
+                            $('#non-disabled').show();
+                            $('#submit-form').hide();
+                            $('#spinner').hide();
+
+                            document.getElementById('alert-danger').style.display = 'block';
+                            console.log(error);
+                        }
+                      });
+
+                    });
+                })().catch((error) => {
+                    document.getElementById('alert-danger').style.display = 'block';
+                    console.error("Error in script: ", error);
+                });
+                //alert('Tài khoản đã được vô hiệu hoá!');
+            } else {
+                alert('Hủy bỏ  vô hiệu hoá tài khoản.');
+            }
         });
 
       //AVATAR
@@ -173,6 +264,7 @@
           var form = $(this).closest('form');
           var ND_HOTEN = form.find('input[name="ND_HOTEN"]').val();
           var ND_EMAIL = form.find('input[name="ND_EMAIL"]').val();
+          var KT_MA = form.find('select[name="KT_MA"]').val();
           var ND_ANHDAIDIEN = form.find('input[name="ND_ANHDAIDIEN"]').val();
           var ND_MOTA = form.find('textarea[name="ND_MOTA"]').val();
           var _token = $('input[name="_token"]').val();
@@ -180,10 +272,12 @@
           form.find('input[name="ND_HOTEN"]').css('border-color', '');
           form.find('input[name="ND_EMAIL"]').css('border-color', '');
 
+          var emailReg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
           if(ND_HOTEN == ""){
             form.find('input[name="ND_HOTEN"]').css('border-color', '#FA896B');
           }
-          else if(ND_EMAIL == ""){
+          else if(ND_EMAIL == "" || emailReg.test(ND_EMAIL)==false){
             form.find('input[name="ND_EMAIL"]').css('border-color', '#FA896B');
           }
           else{
@@ -226,59 +320,82 @@
   
             function UpdateAndForm (downloadURL){
               //|-----------------------------------------------------
-              //|GỬI FORM
+              //|LẤY ID
               //|-----------------------------------------------------
-              /*console.log(ND_HOTEN);
-              console.log(ND_EMAIL);
-              console.log(ND_MOTA);
-              console.log(ND_ANHDAIDIEN);
-              console.log(name);
-              console.log(downloadURL);*/
-              
-              $.ajax({
-                url: '{{URL::to('/tai-khoan/'.$userAcc)}}',
-                type: 'PUT',
-                data: {
-                  ND_HOTEN: ND_HOTEN,
-                  ND_EMAIL: ND_EMAIL,
-                  ND_MOTA: ND_MOTA,
-                  downloadURL: downloadURL,
-                  _token: _token // Include the CSRF token in the data
-                },
-                success: function(response) {
-                    $('#form')[0].reset();
-                    for (var i = 0; i < elements.length; i++) {
-                        elements[i].disabled = true;
-                    }
+              (async () => {
+                  const quser = query(
+                    collection(db, "ANH_DAI_DIEN"), 
+                    where('ND_MA', '==', <?php echo $userAcc; ?>)
+                  );
+
+                  const querySnapshotuser = await getDocs(quser);
+                  querySnapshotuser.forEach((doc) => {
+                    //console.log(doc.id, " => ", doc.data());
+
+                    //|-----------------------------------------------------
+                    //|GỬI FORM
+                    //|-----------------------------------------------------
+                    /*console.log(ND_HOTEN);
+                    console.log(ND_EMAIL);
+                    console.log(ND_MOTA);
+                    console.log(ND_ANHDAIDIEN);
+                    console.log(name);
+                    console.log(downloadURL);*/
                     
-                    $('#non-disabled').show();
-                    $('#submit-form').hide();
-                    $('#spinner').hide();
+                    $.ajax({
+                      url: '{{URL::to('/tai-khoan/'.$userAcc)}}',
+                      type: 'PUT',
+                      data: {
+                        ND_HOTEN: ND_HOTEN,
+                        ND_EMAIL: ND_EMAIL,
+                        KT_MA: KT_MA,
+                        ND_MOTA: ND_MOTA,
+                        downloadURL: downloadURL,
+                        idFirestore: doc.id,
+                        _token: _token // Include the CSRF token in the data
+                      },
+                      success: function(response) {
+                          $('#form')[0].reset();
+                          for (var i = 0; i < elements.length; i++) {
+                              elements[i].disabled = true;
+                          }
+                          
+                          $('#block-account').show();
+                          $('#non-disabled').show();
+                          $('#submit-form').hide();
+                          $('#spinner').hide();
 
-                    form.find('input[name="ND_HOTEN"]').css('border-color', '');
-                    form.find('input[name="ND_EMAIL"]').css('border-color', '');
-                    //console.log('Thành công');
-                    window.location.href = '{{URL::to('/tai-khoan/'.$userAcc.'/edit')}}';
-                },
-                error: function(error) {
-                    // Handle errors here
-                    $('#form')[0].reset();
-                    for (var i = 0; i < elements.length; i++) {
-                        elements[i].disabled = true;
-                    }
-                    
-                    $('#non-disabled').show();
-                    $('#submit-form').hide();
-                    $('#spinner').hide();
+                          form.find('input[name="ND_HOTEN"]').css('border-color', '');
+                          form.find('input[name="ND_EMAIL"]').css('border-color', '');
+                          //console.log('Thành công');
+                          //console.log(response.message);
+                          window.location.href = '{{URL::to('/tai-khoan/'.$userAcc.'/edit')}}';
+                      },
+                      error: function(error) {
+                          // Handle errors here
+                          $('#form')[0].reset();
+                          for (var i = 0; i < elements.length; i++) {
+                              elements[i].disabled = true;
+                          }
+                          
+                          $('#block-account').show();
+                          $('#non-disabled').show();
+                          $('#submit-form').hide();
+                          $('#spinner').hide();
 
-                    form.find('input[name="ND_HOTEN"]').css('border-color', '');
-                    form.find('input[name="ND_EMAIL"]').css('border-color', '');
+                          form.find('input[name="ND_HOTEN"]').css('border-color', '');
+                          form.find('input[name="ND_EMAIL"]').css('border-color', '');
 
-                    document.getElementById('alert-danger').style.display = 'block';
-                    console.log(error);
-                }
+                          document.getElementById('alert-danger').style.display = 'block';
+                          console.log(error);
+                      }
+                    });
+
+                  });
+              })().catch((error) => {
+                  document.getElementById('alert-danger').style.display = 'block';
+                  console.error("Error in script: ", error);
               });
-
             }
           }
       });

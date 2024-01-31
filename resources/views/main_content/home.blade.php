@@ -7,6 +7,17 @@
             <div class="mb-3 mb-sm-0 d-flex">
               <h5 class="card-title fw-semibold">Bảng tin</h5>
             </div>
+            <?php
+              $alert = Session::get('alert');
+              if ($alert && is_array($alert)) {
+                  echo '<div class="text-notice text-notice-' . $alert['type'] . ' alert alert-' . $alert['type'] . '">';
+                  echo $alert['content'];
+                  echo '<i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = \'none\'"></i>';
+                  echo '</div>';
+                  Session::put('alert', null);
+              }
+              Session::put('alert',null);
+            ?>
             <hr>
             <div class="d-block">
               @if($userLog)

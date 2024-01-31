@@ -8,7 +8,7 @@
                   </div>
                   <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Email:</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" required="" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" name="ND_EMAIL" aria-describedby="emailHelp">
+                    <input type="email" class="form-control" id="exampleInputEmail1" required="" pattern="[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" name="ND_EMAIL" aria-describedby="emailHelp">
                   </div>
                   <div class="mb-3">
                     <label for="exampleInputPassword1" class="form-label">Mật khẩu:</label>

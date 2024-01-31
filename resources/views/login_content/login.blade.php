@@ -4,7 +4,7 @@
                   {{ csrf_field() }}
                   <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Email:</label>
-                    <input type="email" class="form-control" name="ND_EMAIL" required="" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <input type="email" class="form-control" name="ND_EMAIL" required=""  pattern="[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}" id="exampleInputEmail1" aria-describedby="emailHelp">
                   </div>
                   <div class="mb-3">
                     <label for="exampleInputPassword1" class="form-label">Mật khẩu:</label>

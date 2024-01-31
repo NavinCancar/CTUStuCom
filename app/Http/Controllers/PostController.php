@@ -125,8 +125,10 @@ class PostController extends Controller
             }
         }
         
-        return Redirect::to('trang-chu');
-        
+        //return Redirect::to('trang-chu');
+        return;
+
+        //Gọi bằng ajax nên không cần return gì
         /*echo '<pre>';
         print_r ($dontUseArray);
         print_r ($request->file('TN_FDK'));

@@ -11,6 +11,7 @@ use App\Http\Requests;
 use Illuminate\Support\Facades\Redirect;
 
 use MrShan0\PHPFirestore\FirestoreClient;
+use MrShan0\PHPFirestore\Attributes\FirestoreDeleteAttribute;
 
 use Carbon\Carbon;
 session_start();
@@ -25,7 +26,8 @@ class UserSysController extends Controller
     - Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
     
     NGƯỜI DÙNG
-    - Đối với cá nhân: Đăng nhập tài khoản, Đăng xuất tài khoản(*), Đăng ký tài khoản, Cập nhật tài khoản người dùng (****)
+    - Đối với cá nhân: Đăng nhập tài khoản, Đăng xuất tài khoản(*), Đăng ký tài khoản, 
+        Cập nhật tài khoản người dùng (****), Vô hiệu hoá tài khoản người dùng (****),
     - Đối với người dùng khác: 
     |--------------------------------------------------------------------------
     */
@@ -163,6 +165,17 @@ class UserSysController extends Controller
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))
             ->first();
+
+
+        //FIRESTORE
+        $collection = 'ANH_DAI_DIEN';
+        $this->firestoreClient->addDocument($collection, [
+            'ND_MA' => $userLog->ND_MA,
+            'ND_HOTEN' => $request->ND_HOTEN,  
+            'ND_ANHDAIDIEN' =>  '',
+            'ND_TRANGTHAI' =>  1,
+        ]);
+            
         Session::put('userLog',$userLog);
         return Redirect::to('/tai-khoan/'.$userLog->ND_MA.'/edit');
     }
@@ -186,17 +199,19 @@ class UserSysController extends Controller
     /**
      * Cập nhật tài khoản người dùng (****)
      */
-    public function edit(UserSys $tai_khoan){
+    public function edit(UserSys $tai_khoan){///
         $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
 
         $account_info = DB::table('nguoi_dung')
             ->where('ND_MA', $tai_khoan->ND_MA)->get();
+
+        $college = DB::table('khoa_truong')->get();
         
-        return view('main_content.personal_account.edit_personal_account')->with('account_info', $account_info);
+        return view('main_content.personal_account.edit_personal_account')
+        ->with('account_info', $account_info)->with('college', $college);
     }
 
-    public function update(Request $request, UserSys $tai_khoan)
-    {
+    public function update(Request $request, UserSys $tai_khoan){///
         $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
 
         //Dò trùng
@@ -205,7 +220,7 @@ class UserSysController extends Controller
             if (strtolower($ds->ND_EMAIL)==strtolower($request->ND_EMAIL) && ($ds->ND_MA != $tai_khoan->ND_MA)) {
                 //Phải load lại trang mới xài
                 Session::put('alert', ['type' => 'warning', 'content' => 'Email đã tồn tại trên hệ thống, vui lòng đăng ký với email khác!']);
-                return response()->json(['ND_MA' => $tai_khoan->ND_MA], 200);
+                return;
             }
         }
 
@@ -217,24 +232,61 @@ class UserSysController extends Controller
             'ND_MOTA' => $request->ND_MOTA
         ]);
 
+        //FIRESTORE
+        $documentPath = 'ANH_DAI_DIEN/' . $request->idFirestore;
+        $this->firestoreClient->updateDocument($documentPath, [
+            'ND_HOTEN' => $request->ND_HOTEN
+        ], true);
+        //$responseData = ['message' => $documentPath];
+
         if($request->downloadURL != ''){
             DB::table('nguoi_dung')
                 ->where('ND_MA', $tai_khoan->ND_MA)
                 ->update([ 
                     'ND_ANHDAIDIEN' => $request->downloadURL
                 ]);
+
+            //FIRESTORE
+            $this->firestoreClient->updateDocument($documentPath, [
+                'ND_ANHDAIDIEN' => $request->downloadURL
+            ], true);
+        }
+
+        if($request->KT_MA != ''){
+            DB::table('nguoi_dung')
+                ->where('ND_MA', $tai_khoan->ND_MA)
+                ->update([ 
+                    'KT_MA' => $request->KT_MA
+                ]);
         }
 
         Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật thành công!']);
-        return response()->json(['ND_MA' => $tai_khoan->ND_MA], 200);
+        //return response()->json(['ND_MA' => $tai_khoan->ND_MA], 200);
+        //return response()->json($responseData);
+        return;
     }
 
     /**
-     * Vô hiệu hoá tài khoản người dùng
+     * Vô hiệu hoá tài khoản người dùng (****)
      */
-    public function destroy(UserSys $tai_khoan)
-    {
-        //
+    public function destroy(UserSys $tai_khoan){ ///
+        $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
+        DB::table('nguoi_dung')
+        ->where('ND_MA', $tai_khoan->ND_MA)
+        ->update([ 
+            'ND_TRANGTHAI' => 0
+        ]);
+
+        //FIRESTORE
+        $idFirestore = request('idFirestore');
+        $documentPath = 'ANH_DAI_DIEN/' . $idFirestore;
+        $this->firestoreClient->updateDocument($documentPath, [
+            'ND_TRANGTHAI' => 0
+        ], true);
+
+        Session::put('userLog',null);
+        Session::put('alert', ['type' => 'success', 'content' => 'Tài khoản bị vô hiệu hoá thành công!']);
+        return;
     }
 
      /**
