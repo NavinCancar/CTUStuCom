@@ -17,24 +17,30 @@ session_start();
 
 class PostController extends Controller
 {
-    public function __construct()
-    {
+    /*
+    |--------------------------------------------------------------------------
+    HÀM HỖ TRỢ
+    - Hàm xây dựng FireStore
+    - Kiểm tra đăng nhập: Người dùng => (*)
+    
+    NGƯỜI DÙNG
+    - Tạo bài đăng mới(*)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Hàm xây dựng FireStore
+     */
+    public function __construct(){ ///
         $this->firestoreClient = new FirestoreClient('ctu-student-community', 'AIzaSyCM8jj3tql4LSIaPvjI6D9_BTLYnaspwks', [
             'database' => '(default)',
         ]);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | NGƯỜI DÙNG
-    | - Tạo bài đăng mới(*),
-    |--------------------------------------------------------------------------
-    */
-
     /**
-     * Kiểm tra đăng nhập
+     * Kiểm tra đăng nhập: Người dùng => (*)
      */
-    public function AuthLogin_ND(){
+    public function AuthLogin_ND(){ ///
         $userLog = Session::get('userLog');
         if($userLog){
         }else{
@@ -42,16 +48,21 @@ class PostController extends Controller
         }
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | NGƯỜI DÙNG
+    |--------------------------------------------------------------------------
+    */
+
     /**
-     * Tạo bài đăng mới
+     * Tạo bài đăng mới(*)
      */
-    public function create()
-    {
-        //
+    public function create(){ //Không dùng
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){ ///
+
         $this->AuthLogin_ND();
 
         $userLog = Session::get('userLog');
@@ -151,18 +162,26 @@ class PostController extends Controller
         //
     }
 
+
     /*
     |--------------------------------------------------------------------------
-    | KIỂM DUYỆT
+    | KIỂM DUYỆT VIÊN
     |--------------------------------------------------------------------------
     */
+
     /**
-     * Display a listing of the resource.
+     * Xem danh sách bài đăng
      */
     public function index()
     {
         //
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | QUẢN TRỊ VIÊN
+    |--------------------------------------------------------------------------
+    */
     
 }

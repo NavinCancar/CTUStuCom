@@ -14,15 +14,18 @@ class HomeController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | NGƯỜI DÙNG
-    | - Hiển thị trang chủ
+    HÀM HỖ TRỢ
+    - Kiểm tra đăng nhập: Người dùng => (*)
+    
+    NGƯỜI DÙNG
+    - Hiển thị trang chủ
     |--------------------------------------------------------------------------
     */
 
     /**
-     * Kiểm tra đăng nhập người dùng
+     * Kiểm tra đăng nhập: Người dùng => (*)
      */
-    public function AuthLogin_ND(){
+    public function AuthLogin_ND(){ ///
         $userLog = Session::get('userLog');
         if($userLog){
         }else{
@@ -30,10 +33,17 @@ class HomeController extends Controller
         }
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | NGƯỜI DÙNG
+    |--------------------------------------------------------------------------
+    */
+
     /**
      * Hiển thị trang chủ
      */
-    public function index(Request $request){
+    public function index(Request $request){ ///
         //Bài viết Start
         $bai_viet = DB::table('bai_viet')
         ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')

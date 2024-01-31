@@ -58,6 +58,7 @@
                   if ($alert && is_array($alert)) {
                       echo '<div class="text-notice text-notice-' . $alert['type'] . ' alert alert-' . $alert['type'] . '">';
                       echo $alert['content'];
+                      echo '<i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = \'none\'"></i>';
                       echo '</div>';
                       Session::put('alert', null);
                   }

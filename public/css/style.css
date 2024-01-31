@@ -267,3 +267,13 @@
   border-radius: 50%;
   background-color: var(--bs-white);
 }
+
+.text-notice .fa-times-circle{
+  cursor: pointer;
+}
+
+
+.position-center {
+  width:76%;
+  margin: 0 auto;
+}

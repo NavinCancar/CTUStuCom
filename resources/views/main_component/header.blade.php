@@ -90,11 +90,11 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
                   <div class="message-body">
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                    <a href="{{URL::to('/tai-khoan/'.$userLog -> ND_MA)}}" class="d-flex align-items-center gap-2 dropdown-item">
                       <i class="fa fa-user"></i>
                       <p class="mb-0 fs-3">Trang cá nhân</p>
                     </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                    <a href="{{URL::to('/tai-khoan/'.$userLog -> ND_MA.'/edit')}}" class="d-flex align-items-center gap-2 dropdown-item">
                       <i class="fas fa-user-cog"></i>
                       <p class="mb-0 fs-3">Cập nhật tài khoản</p>
                     </a>

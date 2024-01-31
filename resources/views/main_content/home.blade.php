@@ -19,11 +19,11 @@
 
             <div class="text-notice text-notice-success alert alert-success" id="them-success" style="display: none">
               Thêm bài viết thành công
-              <button type="button" class="btn btn-link p-0 float-end text-success" onclick="this.parentNode.style.display = 'none'"><i class="fas fa-times-circle"></i></button>
+              <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
             </div>
             <div class="text-notice text-notice-danger alert alert-danger" id="them-danger" style="display: none">
               Thêm bài viết thất bại
-              <button type="button" class="btn btn-link p-0 float-end text-danger" onclick="this.parentNode.style.display = 'none'"><i class="fas fa-times-circle"></i></button>
+              <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
             </div>
 
             @if($userLog)

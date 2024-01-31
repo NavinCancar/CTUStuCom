@@ -18,15 +18,18 @@ class MessageController_FB extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | NGƯỜI DÙNG
-    | - Nhắn tin(*)
+    HÀM HỖ TRỢ
+    - Kiểm tra đăng nhập: Người dùng => (*)
+    
+    NGƯỜI DÙNG
+    - Nhắn tin(*)
     |--------------------------------------------------------------------------
     */
-
+    
     /**
-     * Kiểm tra đăng nhập người dùng
+     * Kiểm tra đăng nhập: Người dùng => (*)
      */
-    public function AuthLogin_ND(){
+    public function AuthLogin_ND(){ ///
         $userLog = Session::get('userLog');
         if($userLog){
         }else{
@@ -34,18 +37,23 @@ class MessageController_FB extends Controller
         }
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | NGƯỜI DÙNG
+    |--------------------------------------------------------------------------
+    */
+
     /**
-     * Nhắn tin
+     * Nhắn tin(*)
      */
 
-    public function index()
-    {
+    public function index(){ ///
         $this->AuthLogin_ND();
         return view('main_content.message');
     }
 
-    public function show(string $id)
-    {
+    public function show(string $id){ ///
         $this->AuthLogin_ND();
         
         $userChat = DB::table('nguoi_dung')

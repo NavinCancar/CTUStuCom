@@ -10,6 +10,8 @@ use Session;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Redirect;
 
+use MrShan0\PHPFirestore\FirestoreClient;
+
 use Carbon\Carbon;
 session_start();
 
@@ -17,16 +19,30 @@ class UserSysController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | NGƯỜI DÙNG
-    | - Đối với cá nhân: Đăng nhập, đăng xuất(*), đăng ký
-    | - Đối với người dùng khác: 
+    HÀM HỖ TRỢ
+    - Hàm xây dựng FireStore
+    - Kiểm tra đăng nhập: Người dùng => (*)
+    - Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+    
+    NGƯỜI DÙNG
+    - Đối với cá nhân: Đăng nhập tài khoản, Đăng xuất tài khoản(*), Đăng ký tài khoản, Cập nhật tài khoản người dùng (****)
+    - Đối với người dùng khác: 
     |--------------------------------------------------------------------------
     */
 
     /**
-     * Kiểm tra đăng nhập người dùng
+     * Hàm xây dựng FireStore
      */
-    public function AuthLogin_ND(){
+    public function __construct(){ ///
+        $this->firestoreClient = new FirestoreClient('ctu-student-community', 'AIzaSyCM8jj3tql4LSIaPvjI6D9_BTLYnaspwks', [
+            'database' => '(default)',
+        ]);
+    }
+
+    /**
+     * Kiểm tra đăng nhập: Người dùng => (*)
+     */
+    public function AuthLogin_ND(){ ///
         $userLog = Session::get('userLog');
         if($userLog){
         }else{
@@ -34,32 +50,51 @@ class UserSysController extends Controller
         }
     }
 
+    /**
+     * Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+     */
+    public function AuthLogin_BTwQTV($ma){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->VT_MA == 1 || $userLog->ND_MA == $ma){
+            }
+            else{
+                return Redirect::to('tai-khoan/'.$userLog->ND_MA.'/edit')->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | NGƯỜI DÙNG
+    |--------------------------------------------------------------------------
+    */
+
     //TÁC ĐỘNG TÀI KHOẢN CÁ NHÂN
 
     /**
-     * Đăng nhập
+     * Đăng nhập tài khoản
      */
-    public function login() ///ok
-    {
+    public function login(){ ///
         return view('login_content.login');
     }
 
-    public function login_check(Request $request) ///ok
-    {
+    public function login_check(Request $request){ ///
     	$ND_EMAIL = $request->ND_EMAIL;
         $ND_MATKHAU = $request->ND_MATKHAU;
         
-        $result = DB::table('nguoi_dung')->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))->first();
+        $userLog = DB::table('nguoi_dung')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))
+            ->first();
         /*echo '<pre>';
         print_r ($result);
         echo '</pre>';*/
         
-        if($result){
-            if($result->ND_TRANGTHAI==1){
-                $userLog = DB::table('nguoi_dung')
-                    ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-                    ->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))
-                    ->first();
+        if($userLog){
+            if($userLog->ND_TRANGTHAI==1){
                 Session::put('userLog',$userLog);
                 return Redirect::to('/trang-chu');
             }
@@ -75,35 +110,22 @@ class UserSysController extends Controller
     }
 
     /**
-     * Đăng xuất
+     * Đăng xuất tài khoản(*)
      */
-    public function logout() ///ok
-    {
+    public function logout(){ ///
         $this->AuthLogin_ND();
         Session::put('userLog',null);
         return Redirect::to('/trang-chu');
     }
     
     /**
-     * Đăng ký
+     * Đăng ký tài khoản
      */
-    public function u_create() ///ok
-    {
+    public function u_create(){ ///
         return view('login_content.register');
     }
 
-    public function u_store(Request $request) ///ok
-    {
-        //Ghi nhận đăng ký, chưa xử lý ảnh đại diện
-        $data = array();
-        $data['VT_MA'] = 3;  
-        $data['ND_HOTEN'] = $request->ND_HOTEN;
-        $data['ND_EMAIL'] = $request->ND_EMAIL;
-        $data['ND_MATKHAU'] = md5($request->ND_MATKHAU);
-        $data['ND_DIEMCONGHIEN'] = 0;
-        $data['ND_TRANGTHAI'] = 1;
-        $data['ND_NGAYTHAMGIA'] = Carbon::now('Asia/Ho_Chi_Minh');
-
+    public function u_store(Request $request){ ///
         //Dò trùng
         $dsnd=DB::table('nguoi_dung')->get();
         foreach ($dsnd as $ds){
@@ -113,7 +135,15 @@ class UserSysController extends Controller
             }
         }
 
-        DB::table('nguoi_dung')->insert($data);
+        DB::table('nguoi_dung')->insert([
+            'VT_MA' => 3,
+            'ND_HOTEN' => $request->ND_HOTEN,
+            'ND_EMAIL' => $request->ND_EMAIL,
+            'ND_MATKHAU' => md5($request->ND_MATKHAU),
+            'ND_DIEMCONGHIEN' => 0,
+            'ND_TRANGTHAI' => 1,
+            'ND_NGAYTHAMGIA' => Carbon::now('Asia/Ho_Chi_Minh')
+        ]);
 
         /* 
         //Lấy mã để xử lý ảnh đại diện
@@ -134,37 +164,87 @@ class UserSysController extends Controller
             ->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))
             ->first();
         Session::put('userLog',$userLog);
-        return Redirect::to('/trang-chu');
+        return Redirect::to('/tai-khoan/'.$userLog->ND_MA.'/edit');
     }
 
     /**
-     * Chi tiết tài khoản cá nhân
+     * Danh sách người dùng gợi ý
      */
-    public function u_show(UserSys $userSys)
-    {
-        //
-    }
-
-    /**
-     * Cập nhật tài khoản cá nhân
-     */
-    public function u_edit(UserSys $userSys)
-    {
-        //
-    }
-
-    public function u_update(Request $request, UserSys $userSys)
+    public function u_index()
     {
         //
     }
 
     /**
-     * Vô hiệu hoá tài khoản cá nhân
+     * Tài khoản cá nhân người dùng
      */
-    public function u_destroy(UserSys $userSys)
+    public function show(UserSys $tai_khoan)
     {
         //
     }
+
+    /**
+     * Cập nhật tài khoản người dùng (****)
+     */
+    public function edit(UserSys $tai_khoan){
+        $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
+
+        $account_info = DB::table('nguoi_dung')
+            ->where('ND_MA', $tai_khoan->ND_MA)->get();
+        
+        return view('main_content.personal_account.edit_personal_account')->with('account_info', $account_info);
+    }
+
+    public function update(Request $request, UserSys $tai_khoan)
+    {
+        $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
+
+        //Dò trùng
+        $dsnd=DB::table('nguoi_dung')->get();
+        foreach ($dsnd as $ds){
+            if (strtolower($ds->ND_EMAIL)==strtolower($request->ND_EMAIL) && ($ds->ND_MA != $tai_khoan->ND_MA)) {
+                //Phải load lại trang mới xài
+                Session::put('alert', ['type' => 'warning', 'content' => 'Email đã tồn tại trên hệ thống, vui lòng đăng ký với email khác!']);
+                return response()->json(['ND_MA' => $tai_khoan->ND_MA], 200);
+            }
+        }
+
+        DB::table('nguoi_dung')
+        ->where('ND_MA', $tai_khoan->ND_MA)
+        ->update([ 
+            'ND_HOTEN' => $request->ND_HOTEN,
+            'ND_EMAIL' => $request->ND_EMAIL,
+            'ND_MOTA' => $request->ND_MOTA
+        ]);
+
+        if($request->downloadURL != ''){
+            DB::table('nguoi_dung')
+                ->where('ND_MA', $tai_khoan->ND_MA)
+                ->update([ 
+                    'ND_ANHDAIDIEN' => $request->downloadURL
+                ]);
+        }
+
+        Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật thành công!']);
+        return response()->json(['ND_MA' => $tai_khoan->ND_MA], 200);
+    }
+
+    /**
+     * Vô hiệu hoá tài khoản người dùng
+     */
+    public function destroy(UserSys $tai_khoan)
+    {
+        //
+    }
+
+     /**
+     * Đổi mật khẩu
+     */
+    public function change_password(UserSys $tai_khoan)
+    {
+        //
+    }
+
 
     //TÁC ĐỘNG TÀI KHOẢN HỆ THỐNG
 
@@ -174,22 +254,17 @@ class UserSysController extends Controller
 
 
      /**
-     * Danh sách gợi ý người dùng
-     */
-
-
-     /**
      * Theo dõi người dùng khác
      */
 
     /*
     |--------------------------------------------------------------------------
-    |   QUẢN TRỊ
+    |   QUẢN TRỊ VIÊN
     |--------------------------------------------------------------------------
     */
 
     /**
-     * Display a listing of the resource.
+     * Danh sách người dùng hệ thống
      */
     public function index()
     {
@@ -197,49 +272,14 @@ class UserSysController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Thêm người dùng mới
      */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(UserSys $userSys)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(UserSys $userSys)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, UserSys $userSys)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(UserSys $userSys)
     {
         //
     }
