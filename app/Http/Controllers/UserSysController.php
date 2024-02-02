@@ -68,6 +68,7 @@ class UserSysController extends Controller
         }
     }
 
+
     /*
     |--------------------------------------------------------------------------
     | NGƯỜI DÙNG
@@ -123,11 +124,11 @@ class UserSysController extends Controller
     /**
      * Đăng ký tài khoản
      */
-    public function u_create(){ ///
+    public function create(){ ///
         return view('login_content.register');
     }
 
-    public function u_store(Request $request){ ///
+    public function store(Request $request){ ///
         //Dò trùng
         $dsnd=DB::table('nguoi_dung')->get();
         foreach ($dsnd as $ds){
@@ -183,7 +184,7 @@ class UserSysController extends Controller
     /**
      * Danh sách người dùng gợi ý
      */
-    public function u_index()
+    public function index()
     {
         //
     }
@@ -290,11 +291,39 @@ class UserSysController extends Controller
     }
 
      /**
-     * Đổi mật khẩu
+     * Đổi mật khẩu (*)
      */
-    public function change_password(UserSys $tai_khoan)
-    {
-        //
+    public function change_password(){///
+        $this->AuthLogin_ND();
+
+        return view('main_content.personal_account.change_password');
+    }
+
+    public function password_check(Request $request){///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        if ($userLog->ND_MATKHAU!=md5($request->ND_MATKHAUCU)){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Mật khẩu cũ sai, vui lòng kiểm tra lại!']);
+            return Redirect::to('doi-mat-khau');
+        }
+        if ($request->ND_MATKHAUMOI1!=$request->ND_MATKHAUMOI2){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Mật khẩu mới nhập lại sai, vui lòng kiểm tra lại!']);
+            return Redirect::to('doi-mat-khau');
+        }
+        if ($request->ND_MATKHAUMOI1==$request->ND_MATKHAUCU){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Mật khẩu cũ và mật khẩu mới phải khác nhau, vui lòng kiểm tra lại!']);
+            return Redirect::to('doi-mat-khau');
+        }
+
+        DB::table('nguoi_dung')
+        ->where('ND_MA', $userLog->ND_MA)
+        ->update([ 
+            'ND_MATKHAU' => md5($request->ND_MATKHAUMOI1)
+        ]);
+
+        Session::put('alert', ['type' => 'success', 'content' => 'Đổi mật khẩu thành công!']);
+        return Redirect::to('doi-mat-khau');
     }
 
 
@@ -318,20 +347,7 @@ class UserSysController extends Controller
     /**
      * Danh sách người dùng hệ thống
      */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Thêm người dùng mới
-     */
-    public function create()
-    {
-        //
-    }
-
-    public function store(Request $request)
+    public function a_index()
     {
         //
     }

@@ -98,7 +98,9 @@
                             placeholder="Nhập mô tả bản thân..." id="desc">{{$account_info->ND_MOTA}}</textarea>
                         </div> 
                         <button type="button" style="width: 100%; display: none" class="btn btn-primary" id="submit-form">Lưu cập nhật</button>
-                        <div id="spinner" class="spinner-border text-primary" style="display: none;"></div>
+                        <div class="text-center" style="display: none;" id="spinner">
+                            <div class="spinner-border text-primary"></div>
+                        </div>
                     </form>
                     <button type="button" style="width: 100%;" class="btn btn-primary" id="non-disabled">Cập nhật thông tin</button>
                     <button type="button" style="width: 100%;margin-top: 20px;" class="btn btn-danger" id="block-account">Vô hiệu hoá tài khoản</button>

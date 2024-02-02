@@ -98,7 +98,7 @@
                       <i class="fas fa-user-cog"></i>
                       <p class="mb-0 fs-3">Cập nhật tài khoản</p>
                     </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
+                    <a href="{{URL::to('/doi-mat-khau')}}" class="d-flex align-items-center gap-2 dropdown-item">
                       <i class="fas fa-lock"></i>
                       <p class="mb-0 fs-3">Đổi mật khẩu</p>
                     </a>

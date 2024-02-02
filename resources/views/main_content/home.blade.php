@@ -89,7 +89,9 @@
                         
                       </div>
                       <button type="button" class="btn btn-primary float-sm-end" id="dangbai-btn">Đăng bài</button>
-                      <div id="spinner" class="spinner-border text-primary" style="display: none;"></div>
+                      <div class="text-center" style="display: none;" id="spinner">
+                          <div class="spinner-border text-primary"></div>
+                      </div>
                     </form>
                   </div>
                 </div>

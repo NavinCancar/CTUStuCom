@@ -268,7 +268,7 @@
   background-color: var(--bs-white);
 }
 
-.text-notice .fa-times-circle{
+.text-notice .fa-times-circl, .cursor-pointer{
   cursor: pointer;
 }
 

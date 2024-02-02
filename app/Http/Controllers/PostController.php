@@ -138,20 +138,68 @@ class PostController extends Controller
     /**
      * Xem chi tiết bài đăng
      */
-    public function show(Post $post)
-    {
-        //
+    public function show(Post $bai_dang){ ///
+        //Tăng lượt xem
+        $bv = DB::table('bai_viet')->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->first();
+        $bvluotxem = $bv->BV_LUOTXEM;
+        $bvluotxem = $bvluotxem + 1;
+        DB::table('bai_viet')
+        ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)
+        ->update([ 
+            'BV_LUOTXEM' => $bvluotxem
+        ]);
+
+        $bai_viet = DB::table('bai_viet')
+        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+        ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->get();
+        
+        $hashtag_bai_viet = DB::table('hashtag')
+        ->join('cua_bai_viet', 'cua_bai_viet.H_HASHTAG', '=', 'hashtag.H_HASHTAG')
+        ->where('cua_bai_viet.BV_MA', '=', $bai_dang->BV_MA)->get();
+
+        $hoc_phan = DB::table('hoc_phan')->get();
+
+        $count_thich = DB::table('bai_viet')
+        ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->count();
+
+        //Bình luận
+        $count_binh_luan = DB::table('bai_viet')
+        ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->count();
+
+        $binh_luan_goc = DB::table('binh_luan')
+        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+        ->where('binh_luan.BL_TRALOI_MA', '=', null)->get();
+
+        $binh_luan_traloi = DB::table('binh_luan')
+        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+        ->where('binh_luan.BL_TRALOI_MA', '!=', null)->get();
+
+        //File đính kèm
+
+        $binh_luan_bv= DB::table('binh_luan')
+        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+        ->pluck('BL_MA')->toArray();
+
+        return view('main_content.post.show_post')->with('bai_viet', $bai_viet)
+        ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
+        ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
+        ->with('binh_luan_goc', $binh_luan_goc)->with('binh_luan_traloi', $binh_luan_traloi)
+        ->with('binh_luan_bv', $binh_luan_bv);
     }
 
     /**
      * Sửa bài đăng
      */
-    public function edit(Post $post)
+    public function edit(Post $bai_dang)
     {
         //
     }
 
-    public function update(Request $request, Post $post)
+    public function update(Request $request, Post $bai_dang)
     {
         //
     }
@@ -159,7 +207,7 @@ class PostController extends Controller
     /**
      * Xoá bài đăng
      */
-    public function destroy(Post $post)
+    public function destroy(Post $bai_dang)
     {
         //
     }
