@@ -73,7 +73,13 @@
                       <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-flag"></i> Báo cáo</a>
                     </div>
                     <div class="col-sm-6 d-flex mt-2 justify-content-end">
-                      <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-heart"></i> Thích: <b><?php if($count_thich) echo $count_thich; else echo 0;?></b></a>
+                      <a class="ms-3 cursor-pointer <?php 
+                          if($userLog){
+                              $check_bv_thich = $thich_no_get->clone()
+                              ->where('baiviet_thich.BV_MA', $bv->BV_MA)->where('baiviet_thich.ND_MA', $userLog->ND_MA)->exists();
+                              if($check_bv_thich) echo 'text-danger'; else echo "text-muted";
+                          }?> ">
+                        <i class="fas fa-heart"></i> Thích: <b><?php if($count_thich) echo $count_thich; else echo 0;?></b></a>
                       <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-reply"></i> Trả lời: <b><?php if($count_binh_luan) echo $count_binh_luan; else echo 0;?></b></a>
                       <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-bookmark"></i> Lưu</a>
                     </div>
@@ -132,7 +138,7 @@
             <div class="card" id="form-comment1">
                 <div class="card-body p-3">
                     <div class="list-unstyled mb-0 p-2 reply-comment-card">
-                        <div class="d-flex flex-row pb-3 pt-1">
+                        <div class="d-flex flex-row pb-3 pt-1" data-comment-id-value="{{$blg->BL_MA}}">
                             <div>
                               <a href="javascript:void(0)" class="text-body">
                                 <img src="<?php if($blg->ND_ANHDAIDIEN) echo $blg->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
@@ -154,8 +160,30 @@
                                   </div>
                                   <div class="col-sm-6 d-flex mt-2 justify-content-end">
                                     <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-flag"></i> Báo cáo</a>
-                                    <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-heart"></i> Thích</a>
-                                    <a class="ms-3 text-muted reply-comment-btn cursor-pointer" data-comment-id-value="{{$blg->BL_MA}}"><i class="fas fa-reply"></i> Trả lời</a>
+                                    <a class="ms-3 cursor-pointer <?php 
+                                        if($userLog){
+                                            $check_bl_thich0 = $binh_luan_thich_no_get->clone()
+                                            ->where('binh_luan.BL_MA', $blg->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
+                                            if($check_bl_thich0) echo 'text-danger'; else echo "text-muted";
+                                        }?> ">
+                                      <i class="fas fa-heart"></i> Thích:
+                                      <b>
+                                        <?php 
+                                          $count_bl_thich0 = $binh_luan_thich_no_get->clone()->where('binh_luan.BL_MA', $blg->BL_MA)->count();
+                                          if($count_bl_thich0) echo $count_bl_thich0; else echo 0;
+                                        ?>
+                                      </b>
+                                    </a>
+                                    <a class="ms-3 text-muted reply-comment-btn cursor-pointer" data-comment-id-value="{{$blg->BL_MA}}">
+                                      <i class="fas fa-reply"></i> Trả lời: 
+                                      <b>
+                                        <?php 
+                                          $count_bl_traloi = $binh_luan_no_get->clone()->where('binh_luan.BL_TRALOI_MA', $blg->BL_MA)->count();
+                                          //dd($count_bl_traloi);
+                                          if($count_bl_traloi) echo $count_bl_traloi; else echo 0;
+                                        ?>
+                                      </b>
+                                    </a>
                                   </div>
                                 </div>
                             </div>
@@ -164,7 +192,7 @@
                         <!-- Rep Comment -->
                         @foreach($binh_luan_traloi as $key => $bltl)
                           @if($bltl->BL_TRALOI_MA == $blg->BL_MA)
-                            <div class="d-flex flex-row ms-5 pb-1 pt-3">
+                            <div class="d-flex flex-row ms-5 pb-1 pt-3" data-comment-id-value="{{$bltl->BL_MA}}">
                                 <div>
                                   <a href="javascript:void(0)" class="text-body">
                                     <img src="<?php if($bltl->ND_ANHDAIDIEN) echo $bltl->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
@@ -186,7 +214,19 @@
                                       </div>
                                       <div class="col-sm-6 d-flex mt-2 justify-content-end">
                                         <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-flag"></i> Báo cáo</a>
-                                        <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-heart"></i> Thích</a>
+                                        <a class="ms-3 cursor-pointer <?php 
+                                            if($userLog){
+                                                $check_bl_thich1 = $binh_luan_thich_no_get->clone()
+                                                ->where('binh_luan.BL_MA', $bltl->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
+                                                if($check_bl_thich1) echo 'text-danger'; else echo "text-muted";
+                                            }?> ">
+                                          <i class="fas fa-heart"></i> Thích:
+                                          <b>
+                                            <?php 
+                                              $count_bl_thich1 = $binh_luan_thich_no_get->clone()->where('binh_luan.BL_MA', $bltl->BL_MA)->count();
+                                              if($count_bl_thich1) echo $count_bl_thich1; else echo 0;
+                                            ?>
+                                          </b>
                                       </div>
                                     </div>
                                 </div>
@@ -597,7 +637,7 @@
               var dataValue = $(this).attr('data-comment-id-value');
               var closestReplyComment = $(this).closest('.reply-comment-card')[0];
               var divData = 
-                      `<div id="divdata-unique" class="ms-5 pb-1 pt-3">`+
+                      `<div id="divdata-unique" tabindex="0" class="ms-5 pb-1 pt-3">`+
                       `<form id="reply-form1" class="text-muted d-flex justify-content-start align-items-center pe-3 mt-3">`+
                       `    {{ csrf_field() }}`+
                       `    <textarea name="BL_NOIDUNG1" class="form-control border-secondary ms-3" placeholder="Nhập bình luận" rows="2" style="resize: none;"></textarea>`+
@@ -613,7 +653,7 @@
                       `<div id="selected-images-container1" class="m-2 mb-3 position-relative"></div>`+
                       `</div>`;
               closestReplyComment.insertAdjacentHTML('beforeend', divData);
-
+              $( "#divdata-unique" ).focus();
               //|*****************************************************
               //|GỬI COMMENT REPLY START
               //|*****************************************************
@@ -805,6 +845,30 @@
 
             });
           <?php } ?>
+
+          //|-----------------------------------------------------
+          //|FOCUS BÌNH LUẬN NẾU CO
+          //|-----------------------------------------------------
+          <?php 
+            $BL_MA_Focus = Session::get('BL_MA_Focus');
+            if($BL_MA_Focus) { 
+          ?>
+              var commentIdValue = <?php echo $BL_MA_Focus ?>;
+              
+              var divToFocus = document.querySelector(`div[data-comment-id-value="${commentIdValue}"]`);
+              //console.log("focus:", divToFocus)
+              if (divToFocus) {
+                  divToFocus.style.background = 'linear-gradient(to right, #ffffff00, #ffff0038, #ffff0038, #ffffff00)';
+                  divToFocus.tabIndex = 0;
+                  divToFocus.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'center', // Hoặc 'center', 'end', 'nearest'
+                  });
+              }
+          <?php 
+              Session::put('BL_MA_Focus',null);
+            } 
+          ?>
         });
     </script>
 @endsection

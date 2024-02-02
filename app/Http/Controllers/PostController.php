@@ -163,6 +163,10 @@ class PostController extends Controller
         ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA')
         ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->count();
 
+        $thich_no_get = DB::table('bai_viet')
+        ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA);
+
         //Bình luận
         $count_binh_luan = DB::table('bai_viet')
         ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
@@ -178,17 +182,23 @@ class PostController extends Controller
         ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
         ->where('binh_luan.BL_TRALOI_MA', '!=', null)->get();
 
-        //File đính kèm
-
         $binh_luan_bv= DB::table('binh_luan')
         ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
         ->pluck('BL_MA')->toArray();
 
+        $binh_luan_no_get= DB::table('binh_luan')
+        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA);
+
+        $binh_luan_thich_no_get = DB::table('binh_luan')
+        ->join('binhluan_thich', 'binhluan_thich.BL_MA', '=', 'binh_luan.BL_MA')
+        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA);
+
         return view('main_content.post.show_post')->with('bai_viet', $bai_viet)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
-        ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
-        ->with('binh_luan_goc', $binh_luan_goc)->with('binh_luan_traloi', $binh_luan_traloi)
-        ->with('binh_luan_bv', $binh_luan_bv);
+        ->with('count_thich', $count_thich)->with('thich_no_get', $thich_no_get)
+        ->with('count_binh_luan', $count_binh_luan)->with('binh_luan_goc', $binh_luan_goc)
+        ->with('binh_luan_traloi', $binh_luan_traloi)->with('binh_luan_bv', $binh_luan_bv)
+        ->with('binh_luan_no_get', $binh_luan_no_get)->with('binh_luan_thich_no_get', $binh_luan_thich_no_get);
     }
 
     /**

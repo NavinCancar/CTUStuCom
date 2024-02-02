@@ -48,7 +48,7 @@ Route::resource('/bai-dang', 'App\Http\Controllers\PostController')->except(['cr
 
 
 //Post: Bài đăng
-Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(['create']); ///
+Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(['create']); ///ok: C_ND
 
 
 //Message: Tin nhắn

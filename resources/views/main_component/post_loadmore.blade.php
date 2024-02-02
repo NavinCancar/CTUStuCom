@@ -21,7 +21,13 @@
                           $count_thich_tim= $count_thich->where('BV_MA',$bv->BV_MA)->first();
                           $count_binh_luan_tim= $count_binh_luan->where('BV_MA',$bv->BV_MA)->first();
                         ?>
-                        <a class="ms-3 text-muted"><i class="fas fa-heart"></i> Thích: <b><?php if($count_thich_tim) echo $count_thich_tim->count; else echo 0;?></b></a>
+                        <a class="ms-3 <?php 
+                          if($userLog){
+                              $check_bv_thich = $thich_no_get->clone()
+                              ->where('baiviet_thich.BV_MA', $bv->BV_MA)->where('baiviet_thich.ND_MA', $userLog->ND_MA)->exists();
+                              if($check_bv_thich) echo 'text-danger'; else echo "text-muted";
+                          }?> ">
+                        <i class="fas fa-heart"></i> Thích: <b><?php if($count_thich_tim) echo $count_thich_tim->count; else echo 0;?></b></a>
                         <a class="ms-3 text-muted"><i class="fas fa-reply"></i> Trả lời: <b><?php if($count_binh_luan_tim) echo $count_binh_luan_tim->count; else echo 0;?></b></a>
                     </div>
                     <div class=" m-1 mt-2">

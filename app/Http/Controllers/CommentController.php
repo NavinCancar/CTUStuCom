@@ -24,7 +24,7 @@ class CommentController extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - 
+    - Tạo bình luận mới(*)
     |--------------------------------------------------------------------------
     */
 
@@ -102,7 +102,9 @@ class CommentController extends Controller
             }
         }
         
+        Session::put('BL_MA_Focus',$binh_luan->BL_MA);
         //return Redirect::to('trang-chu');
+        //return response()->json(['BL_MA' => $binh_luan->BL_MA]);
         return;
     }
 

@@ -61,6 +61,8 @@ class HomeController extends Controller
         ->groupBy('bai_viet.BV_MA')->select('bai_viet.BV_MA', DB::raw('count(*) as count'))
         ->get();
 
+        $thich_no_get = DB::table('bai_viet')
+        ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA');
         
         $count_binh_luan = DB::table('bai_viet')
         ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
@@ -78,6 +80,7 @@ class HomeController extends Controller
 
         return view('main_content.home')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
-        ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan);
+        ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
+        ->with('thich_no_get', $thich_no_get);
     }
 }
