@@ -223,7 +223,7 @@
         //|KHAI BÁO FIRESTORE
         //|-----------------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, setDoc, addDoc, doc, collection, serverTimestamp, getDocs, query, where, orderBy, limit, or, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, setDoc, addDoc, doc, collection, serverTimestamp, getDocs, query, where, orderBy, limit, or, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         // TODO: Add SDKs for Firebase products that you want to use
@@ -253,8 +253,33 @@
         const selectedFilesContainer = document.getElementById('selected-files-container');
         const selectedImagesContainer = document.getElementById('selected-images-container');
         var dontUse = [];
+        var fileSaved = [];
 
         $(document).ready(function() {
+            //|-----------------------------------------------------
+            //|DANH SÁCH FILE NGƯỜI DÙNG ĐÃ LƯU
+            //|-----------------------------------------------------
+            <?php if($userLog) { ?>
+
+            (async () => {
+                const qbookmarkfileSaved = query(
+                collection(db, "DANH_DAU_FILE"), 
+                where('ND_MA', '==', <?php if($userLog) echo $userLog->ND_MA; ?>)
+                );
+                
+                const querySnapshotbookmarkfileSaved = await getDocs(qbookmarkfileSaved);
+                
+                querySnapshotbookmarkfileSaved.forEach((doc) => {
+                    fileSaved.push(doc.data().FDK_MA);
+                });
+            })().catch((error) => {
+                console.error("Error in script: ", error);
+            });
+
+            <?php } ?>
+
+            //|-----------------------------------------------------
+            //|-----------------------------------------------------
             var justLoad = new Date();
             var userFormList = [];
             //|-----------------------------------------------------
@@ -375,7 +400,7 @@
                                         const fileName = doc2.data().FDK_TEN;
                                         const fileLink = doc2.data().FDK_DUONGDAN;
                                         
-                                        divData += '<div class="d-flex flex-row justify-content-end">' + showFileMessage(fileName, fileLink, '') + '</div>';
+                                        divData += '<div class="d-flex flex-row justify-content-end">' + showFileMessage(fileName, fileLink, '', doc2.id) + '</div>';
                                     });
 
                                     divData +=
@@ -412,7 +437,7 @@
                                         const fileName = doc2.data().FDK_TEN;
                                         const fileLink = doc2.data().FDK_DUONGDAN;
                                         
-                                        divData += '<div class="d-flex flex-row justify-content-start">' + showFileMessage(fileName, fileLink, 'friend-chat') + '</div>';
+                                        divData += '<div class="d-flex flex-row justify-content-start">' + showFileMessage(fileName, fileLink, 'friend-chat', doc2.id) + '</div>';
                                     });
 
                                     divData +=
@@ -763,7 +788,7 @@
                                             const fileName = doc2.data().FDK_TEN;
                                             const fileLink = doc2.data().FDK_DUONGDAN;
                                             
-                                            divData += '<div class="d-flex flex-row justify-content-end">' + showFileMessage(fileName, fileLink, '') + '</div>';
+                                            divData += '<div class="d-flex flex-row justify-content-end">' + showFileMessage(fileName, fileLink, '', doc2.id) + '</div>';
                                         });
 
                                         divData +=
@@ -817,7 +842,7 @@
                                             const fileName = doc2.data().FDK_TEN;
                                             const fileLink = doc2.data().FDK_DUONGDAN;
                                             
-                                            divData += '<div class="d-flex flex-row justify-content-start">' + showFileMessage(fileName, fileLink, 'friend-chat') + '</div>';
+                                            divData += '<div class="d-flex flex-row justify-content-start">' + showFileMessage(fileName, fileLink, 'friend-chat', doc2.id) + '</div>';
                                         });
 
                                         divData +=
@@ -997,7 +1022,7 @@
             }
 
             //SHOW FILE TRONG TIN NHẮN
-            function showFileMessage(fileName, fileLink, addStyle){
+            function showFileMessage(fileName, fileLink, addStyle, docid){
                 const fileExtension = fileName.split('.').pop().toLowerCase();
                 var string;
                 if(addStyle == ''){
@@ -1017,7 +1042,10 @@
                         '    <a target="_blank" href="'+fileLink+'">' +
                         '        <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                         '    </a>' +
-                        '    <button class="btn '+btn+' btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);"><i class="fas fa-bookmark"></i></button>' +
+                        '    <button class="btn '+btn+' btn-sm position-absolute start-100 translate-middle bookmark-file" data-fdk-id-value="'+docid+'" style="transform: translateX(-50%);">';
+                        if (fileSaved.includes(docid)) string += '    <i class="fas fa-vote-yea"></i>';
+                        else  string += '    <i class="fas fa-bookmark"></i>';
+                        string += 
                         '</span>';
                 }
                 else{
@@ -1043,7 +1071,10 @@
                         
                     string += fileName +
                         '    </a>' +
-                        '    <button class="btn '+btn+' btn-sm"><i class="fas fa-bookmark"></i></button>' +
+                        '    <button class="btn '+btn+' btn-sm bookmark-file" data-fdk-id-value="'+docid+'">';
+                    if (fileSaved.includes(docid)) string += '    <i class="fas fa-vote-yea"></i>';
+                    else  string += '    <i class="fas fa-bookmark"></i>';
+                    string += 
                         '</span>';
                 } 
                 return string;
@@ -1152,6 +1183,28 @@
 
             //KHO LƯU TRỮ TỔNG
             $('#kholuutru-btn').on('click', function() {
+                //|-----------------------------------------------------
+                //|DANH SÁCH FILE NGƯỜI DÙNG ĐÃ LƯU
+                //|-----------------------------------------------------
+                <?php if($userLog) { ?>
+
+                (async () => {
+                    fileSaved = []
+                    const qbookmarkfileSaved = query(
+                    collection(db, "DANH_DAU_FILE"), 
+                    where('ND_MA', '==', <?php if($userLog) echo $userLog->ND_MA; ?>)
+                    );
+                    
+                    const querySnapshotbookmarkfileSaved = await getDocs(qbookmarkfileSaved);
+                    
+                    querySnapshotbookmarkfileSaved.forEach((doc) => {
+                        fileSaved.push(doc.data().FDK_MA);
+                    });
+                })().catch((error) => {
+                    console.error("Error in script: ", error);
+                });
+
+                <?php } ?>
                 (async () => {
 
                     const querySnapshotklt = await getDocs(qklt);
@@ -1178,8 +1231,10 @@
                                 '    <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
                                 '        <img src="'+fileLink+'"  width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                                 '    </a>' +
-                                '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);">' +
-                                '        <i class="fas fa-bookmark"></i>' +
+                                '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
+                            if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
+                            else  divData += '    <i class="fas fa-bookmark"></i>';
+                            divData += 
                                 '    </button>' +
                                 '</span>';
                             listimages.insertAdjacentHTML('beforeend', divData);
@@ -1188,7 +1243,7 @@
                         else if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension) && documentcount < 5){
                             var divData =
                                 '<li class="p-2 border-bottom d-flex justify-content-between">' +
-                                '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between">' +
+                                '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between w-75">' +
                                 '        <div class="d-flex flex-row" style="max-width:100%">' +
                                 '            <div>';
 
@@ -1218,7 +1273,10 @@
                                 '            </div>' +
                                 '        </div>' +
                                 '    </a>' +
-                                '    <button class="btn btn-secondary btn-sm" style="height: 28px !important;"><i class="fas fa-bookmark"></i></button>' +      
+                                '    <button class="btn btn-secondary btn-sm bookmark-file" data-fdk-id-value="'+doc.id+'" style="height: 28px !important;">';
+                            if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
+                            else  divData += '    <i class="fas fa-bookmark"></i>';
+                            divData += 
                                 '</li>';
 
                             listdocuments.insertAdjacentHTML('beforeend', divData);
@@ -1286,6 +1344,25 @@
 
                     //KHO LƯU TRỮ ẢNH
                     $('#kholuutruimages-btn').on('click', function() {
+                        <?php if($userLog) { ?>
+
+                        (async () => {
+                            fileSaved = []
+                            const qbookmarkfileSaved = query(
+                            collection(db, "DANH_DAU_FILE"), 
+                            where('ND_MA', '==', <?php if($userLog) echo $userLog->ND_MA; ?>)
+                            );
+                            
+                            const querySnapshotbookmarkfileSaved = await getDocs(qbookmarkfileSaved);
+                            
+                            querySnapshotbookmarkfileSaved.forEach((doc) => {
+                                fileSaved.push(doc.data().FDK_MA);
+                            });
+                        })().catch((error) => {
+                            console.error("Error in script: ", error);
+                        });
+
+                        <?php } ?>
                         (async () => {
                             const querySnapshotklt = await getDocs(qklt);
 
@@ -1305,8 +1382,10 @@
                                         '    <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
                                         '        <img src="'+fileLink+'"  width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                                         '    </a>' +
-                                        '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);">' +
-                                        '        <i class="fas fa-bookmark"></i>' +
+                                        '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
+                                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
+                                    else  divData += '    <i class="fas fa-bookmark"></i>';
+                                    divData += 
                                         '    </button>' +
                                         '</span>';
                                         detailbody.insertAdjacentHTML('beforeend', divData);
@@ -1319,6 +1398,25 @@
 
                     //KHO LƯU TRỮ FILE
                     $('#kholuutrudocuments-btn').on('click', function() {
+                        <?php if($userLog) { ?>
+
+                        (async () => {
+                            fileSaved = []
+                            const qbookmarkfileSaved = query(
+                            collection(db, "DANH_DAU_FILE"), 
+                            where('ND_MA', '==', <?php if($userLog) echo $userLog->ND_MA; ?>)
+                            );
+                            
+                            const querySnapshotbookmarkfileSaved = await getDocs(qbookmarkfileSaved);
+                            
+                            querySnapshotbookmarkfileSaved.forEach((doc) => {
+                                fileSaved.push(doc.data().FDK_MA);
+                            });
+                        })().catch((error) => {
+                            console.error("Error in script: ", error);
+                        });
+
+                        <?php } ?>
                         (async () => {
                             const querySnapshotklt = await getDocs(qklt);
 
@@ -1335,7 +1433,7 @@
                                 if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
                                     var divData =
                                         '<li class="p-2 border-bottom d-flex justify-content-between">' +
-                                        '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between">' +
+                                        '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between w-75">' +
                                         '        <div class="d-flex flex-row" style="max-width:100%">' +
                                         '            <div>';
 
@@ -1365,7 +1463,10 @@
                                         '            </div>' +
                                         '        </div>' +
                                         '    </a>' +
-                                        '    <button class="btn btn-secondary btn-sm" style="height: 28px !important;"><i class="fas fa-bookmark"></i></button>' +      
+                                        '    <button class="btn btn-secondary btn-sm bookmark-file" data-fdk-id-value="'+doc.id+'" style="height: 28px !important;">';
+                                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
+                                    else  divData += '    <i class="fas fa-bookmark"></i>';
+                                    divData += 
                                         '</li>';
 
                                     detailbody.insertAdjacentHTML('beforeend', divData);
@@ -1452,6 +1553,75 @@
                 });
             //|*****************************************************
             //|SEARCH FRIEND END
+            //|*****************************************************
+            //|*****************************************************
+            //|LƯU FILE START
+            //|*****************************************************
+            <?php if($userLog) { ?>
+                $(document).on('click', '.bookmark-file', function() {
+                    // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                    var FDK_MA = $(this).data('fdk-id-value');
+                    var _token = $('meta[name="csrf-token"]').attr('content');
+                    const iconElement = $(this).find('i');
+                    iconElement.removeClass('fa fa-bookmark');
+                    iconElement.removeClass('fa fa-vote-yea');
+                    iconElement.removeClass('fa-exclamation-circle text-danger');
+                    iconElement.addClass('spinner-border text-light spinner-border-sm');
+
+                    (async () => {
+                        const qbookmarkfile = query(
+                        collection(db, "DANH_DAU_FILE"), 
+                        where('FDK_MA', '==', FDK_MA),
+                        where('ND_MA', '==', <?php echo $userLog->ND_MA; ?>)
+                        );
+                        
+                        const querySnapshotbookmarkfile = await getDocs(qbookmarkfile);
+                        
+                        if (querySnapshotbookmarkfile.empty) {
+                            //Lưu file
+                            $.ajax({
+                            url: '{{URL::to('/danh-dau-file')}}',
+                            type: 'POST',
+                            data: {
+                                FDK_MA: FDK_MA,
+                                _token: _token // Include the CSRF token in the data
+                            },
+                            success: function(response) {
+                                iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                iconElement.addClass('fa-vote-yea');
+                                //console.log('Thành công');
+                            },
+                            error: function(error) {
+                                iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                iconElement.addClass('fa-exclamation-circle text-danger');
+                                console.log(error);
+                            }
+                            });
+                        }
+                        else{
+                        //Xoá file
+                        querySnapshotbookmarkfile.forEach((doc2) => {
+                            (async () => {
+                                await deleteDoc(doc(db, "DANH_DAU_FILE", doc2.id));
+
+                                iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                    iconElement.addClass('fa-bookmark');
+                            })().catch((error) => {
+                                iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                iconElement.addClass('fa-exclamation-circle text-danger');
+                                console.error("Error in delete script: ", error);
+                            });
+                        });
+                        }
+                    })().catch((error) => {
+                        console.error("Error in script: ", error);
+                    });
+                    // Thực hiện các xử lý khác với tham số đã truyền
+                    //console.log("Additional Parameter: " + FDK_MA);
+                });
+            <?php } ?>
+            //|*****************************************************
+            //|LƯU FILE END
             //|*****************************************************
         });
     </script>

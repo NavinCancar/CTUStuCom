@@ -78,7 +78,7 @@
                               $check_bv_thich = $thich_no_get->clone()
                               ->where('baiviet_thich.BV_MA', $bv->BV_MA)->where('baiviet_thich.ND_MA', $userLog->ND_MA)->exists();
                               if($check_bv_thich) echo 'text-danger'; else echo "text-muted";
-                          }?> ">
+                          } else echo "text-muted" ?> ">
                         <i class="fas fa-heart"></i> Thích: <b><?php if($count_thich) echo $count_thich; else echo 0;?></b></a>
                       <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-reply"></i> Trả lời: <b><?php if($count_binh_luan) echo $count_binh_luan; else echo 0;?></b></a>
                       <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-bookmark"></i> Lưu</a>
@@ -89,11 +89,12 @@
             </div>
           @endforeach
 
-          @if($userLog)
-            <div class="mb-3 mb-sm-0">
-              <h5 class="card-title fw-semibold">Trả lời bài viết</h5>
-            </div>
-            <hr>
+          
+          <div class="mb-3 mb-sm-0">
+            <h5 class="card-title fw-semibold">Trả lời bài viết</h5>
+          </div>
+          <hr>
+          @if($userLog)  
             <div class="card" id="form-comment0">
                 <div class="card-body p-3">
                     <form id="reply-form0" class="text-muted d-flex justify-content-start align-items-center pe-3 mt-3">
@@ -165,7 +166,7 @@
                                             $check_bl_thich0 = $binh_luan_thich_no_get->clone()
                                             ->where('binh_luan.BL_MA', $blg->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
                                             if($check_bl_thich0) echo 'text-danger'; else echo "text-muted";
-                                        }?> ">
+                                        } else echo "text-muted"?> ">
                                       <i class="fas fa-heart"></i> Thích:
                                       <b>
                                         <?php 
@@ -219,7 +220,7 @@
                                                 $check_bl_thich1 = $binh_luan_thich_no_get->clone()
                                                 ->where('binh_luan.BL_MA', $bltl->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
                                                 if($check_bl_thich1) echo 'text-danger'; else echo "text-muted";
-                                            }?> ">
+                                            } else echo "text-muted"?> ">
                                           <i class="fas fa-heart"></i> Thích:
                                           <b>
                                             <?php 
@@ -263,7 +264,7 @@
         //|KHAI BÁO FIRESTORE
         //|-----------------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, setDoc, addDoc, doc, collection, serverTimestamp, getDocs, query, where, orderBy, limit, or, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, setDoc, addDoc, doc, collection, serverTimestamp, getDocs, query, where, orderBy, limit, or, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         // TODO: Add SDKs for Firebase products that you want to use
@@ -290,8 +291,30 @@
         //***********************************************************************************
         const filesContainer = document.getElementById('files-container');
         const imagesContainer = document.getElementById('images-container');
+        var fileSaved = [];
 
         $(document).ready(function() {
+          //|-----------------------------------------------------
+          //|DANH SÁCH FILE NGƯỜI DÙNG ĐÃ LƯU
+          //|-----------------------------------------------------
+          <?php if($userLog) { ?>
+
+            (async () => {
+                  const qbookmarkfileSaved = query(
+                  collection(db, "DANH_DAU_FILE"), 
+                  where('ND_MA', '==', <?php if($userLog) echo $userLog->ND_MA; ?>)
+                  );
+                  
+                  const querySnapshotbookmarkfileSaved = await getDocs(qbookmarkfileSaved);
+                  
+                  querySnapshotbookmarkfileSaved.forEach((doc) => {
+                      fileSaved.push(doc.data().FDK_MA);
+                  });
+            })().catch((error) => {
+                console.error("Error in script: ", error);
+            });
+
+          <?php } ?>
           //|-----------------------------------------------------
           //|HIỆN FILE BÀI VIẾT
           //|-----------------------------------------------------
@@ -319,8 +342,10 @@
                       '  <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
                       '    <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                       '  </a>' +
-                      '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn" style="transform: translateX(-50%);">' +
-                      '    <i class="fas fa-bookmark"></i>' +
+                      '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
+                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
+                    else  divData += '    <i class="fas fa-bookmark"></i>';
+                    divData += 
                       '  </button>' +
                       '</span>';
                     imagesContainer.insertAdjacentHTML('afterbegin', divData);
@@ -348,8 +373,10 @@
 
                     divData += fileName +
                         ' </a>' +
-                        '  <button class="btn btn-secondary btn-sm file-item-btn">' +
-                        '    <i class="fas fa-bookmark"></i>' +
+                        '  <button class="btn btn-secondary btn-sm file-item-btn bookmark-file" data-fdk-id-value="'+doc.id+'">' ;
+                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea background-indigo"></i>';
+                    else  divData += '    <i class="fas fa-bookmark"></i>';
+                    divData += 
                         '  </button>' +
                         '</span>';
                     filesContainer.insertAdjacentHTML('afterbegin', divData);
@@ -393,8 +420,10 @@
                       '  <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
                       '    <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                       '  </a>' +
-                      '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn" style="transform: translateX(-50%);">' +
-                      '    <i class="fas fa-bookmark"></i>' +
+                      '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
+                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
+                    else  divData += '    <i class="fas fa-bookmark"></i>';
+                    divData += 
                       '  </button>' +
                       '</span>';
                     imagesContainercmt.insertAdjacentHTML('afterbegin', divData);
@@ -422,8 +451,10 @@
 
                     divData += fileName +
                         ' </a>' +
-                        '  <button class="btn btn-secondary btn-sm file-item-btn">' +
-                        '    <i class="fas fa-bookmark"></i>' +
+                        '  <button class="btn btn-secondary btn-sm file-item-btn bookmark-file" data-fdk-id-value="'+doc.id+'">' ;
+                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
+                    else  divData += '    <i class="fas fa-bookmark"></i>';
+                    divData += 
                         '  </button>' +
                         '</span>';
                     filesContainercmt.insertAdjacentHTML('afterbegin', divData);
@@ -547,8 +578,6 @@
                       console.log(error);
                   }
                 });
-                
-
               }
           });
           //|*****************************************************
@@ -869,6 +898,76 @@
               Session::put('BL_MA_Focus',null);
             } 
           ?>
+
+          //|*****************************************************
+          //|LƯU FILE START
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.bookmark-file', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var FDK_MA = $(this).data('fdk-id-value');
+                var _token = $('meta[name="csrf-token"]').attr('content');
+                const iconElement = $(this).find('i');
+                iconElement.removeClass('fa fa-bookmark');
+                iconElement.removeClass('fa fa-vote-yea');
+                iconElement.removeClass('fa-exclamation-circle text-danger');
+                iconElement.addClass('spinner-border text-light spinner-border-sm');
+
+                (async () => {
+                    const qbookmarkfile = query(
+                    collection(db, "DANH_DAU_FILE"), 
+                    where('FDK_MA', '==', FDK_MA),
+                    where('ND_MA', '==', <?php echo $userLog->ND_MA; ?>)
+                    );
+                    
+                    const querySnapshotbookmarkfile = await getDocs(qbookmarkfile);
+                    
+                    if (querySnapshotbookmarkfile.empty) {
+                        //Lưu file
+                        $.ajax({
+                          url: '{{URL::to('/danh-dau-file')}}',
+                          type: 'POST',
+                          data: {
+                            FDK_MA: FDK_MA,
+                            _token: _token // Include the CSRF token in the data
+                          },
+                          success: function(response) {
+                              iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                              iconElement.addClass('fa-vote-yea');
+                              //console.log('Thành công');
+                          },
+                          error: function(error) {
+                              iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                              iconElement.addClass('fa-exclamation-circle text-danger');
+                              console.log(error);
+                          }
+                        });
+                    }
+                    else{
+                      //Xoá file
+                      querySnapshotbookmarkfile.forEach((doc2) => {
+                         (async () => {
+                            await deleteDoc(doc(db, "DANH_DAU_FILE", doc2.id));
+
+                            iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                iconElement.addClass('fa-bookmark');
+                        })().catch((error) => {
+                            iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                            iconElement.addClass('fa-exclamation-circle text-danger');
+                            console.error("Error in delete script: ", error);
+                        });
+                      });
+                    }
+                })().catch((error) => {
+                    console.error("Error in script: ", error);
+                });
+                // Thực hiện các xử lý khác với tham số đã truyền
+                //console.log("Additional Parameter: " + FDK_MA);
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|LƯU FILE END
+          //|*****************************************************
         });
     </script>
 @endsection

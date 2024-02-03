@@ -53,3 +53,6 @@ Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(
 
 //Message: Tin nhắn
 Route::resource('/tin-nhan', 'App\Http\Controllers\MessageController_FB')->only(['index', 'show']); ///ok
+
+//Đánh dấu file: Người dùng và file đính kèm
+Route::resource('/danh-dau-file', 'App\Http\Controllers\FileofUserController_FB')->only(['store']); ///ok: C_ND
