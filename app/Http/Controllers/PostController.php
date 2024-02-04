@@ -24,7 +24,7 @@ class PostController extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - Tạo bài đăng mới(*)
+    - Tạo bài đăng mới(*), Bài viết - thích (*)
     |--------------------------------------------------------------------------
     */
 
@@ -172,15 +172,18 @@ class PostController extends Controller
         ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
         ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->count();
 
+        $binh_luan_not_in = DB::table('binhluan_baocao')->pluck('BL_MA')->toArray();
         $binh_luan_goc = DB::table('binh_luan')
         ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
         ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
-        ->where('binh_luan.BL_TRALOI_MA', '=', null)->get();
+        ->where('binh_luan.BL_TRALOI_MA', '=', null)
+        ->whereNotIn('BL_MA', $binh_luan_not_in)->get();
 
         $binh_luan_traloi = DB::table('binh_luan')
         ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
         ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
-        ->where('binh_luan.BL_TRALOI_MA', '!=', null)->get();
+        ->where('binh_luan.BL_TRALOI_MA', '!=', null)
+        ->whereNotIn('BL_MA', $binh_luan_not_in)->get();
 
         $binh_luan_bv= DB::table('binh_luan')
         ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
@@ -193,12 +196,18 @@ class PostController extends Controller
         ->join('binhluan_thich', 'binhluan_thich.BL_MA', '=', 'binh_luan.BL_MA')
         ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA);
 
+        $bai_viet_luu= DB::table('danh_dau')
+        ->where('danh_dau.BV_MA', '=', $bai_dang->BV_MA);
+
+        $binh_luan_luu_no_get= DB::table('danh_dau_boi');
+
         return view('main_content.post.show_post')->with('bai_viet', $bai_viet)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
         ->with('count_thich', $count_thich)->with('thich_no_get', $thich_no_get)
         ->with('count_binh_luan', $count_binh_luan)->with('binh_luan_goc', $binh_luan_goc)
         ->with('binh_luan_traloi', $binh_luan_traloi)->with('binh_luan_bv', $binh_luan_bv)
-        ->with('binh_luan_no_get', $binh_luan_no_get)->with('binh_luan_thich_no_get', $binh_luan_thich_no_get);
+        ->with('binh_luan_no_get', $binh_luan_no_get)->with('binh_luan_thich_no_get', $binh_luan_thich_no_get)
+        ->with('bai_viet_luu', $bai_viet_luu)->with('binh_luan_luu_no_get', $binh_luan_luu_no_get);
     }
 
     /**
@@ -222,6 +231,98 @@ class PostController extends Controller
         //
     }
 
+    /**
+     * Bài viết - thích (*)
+     */
+    public function baidang_thich($BV_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('baiviet_thich')
+            ->where("BV_MA", $BV_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if(!$isExist){
+             DB::table('baiviet_thich')->insert([
+                'ND_MA' => $userLog->ND_MA,
+                'BV_MA' => $BV_MA,
+                'BVT_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh')
+            ]);
+        }
+    }
+
+    public function destroy_baidang_thich($BV_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('baiviet_thich')
+            ->where("BV_MA", $BV_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if($isExist){
+            DB::table('baiviet_thich')
+            ->where('ND_MA',$userLog->ND_MA)->where('BV_MA',$BV_MA)
+            ->delete();
+        }
+    }
+
+    /**
+     * Bài viết - lưu (*)
+     */
+    public function baidang_luu($BV_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('danh_dau')
+            ->where("BV_MA", $BV_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if(!$isExist){
+             DB::table('danh_dau')->insert([
+                'ND_MA' => $userLog->ND_MA,
+                'BV_MA' => $BV_MA
+            ]);
+        }
+    }
+
+    public function destroy_baidang_luu($BV_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('danh_dau')
+            ->where("BV_MA", $BV_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if($isExist){
+            DB::table('danh_dau')
+            ->where('ND_MA',$userLog->ND_MA)->where('BV_MA',$BV_MA)
+            ->delete();
+        }
+    }
+
+
+    /**
+     * Bài viết - báo cáo (*)
+     */
+    public function baidang_baocao(Request $request, $BV_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('baiviet_baocao')
+            ->where("BV_MA", $BV_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if(!$isExist){
+             DB::table('baiviet_baocao')->insert([
+                'ND_MA' => $userLog->ND_MA,
+                'BV_MA' => $BV_MA,
+                'BVBC_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh'),
+                'BVBC_TRANGTHAI' => 0,
+                'BVBC_NOIDUNG' => $request->BVBC_NOIDUNG,
+            ]);
+            Session::put('alert', ['type' => 'success', 'content' => 'Gửi báo cáo thành công!']);
+        }
+    }
 
     /*
     |--------------------------------------------------------------------------

@@ -21,12 +21,12 @@
                           $count_thich_tim= $count_thich->where('BV_MA',$bv->BV_MA)->first();
                           $count_binh_luan_tim= $count_binh_luan->where('BV_MA',$bv->BV_MA)->first();
                         ?>
-                        <a class="ms-3 <?php 
+                        <a class="ms-3 cursor-pointer <?php 
                           if($userLog){
                               $check_bv_thich = $thich_no_get->clone()
                               ->where('baiviet_thich.BV_MA', $bv->BV_MA)->where('baiviet_thich.ND_MA', $userLog->ND_MA)->exists();
-                              if($check_bv_thich) echo 'text-danger'; else echo "text-muted";
-                          } else echo "text-muted"?> ">
+                              if($check_bv_thich) echo 'text-danger unlike-post'; else echo 'text-muted like-post';
+                          } else echo "text-muted" ?> " data-post-id-value="{{$bv->BV_MA}}">
                         <i class="fas fa-heart"></i> Thích: <b><?php if($count_thich_tim) echo $count_thich_tim->count; else echo 0;?></b></a>
                         <a class="ms-3 text-muted"><i class="fas fa-reply"></i> Trả lời: <b><?php if($count_binh_luan_tim) echo $count_binh_luan_tim->count; else echo 0;?></b></a>
                     </div>
@@ -47,4 +47,65 @@
                   </div>
                 </div>
               </div>
+
+              <script>
+                  $(document).ready(function() {
+                    //|*****************************************************
+                    //|LIKE BÀI VIẾT START
+                    //|*****************************************************
+                    <?php if($userLog) { ?>
+                      $(document).on('click', '.like-post', function() {
+                          // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                          var $element = $(this);
+                          var number = $element.find('b').text();
+                          var BV_MA = $(this).data('post-id-value');
+                          //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                          $.ajax({
+                            url: '{{URL::to('/thich-bai-dang/')}}' +'/'+ BV_MA,
+                            type: 'GET',
+                            success: function(response) {
+                              $element.removeClass('text-muted like-post');
+                              $element.addClass('text-danger unlike-post');
+
+                              number = parseInt(number) + 1;
+                              $element.find('b').text(number);
+                              //console.log(number);
+                            },
+                            error: function(error) {
+                              console.log(error);
+                            }
+                          });
+                              
+                      });
+                      $(document).on('click', '.unlike-post', function() {
+                          // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                          var $element = $(this);
+                          var number = $element.find('b').text();
+                          var BV_MA = $(this).data('post-id-value');
+                          //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                          $.ajax({
+                            url: '{{URL::to('/huy-thich-bai-dang/')}}' +'/'+ BV_MA,
+                            type: 'GET',
+                            success: function(response) {
+                              $element.removeClass('text-danger unlike-post');
+                              $element.addClass('text-muted like-post');
+
+                              number = parseInt(number) - 1;
+                              $element.find('b').text(number);
+                              //console.log(number);
+                            },
+                            error: function(error) {
+                              console.log(error);
+                            }
+                          });
+                              
+                      });
+                    <?php } ?>
+                    //|*****************************************************
+                    //|LIKE BÀI VIẾT END
+                    //|*****************************************************
+                  });
+              </script>
               @endforeach

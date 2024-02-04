@@ -70,18 +70,29 @@
                   <div class="row">
                     <div class="col-sm-6 d-flex mt-2 justify-content-start">
                       <a class="ms-3 text-muted"><i class="fas fa-eye"></i> Lượt xem: <b>{{$bv->BV_LUOTXEM}}</b></a>
-                      <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-flag"></i> Báo cáo</a>
+                      <a class="ms-3 text-muted cursor-pointer report-post" data-post-id-value="{{$bv->BV_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
                     </div>
                     <div class="col-sm-6 d-flex mt-2 justify-content-end">
                       <a class="ms-3 cursor-pointer <?php 
                           if($userLog){
                               $check_bv_thich = $thich_no_get->clone()
                               ->where('baiviet_thich.BV_MA', $bv->BV_MA)->where('baiviet_thich.ND_MA', $userLog->ND_MA)->exists();
-                              if($check_bv_thich) echo 'text-danger'; else echo "text-muted";
-                          } else echo "text-muted" ?> ">
+                              if($check_bv_thich) echo 'text-danger unlike-post'; else echo 'text-muted like-post';
+                          } else echo "text-muted" ?> " data-post-id-value="{{$bv->BV_MA}}">
                         <i class="fas fa-heart"></i> Thích: <b><?php if($count_thich) echo $count_thich; else echo 0;?></b></a>
                       <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-reply"></i> Trả lời: <b><?php if($count_binh_luan) echo $count_binh_luan; else echo 0;?></b></a>
-                      <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-bookmark"></i> Lưu</a>
+                      <a class="ms-3 cursor-pointer text-muted<?php 
+                          if($userLog){
+                              $check_bv_luu = $bai_viet_luu->clone()
+                              ->where('danh_dau.BV_MA', $bv->BV_MA)->where('danh_dau.ND_MA', $userLog->ND_MA)->exists();
+                              if($check_bv_luu) echo ' unbookmark-post'; else echo ' bookmark-post';
+                          } ?> " data-post-id-value="{{$bv->BV_MA}}">
+                        <?php 
+                          if($userLog){
+                            if($check_bv_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
+                            else echo '<i class="fas fa-bookmark"></i> Lưu';
+                        } else echo '<i class="fas fa-bookmark"></i> Lưu';
+                        ?></a>
                     </div>
                   </div>
                 </div>
@@ -160,13 +171,13 @@
                                     <span>{{date('H:i', strtotime($blg->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($blg->BL_THOIGIANTAO))}}</span>
                                   </div>
                                   <div class="col-sm-6 d-flex mt-2 justify-content-end">
-                                    <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-flag"></i> Báo cáo</a>
+                                    <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$blg->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
                                     <a class="ms-3 cursor-pointer <?php 
                                         if($userLog){
                                             $check_bl_thich0 = $binh_luan_thich_no_get->clone()
                                             ->where('binh_luan.BL_MA', $blg->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
-                                            if($check_bl_thich0) echo 'text-danger'; else echo "text-muted";
-                                        } else echo "text-muted"?> ">
+                                            if($check_bl_thich0) echo 'text-danger unlike-comment'; else echo 'text-muted like-comment';
+                                        } else echo "text-muted"?> " data-comment-id-value="{{$blg->BL_MA}}">
                                       <i class="fas fa-heart"></i> Thích:
                                       <b>
                                         <?php 
@@ -185,6 +196,18 @@
                                         ?>
                                       </b>
                                     </a>
+                                    <a class="ms-3 cursor-pointer text-muted <?php 
+                                      if($userLog){
+                                          $check_bl_luu = $binh_luan_luu_no_get->clone()
+                                          ->where('danh_dau_boi.BL_MA', $blg->BL_MA)->where('danh_dau_boi.ND_MA', $userLog->ND_MA)->exists();
+                                          if($check_bl_luu) echo ' unbookmark-comment'; else echo ' bookmark-comment';
+                                      } ?> " data-comment-id-value="{{$blg->BL_MA}}">
+                                    <?php 
+                                      if($userLog){
+                                        if($check_bl_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
+                                        else echo '<i class="fas fa-bookmark"></i> Lưu';
+                                    } else echo '<i class="fas fa-bookmark"></i> Lưu';
+                                    ?></a>
                                   </div>
                                 </div>
                             </div>
@@ -214,13 +237,13 @@
                                         <span>{{date('H:i', strtotime($bltl->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($bltl->BL_THOIGIANTAO))}}</span>
                                       </div>
                                       <div class="col-sm-6 d-flex mt-2 justify-content-end">
-                                        <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-flag"></i> Báo cáo</a>
+                                        <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$bltl->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
                                         <a class="ms-3 cursor-pointer <?php 
                                             if($userLog){
                                                 $check_bl_thich1 = $binh_luan_thich_no_get->clone()
                                                 ->where('binh_luan.BL_MA', $bltl->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
-                                                if($check_bl_thich1) echo 'text-danger'; else echo "text-muted";
-                                            } else echo "text-muted"?> ">
+                                                if($check_bl_thich1) echo 'text-danger unlike-comment'; else echo 'text-muted like-comment';
+                                            } else echo "text-muted"?> "  data-comment-id-value="{{$bltl->BL_MA}}">
                                           <i class="fas fa-heart"></i> Thích:
                                           <b>
                                             <?php 
@@ -228,6 +251,18 @@
                                               if($count_bl_thich1) echo $count_bl_thich1; else echo 0;
                                             ?>
                                           </b>
+                                          <a class="ms-3 cursor-pointer text-muted <?php 
+                                            if($userLog){
+                                                $check_bl_luu = $binh_luan_luu_no_get->clone()
+                                                ->where('danh_dau_boi.BL_MA', $bltl->BL_MA)->where('danh_dau_boi.ND_MA', $userLog->ND_MA)->exists();
+                                                if($check_bl_luu) echo ' unbookmark-comment'; else echo ' bookmark-comment';
+                                            } ?> " data-comment-id-value="{{$bltl->BL_MA}}">
+                                          <?php 
+                                            if($userLog){
+                                              if($check_bl_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
+                                              else echo '<i class="fas fa-bookmark"></i> Lưu';
+                                          } else echo '<i class="fas fa-bookmark"></i> Lưu';
+                                          ?></a>
                                       </div>
                                     </div>
                                 </div>
@@ -967,6 +1002,320 @@
           <?php } ?>
           //|*****************************************************
           //|LƯU FILE END
+          //|*****************************************************
+          //|*****************************************************
+          //|LƯU BÀI VIẾT START
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.bookmark-post', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var BV_MA = $(this).data('post-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                  url: '{{URL::to('/luu-bai-dang/')}}' +'/'+ BV_MA,
+                  type: 'GET',
+                  success: function(response) {
+                    $element.removeClass('bookmark-post');
+                    $element.addClass('unbookmark-post');
+
+                    $element.empty();
+                    $element.html(`<i class="fas fa-vote-yea"></i> Đã lưu`);
+                    //console.log(number);
+                  },
+                  error: function(error) {
+                    console.log(error);
+                  }
+                });
+                    
+            });
+            $(document).on('click', '.unbookmark-post', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var BV_MA = $(this).data('post-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                  url: '{{URL::to('/huy-luu-bai-dang/')}}' +'/'+ BV_MA,
+                  type: 'GET',
+                  success: function(response) {
+                    $element.removeClass('unbookmark-post');
+                    $element.addClass('bookmark-post');
+
+                    $element.empty();
+                    $element.html(`<i class="fas fa-bookmark"></i> Lưu`);
+                    //console.log(number);
+                  },
+                  error: function(error) {
+                    console.log(error);
+                  }
+                });
+                    
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|LƯU BÀI VIẾT END
+          //|*****************************************************
+          //|*****************************************************
+          //|LƯU BÌNH LUẬN START
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.bookmark-comment', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var BL_MA = $(this).data('comment-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                  url: '{{URL::to('/luu-binh-luan/')}}' +'/'+ BL_MA,
+                  type: 'GET',
+                  success: function(response) {
+                    $element.removeClass('bookmark-comment');
+                    $element.addClass('unbookmark-comment');
+
+                    $element.empty();
+                    $element.html(`<i class="fas fa-vote-yea"></i> Đã lưu`);
+                    //console.log(number);
+                  },
+                  error: function(error) {
+                    console.log(error);
+                  }
+                });
+                    
+            });
+            $(document).on('click', '.unbookmark-comment', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var BL_MA = $(this).data('comment-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                  url: '{{URL::to('/huy-luu-binh-luan/')}}' +'/'+ BL_MA,
+                  type: 'GET',
+                  success: function(response) {
+                    $element.removeClass('unbookmark-comment');
+                    $element.addClass('bookmark-comment');
+
+                    $element.empty();
+                    $element.html(`<i class="fas fa-bookmark"></i> Lưu`);
+                    //console.log(number);
+                  },
+                  error: function(error) {
+                    console.log(error);
+                  }
+                });
+                    
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|LƯU BÌNH LUẬN END
+          //|*****************************************************
+
+          //|*****************************************************
+          //|LIKE BÀI VIẾT START
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.like-post', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var number = $element.find('b').text();
+                var BV_MA = $(this).data('post-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                  url: '{{URL::to('/thich-bai-dang/')}}' +'/'+ BV_MA,
+                  type: 'GET',
+                  success: function(response) {
+                    $element.removeClass('text-muted like-post');
+                    $element.addClass('text-danger unlike-post');
+
+                    number = parseInt(number) + 1;
+                    $element.find('b').text(number);
+                    //console.log(number);
+                  },
+                  error: function(error) {
+                    console.log(error);
+                  }
+                });
+                    
+            });
+            $(document).on('click', '.unlike-post', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var number = $element.find('b').text();
+                var BV_MA = $(this).data('post-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                  url: '{{URL::to('/huy-thich-bai-dang/')}}' +'/'+ BV_MA,
+                  type: 'GET',
+                  success: function(response) {
+                    $element.removeClass('text-danger unlike-post');
+                    $element.addClass('text-muted like-post');
+
+                    number = parseInt(number) - 1;
+                    $element.find('b').text(number);
+                    //console.log(number);
+                  },
+                  error: function(error) {
+                    console.log(error);
+                  }
+                });
+                    
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|LIKE BÀI VIẾT END
+          //|*****************************************************
+          //|*****************************************************
+          //|LIKE BÌNH LUẬN START
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.like-comment', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var number = $element.find('b').text();
+                var BL_MA = $(this).data('comment-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                  url: '{{URL::to('/thich-binh-luan/')}}' +'/'+ BL_MA,
+                  type: 'GET',
+                  success: function(response) {
+                    $element.removeClass('text-muted like-comment');
+                    $element.addClass('text-danger unlike-comment');
+
+                    number = parseInt(number) + 1;
+                    $element.find('b').text(number);
+                    //console.log(number);
+                  },
+                  error: function(error) {
+                    console.log(error);
+                  }
+                });
+                    
+            });
+            $(document).on('click', '.unlike-comment', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var number = $element.find('b').text();
+                var BL_MA = $(this).data('comment-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajax({
+                  url: '{{URL::to('/huy-thich-binh-luan/')}}' +'/'+ BL_MA,
+                  type: 'GET',
+                  success: function(response) {
+                    $element.removeClass('text-danger unlike-comment');
+                    $element.addClass('text-muted like-comment');
+
+                    number = parseInt(number) - 1;
+                    $element.find('b').text(number);
+                    //console.log(number);
+                  },
+                  error: function(error) {
+                    console.log(error);
+                  }
+                });
+                    
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|LIKE BÌNH LUẬN END
+          //|*****************************************************
+
+          //|*****************************************************
+          //|REPORT BÀI VIẾT START
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.report-post', function() {
+              var BVBC_NOIDUNG;
+
+              while (true) {
+                  BVBC_NOIDUNG = prompt("Nội dung báo cáo:");
+
+                  if (BVBC_NOIDUNG !== null && BVBC_NOIDUNG.trim() !== "") {
+                      //Báo cáo hơp lệ có nội dung
+                      //console.log("Giá trị đã nhập: " + BVBC_NOIDUNG);
+                      // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                      var $element = $(this);
+                      var BV_MA = $(this).data('post-id-value');
+                      var _token = $('meta[name="csrf-token"]').attr('content');
+
+                      $.ajax({
+                        url: '{{URL::to('/bao-cao-bai-dang/')}}' +'/'+ BV_MA,
+                        type: 'POST',
+                        data: {
+                          BVBC_NOIDUNG: BVBC_NOIDUNG,
+                          _token: _token // Include the CSRF token in the data
+                        },
+                        success: function(response) {
+                          window.location.href = '{{URL::to('/trang-chu')}}';
+                          //console.log(number);
+                        },
+                        error: function(error) {
+                          console.log(error);
+                        }
+                      });
+                      break;
+                  } else if (BVBC_NOIDUNG === null) {
+                      //console.log("Người dùng đã hủy.");
+                      break;
+                  } else {
+                      alert("Vui lòng nhập nội dung báo cáo!"); 
+                  }
+              }
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|REPORT BÀI VIẾT END
+          //|*****************************************************
+          //|*****************************************************
+          //|REPORT BÌNH LUẬN START
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.report-comment', function() {
+              var BLBC_NOIDUNG;
+
+              while (true) {
+                  BLBC_NOIDUNG = prompt("Nội dung báo cáo:");
+
+                  if (BLBC_NOIDUNG !== null && BLBC_NOIDUNG.trim() !== "") {
+                      //Báo cáo hơp lệ có nội dung
+                      //console.log("Giá trị đã nhập: " + BLBC_NOIDUNG);
+                      // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                      var $element = $(this);
+                      var BL_MA = $(this).data('comment-id-value');
+                      var _token = $('meta[name="csrf-token"]').attr('content');
+
+                      $.ajax({
+                        url: '{{URL::to('/bao-cao-binh-luan/')}}' +'/'+ BL_MA,
+                        type: 'POST',
+                        data: {
+                          BLBC_NOIDUNG: BLBC_NOIDUNG,
+                          _token: _token // Include the CSRF token in the data
+                        },
+                        success: function(response) {
+                          window.location.href = '{{URL::to('/bai-dang/'.$BV_MA)}}';
+                          //console.log(number);
+                        },
+                        error: function(error) {
+                          console.log(error);
+                        }
+                      });
+                      break;
+                  } else if (BLBC_NOIDUNG === null) {
+                      //console.log("Người dùng đã hủy.");
+                      break;
+                  } else {
+                      alert("Vui lòng nhập nội dung báo cáo!"); 
+                  }
+              }
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|REPORT BÌNH LUẬN END
           //|*****************************************************
         });
     </script>

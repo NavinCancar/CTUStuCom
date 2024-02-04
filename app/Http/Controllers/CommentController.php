@@ -24,7 +24,7 @@ class CommentController extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - Tạo bình luận mới(*)
+    - Tạo bình luận mới(*), Bình luận - thích (*)
     |--------------------------------------------------------------------------
     */
 
@@ -135,7 +135,97 @@ class CommentController extends Controller
         //
     }
 
+    /**
+     * Bình luận - thích (*)
+     */
+    public function binhluan_thich($BL_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
 
+        $isExist = DB::table('binhluan_thich')
+            ->where("BL_MA", $BL_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if(!$isExist){
+             DB::table('binhluan_thich')->insert([
+                'ND_MA' => $userLog->ND_MA,
+                'BL_MA' => $BL_MA,
+                'BLT_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh')
+            ]);
+        }
+    }
+
+    public function destroy_binhluan_thich($BL_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('binhluan_thich')
+            ->where("BL_MA", $BL_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if($isExist){
+            DB::table('binhluan_thich')
+            ->where('ND_MA',$userLog->ND_MA)->where('BL_MA',$BL_MA)
+            ->delete();
+        }
+    }
+
+    /**
+     * Bình luận - lưu (*)
+     */
+    public function binhluan_luu($BL_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('danh_dau_boi')
+            ->where("BL_MA", $BL_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if(!$isExist){
+             DB::table('danh_dau_boi')->insert([
+                'ND_MA' => $userLog->ND_MA,
+                'BL_MA' => $BL_MA
+            ]);
+        }
+    }
+
+    public function destroy_binhluan_luu($BL_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('danh_dau_boi')
+            ->where("BL_MA", $BL_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if($isExist){
+            DB::table('danh_dau_boi')
+            ->where('ND_MA',$userLog->ND_MA)->where('BL_MA',$BL_MA)
+            ->delete();
+        }
+    }
+
+    /**
+     * Bình luận - báo cáo (*)
+     */
+    public function binhluan_baocao(Request $request, $BL_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('binhluan_baocao')
+            ->where("BL_MA", $BL_MA)->where("ND_MA", $userLog->ND_MA)
+            ->exists();
+
+        if(!$isExist){
+             DB::table('binhluan_baocao')->insert([
+                'ND_MA' => $userLog->ND_MA,
+                'BL_MA' => $BL_MA,
+                'BLBC_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh'),
+                'BLBC_TRANGTHAI' => 0,
+                'BLBC_NOIDUNG' => $request->BLBC_NOIDUNG,
+            ]);
+            Session::put('alert', ['type' => 'success', 'content' => 'Gửi báo cáo thành công!']);
+        }
+    }
     /*
     |--------------------------------------------------------------------------
     | KIỂM DUYỆT VIÊN
