@@ -111,7 +111,7 @@ class PostController extends Controller
         
         if($linkFile && is_array($linkFile)){   
             foreach ($linkFile as $file) {
-                $fileSend = $fileSend = $this->firestoreClient->addDocument($collection, [
+                $this->firestoreClient->addDocument($collection, [
                     'BV_MA' =>  $bai_viet->BV_MA,  
                     'BL_MA' =>  0,
                     'FDK_DUONGDAN'=> $file['link'],
@@ -139,6 +139,11 @@ class PostController extends Controller
      * Xem chi tiết bài đăng
      */
     public function show(Post $bai_dang){ ///
+        //Xử lý đường dẫn: http://localhost/ctustucom/bai-dang/{bai_dang}?binh-luan={binh_luan}\
+        $binhLuanMa = request()->query('binh-luan');
+        if($binhLuanMa) Session::put('BL_MA_Focus', $binhLuanMa);
+        $binhLuanMa = null;
+
         //Tăng lượt xem
         $bv = DB::table('bai_viet')->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->first();
         $bvluotxem = $bv->BV_LUOTXEM;
@@ -172,18 +177,33 @@ class PostController extends Controller
         ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
         ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->count();
 
-        $binh_luan_not_in = DB::table('binhluan_baocao')->pluck('BL_MA')->toArray();
-        $binh_luan_goc = DB::table('binh_luan')
-        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
-        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
-        ->where('binh_luan.BL_TRALOI_MA', '=', null)
-        ->whereNotIn('BL_MA', $binh_luan_not_in)->get();
+        $userLog = Session::get('userLog');
+        if($userLog){
+            $binh_luan_not_in = DB::table('binhluan_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BL_MA')->toArray();
+            
+            $binh_luan_goc = DB::table('binh_luan')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+            ->where('binh_luan.BL_TRALOI_MA', '=', null)
+            ->whereNotIn('BL_MA', $binh_luan_not_in)->get();
 
-        $binh_luan_traloi = DB::table('binh_luan')
-        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
-        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
-        ->where('binh_luan.BL_TRALOI_MA', '!=', null)
-        ->whereNotIn('BL_MA', $binh_luan_not_in)->get();
+            $binh_luan_traloi = DB::table('binh_luan')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+            ->where('binh_luan.BL_TRALOI_MA', '!=', null)
+            ->whereNotIn('BL_MA', $binh_luan_not_in)->get();
+            }
+        else{
+            $binh_luan_goc = DB::table('binh_luan')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+            ->where('binh_luan.BL_TRALOI_MA', '=', null)->get();
+
+            $binh_luan_traloi = DB::table('binh_luan')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+            ->where('binh_luan.BL_TRALOI_MA', '!=', null)->get();
+        }
 
         $binh_luan_bv= DB::table('binh_luan')
         ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
@@ -243,7 +263,7 @@ class PostController extends Controller
             ->exists();
 
         if(!$isExist){
-             DB::table('baiviet_thich')->insert([
+            DB::table('baiviet_thich')->insert([
                 'ND_MA' => $userLog->ND_MA,
                 'BV_MA' => $BV_MA,
                 'BVT_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh')
@@ -265,6 +285,7 @@ class PostController extends Controller
             ->delete();
         }
     }
+
 
     /**
      * Bài viết - lưu (*)
@@ -324,6 +345,7 @@ class PostController extends Controller
         }
     }
 
+    
     /*
     |--------------------------------------------------------------------------
     | KIỂM DUYỆT VIÊN

@@ -192,6 +192,15 @@
   max-height: 42px
 }
 
+.wrap-noti-text{
+  max-width: 80%; 
+  max-height: 3em; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  overflow-wrap: break-word; 
+  white-space: normal;
+}
+
 .text-notice {
   border-radius: 20px;
   text-align: center;

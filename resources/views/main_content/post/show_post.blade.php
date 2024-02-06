@@ -1113,7 +1113,7 @@
           //|*****************************************************
 
           //|*****************************************************
-          //|LIKE BÀI VIẾT START
+          //|LIKE BÀI VIẾT START //
           //|*****************************************************
           <?php if($userLog) { ?>
             $(document).on('click', '.like-post', function() {
@@ -1133,6 +1133,19 @@
                     number = parseInt(number) + 1;
                     $element.find('b').text(number);
                     //console.log(number);
+
+                    //Notification start
+                    $.ajax({
+                        url: '{{URL::to('/thong-bao-thich-bai-dang/')}}' +'/'+ BV_MA,
+                        type: 'GET',
+                        success: function(response2) {
+                          //console.log('ok');
+                        },
+                        error: function(error2) {
+                          console.log(error);
+                        }
+                    });
+                    //Notification end
                   },
                   error: function(error) {
                     console.log(error);
@@ -1169,7 +1182,7 @@
           //|LIKE BÀI VIẾT END
           //|*****************************************************
           //|*****************************************************
-          //|LIKE BÌNH LUẬN START
+          //|LIKE BÌNH LUẬN START //
           //|*****************************************************
           <?php if($userLog) { ?>
             $(document).on('click', '.like-comment', function() {
@@ -1189,6 +1202,19 @@
                     number = parseInt(number) + 1;
                     $element.find('b').text(number);
                     //console.log(number);
+
+                    //Notification start
+                    $.ajax({
+                        url: '{{URL::to('/thong-bao-thich-binh-luan/')}}' +'/'+ BL_MA,
+                        type: 'GET',
+                        success: function(response2) {
+                          //console.log('ok');
+                        },
+                        error: function(error2) {
+                          console.log(error);
+                        }
+                    });
+                    //Notification end
                   },
                   error: function(error) {
                     console.log(error);
@@ -1226,7 +1252,7 @@
           //|*****************************************************
 
           //|*****************************************************
-          //|REPORT BÀI VIẾT START
+          //|REPORT BÀI VIẾT START //
           //|*****************************************************
           <?php if($userLog) { ?>
             $(document).on('click', '.report-post', function() {
@@ -1251,6 +1277,19 @@
                           _token: _token // Include the CSRF token in the data
                         },
                         success: function(response) {
+                          //Notification start
+                          $.ajax({
+                              url: '{{URL::to('/thong-bao-bao-cao-bai-dang/')}}' +'/'+ BV_MA,
+                              type: 'GET',
+                              success: function(response2) {
+                                //console.log('ok');
+                              },
+                              error: function(error2) {
+                                console.log(error);
+                              }
+                          });
+                          //Notification end
+
                           window.location.href = '{{URL::to('/trang-chu')}}';
                           //console.log(number);
                         },
@@ -1272,7 +1311,7 @@
           //|REPORT BÀI VIẾT END
           //|*****************************************************
           //|*****************************************************
-          //|REPORT BÌNH LUẬN START
+          //|REPORT BÌNH LUẬN START //
           //|*****************************************************
           <?php if($userLog) { ?>
             $(document).on('click', '.report-comment', function() {
@@ -1297,6 +1336,19 @@
                           _token: _token // Include the CSRF token in the data
                         },
                         success: function(response) {
+                          //Notification start
+                          $.ajax({
+                              url: '{{URL::to('/thong-bao-bao-cao-binh-luan/')}}' +'/'+ BL_MA,
+                              type: 'GET',
+                              success: function(response2) {
+                                //console.log('ok');
+                              },
+                              error: function(error2) {
+                                console.log(error);
+                              }
+                          });
+                          //Notification end
+
                           window.location.href = '{{URL::to('/bai-dang/'.$BV_MA)}}';
                           //console.log(number);
                         },

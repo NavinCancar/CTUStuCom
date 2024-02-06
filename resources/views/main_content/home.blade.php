@@ -518,7 +518,7 @@
     //|KHAI BÁO FIRESTORE
     //|-----------------------------------------------------
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, setDoc, addDoc, doc, collection, serverTimestamp, getDocs, query, where, orderBy, limit, or, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, setDoc, addDoc, doc, collection, serverTimestamp, getDocs, query, where, orderBy, limit, or, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, listAll, getDownloadURL, deleteObject  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
     // TODO: Add SDKs for Firebase products that you want to use
@@ -761,7 +761,77 @@
       //|*****************************************************
       //|UPLOAD FILE END
       //|*****************************************************  
+
+      //|*****************************************************
+      //|LIKE BÀI VIẾT START
+      //|*****************************************************
+      <?php if($userLog) { ?>
+        $(document).on('click', '.like-post', function() {
+            // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+            var $element = $(this);
+            var number = $element.find('b').text();
+            var BV_MA = $(this).data('post-id-value');
+            //var _token = $('meta[name="csrf-token"]').attr('content');
+
+            $.ajax({
+              url: '{{URL::to('/thich-bai-dang/')}}' +'/'+ BV_MA,
+              type: 'GET',
+              success: function(response) {
+                $element.removeClass('text-muted like-post');
+                $element.addClass('text-danger unlike-post');
+
+                number = parseInt(number) + 1;
+                $element.find('b').text(number);
+                //console.log(number);
+
+                //Notification start
+                $.ajax({
+                    url: '{{URL::to('/thong-bao-thich-bai-dang/')}}' +'/'+ BV_MA,
+                    type: 'GET',
+                    success: function(response2) {
+                      //console.log('ok');
+                    },
+                    error: function(error2) {
+                      console.log(error);
+                    }
+                });
+                //Notification end
+              },
+              error: function(error) {
+                console.log(error);
+              }
+            });
+        });
+        $(document).on('click', '.unlike-post', function() {
+            // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+            var $element = $(this);
+            var number = $element.find('b').text();
+            var BV_MA = $(this).data('post-id-value');
+            var BV_ND_MA = $(this).data('post-id-user-value');
+            //var _token = $('meta[name="csrf-token"]').attr('content');
+
+            $.ajax({
+              url: '{{URL::to('/huy-thich-bai-dang/')}}' +'/'+ BV_MA,
+              type: 'GET',
+              success: function(response) {
+                $element.removeClass('text-danger unlike-post');
+                $element.addClass('text-muted like-post');
+
+                number = parseInt(number) - 1;
+                $element.find('b').text(number);
+                //console.log(number);
+              },
+              error: function(error) {
+                console.log(error);
+              }
+            });
+                
+        });
+      <?php } ?>
+      //|*****************************************************
+      //|LIKE BÀI VIẾT END
+      //|*****************************************************
     });
   </script>
-  <!--MIN END-->
+  <!--MAIN END-->
 @endsection

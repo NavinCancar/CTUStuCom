@@ -58,28 +58,23 @@
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
                   aria-expanded="false">
                   <i class="fa fa-bell"></i>
-                  <div class="notification bg-primary rounded-circle"></div>
+                  <!--<div class="notification bg-primary rounded-circle"></div>-->
+                  <span class="badge rounded-pill bg-primary float-end fs-1 px-2" id="noti-circle" style="display:none; position: relative;top: -10px; left: -7px"></span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
                   <div class="message-body">
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1"
+                    <div id="list-noti">
+                    <!--<a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1"
                       style="flex-wrap: wrap;">
                       <img src="{{asset('public/images/profile/user-1.jpg')}}" alt="" width="35" height="35"
                         class="rounded-circle">
                       <p class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">
                         Trần Kim Anh đã thích bài viết của bạn: Tìm giáo trình Anh văn căn bản chưa hết hạn.
                       </p>
-                    </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1"
-                      style="flex-wrap: wrap;">
-                      <img src="{{asset('public/images/profile/user-1.jpg')}}" alt="" width="35" height="35"
-                        class="rounded-circle">
-                      <p class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">
-                        Trần Kim Anh đã thích bài viết của bạn: Tìm giáo trình Anh văn căn bản chưa hết hạn.
-                      </p>
-                    </a>
+                    </a>-->
+                    </div>
                     <hr>
-                    <div class="text-center mb-1"><a href="javascript:void(0)" class="card-link">Xem thêm</a></div>
+                    <div class="text-center mb-1"><a href="{{URL::to('/thong-bao')}}" id="list-noti-link" class="card-link">Xem thêm</a></div>
                   </div>
                 </div>
               </li>
@@ -123,7 +118,7 @@
         //|KHAI BÁO FIRESTORE
         //|-----------------------------------------------------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, collection, getDocs, query, where, orderBy, limit, or, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, collection, getDocs, updateDoc, query, where, orderBy, limit, or, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // TODO: Add SDKs for Firebase products that you want to use
         // https://firebase.google.com/docs/web/setup#available-libraries
@@ -145,9 +140,11 @@
 
 
         $(document).ready(function() {
-
             <?php if($userLog) {?>//Không có dòng này navbar sẽ gây lỗi
               var justLoad = new Date();
+              //|*****************************************************
+              //|NHẮN TIN START
+              //|***************************************************** 
               var userFormList = [];
 
               //|-----------------------------------------------------
@@ -421,7 +418,214 @@
                       }
                   });
               }
+              //|*****************************************************
+              //|NHẮN TIN END
+              //|***************************************************** 
+              //|*****************************************************
+              //|THÔNG BÁO START
+              //|***************************************************** 
+              var notiFormList = [];
 
+              //|-----------------------------------------------------
+              //|HIỆN CÁC THÔNG BÁO CHAT GẦN NHẤT
+              //|-----------------------------------------------------
+              (async () => {
+                const qnoti = query(
+                  collection(db, "THONG_BAO"), 
+                  where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
+                  orderBy("TB_REALTIME", "desc")
+                );
+
+                const querySnapshotnoti = await getDocs(qnoti);
+                
+                //KHÔNG TỒN TẠI THÔNG BÁO CŨ
+                if (querySnapshotnoti.empty) {
+                  console.log('no data');
+                  var divData = `<p class="text-center p-2">Bạn chưa thông báo nào trước đây!</p>`;
+
+                  var listnoti = document.getElementById('list-noti');
+                  listnoti.insertAdjacentHTML('afterbegin', divData);
+
+                  var listnotilink = document.getElementById('list-noti-link');
+                  listnotilink.style.display = "none";
+                }
+                //TỒN TẠI THÔNG BÁO CŨ
+                else{
+                  //console.log('have data');
+                  //|-----------------------------------------------------
+                  //|ICON NOTI
+                  //|-----------------------------------------------------
+                  const qiconnoti = query(
+                    collection(db, "THONG_BAO"), 
+                    where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
+                    where("TB_TRANGTHAI", "==", 0)
+                  );
+                  const querySnapshoticonnoti = await getDocs(qiconnoti);
+                  //console.log(querySnapshotnocheck);
+                  var noCheckNotiSum = querySnapshoticonnoti.size;
+                  if (noCheckNotiSum != 0){
+                    var noticircle = document.getElementById('noti-circle');
+                    noticircle.innerHTML = noCheckNotiSum;
+                    noticircle.style.display = "block";
+                  }
+
+                  querySnapshotnoti.forEach((doc) => {
+                      //doc.data() is never undefined for query doc snapshots
+                      //console.log(doc.id, " => ", doc.data());
+
+                      //|-----------------------------------------------------
+                      //|LẤY 5 NGƯỜI NHẮN GẦN NHẤT
+                      //|-----------------------------------------------------
+                      
+                      //checkNoti chưa tồn tại trong mảng
+                      if (notiFormList.indexOf(doc.id) === -1 && notiFormList.length < 5) {
+                          notiFormList.push(doc.id);
+
+                          var divData = 
+                              '<a data-value="'+doc.id+'" data-href="'+doc.data().TB_DUONGDAN+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1 noti-href" style="flex-wrap: wrap;">' +
+                              '  <img src="'+ (doc.data().TB_ANHDINHKEM != null ? doc.data().TB_ANHDINHKEM : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
+                              '    class="rounded-circle">'+
+                              '  <p class="mb-0 fs-3 wrap-noti-text">' +
+                              doc.data().TB_NOIDUNG +
+                              '  </p>' +
+                              (doc.data().TB_TRANGTHAI==0 ? '<div class="notification bg-primary rounded-circle"></div>' : '') +
+                              '</a>';
+
+                          var listnoti = document.getElementById('list-noti');
+                          listnoti.insertAdjacentHTML('beforeend', divData);
+                      }
+                      else if(notiFormList.length >= 5){
+                        return; //forEach không cho break
+                      }
+                      else{}
+                  });
+                }
+
+              })().catch((error) => {
+                  console.error("Error in script: ", error);
+              });
+
+
+              //|-----------------------------------------------------
+              //|BẮT SỰ KIỆN REALTIME
+              //|-----------------------------------------------------
+              //console.log(justLoad);
+              
+              const qrealnoti = query(
+                  collection(db, "THONG_BAO"), 
+                  where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
+                  where("TB_REALTIME", ">", justLoad),
+                  orderBy("TB_REALTIME", "desc")
+              );
+
+              //console.log("Before onSnapshot");
+              const unsubscriberealnoti = onSnapshot(qrealnoti, (querySnapshot) => {
+                  //console.log("Snapshot event received");
+                  //console.log(notiFormList);
+                  querySnapshot.docChanges().forEach((change) => {
+
+                      //|-----------------------------------------------------
+                      //|ICON NOTI
+                      //|-----------------------------------------------------
+                      (async () => {
+                        const qiconnoti = query(
+                          collection(db, "THONG_BAO"), 
+                          where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
+                          where("TB_TRANGTHAI", "==", 0)
+                        );
+                        const querySnapshoticonnoti = await getDocs(qiconnoti);
+                        //console.log(querySnapshotnocheck);
+                        var noCheckNotiSum = querySnapshoticonnoti.size;
+                        if (noCheckNotiSum != 0){
+                          var noticircle = document.getElementById('noti-circle');
+                          noticircle.innerHTML = noCheckNotiSum;
+                          noticircle.style.display = "block";
+                        }
+                      })().catch((error) => {
+                          console.error("Error in script: ", error);
+                      });
+                      
+                      const iddata = change.doc.id;
+                      const data = change.doc.data(); // Cũng có thể dùng change.doc.id / change.doc.data().TN_REALTIME
+                      // Kiểm tra loại thay đổi
+                      if (change.type === "added" || change.type === "modified") { //Tương tự có thể dùng modified hoặc removed
+                          //console.log("ID Document added:", iddata);
+                          //console.log("Document added:", data);
+                          //console.log("Ori ",notiFormList);
+
+                          //Người vừa nhắn tin chưa tồn tại trong mảng
+                          if (notiFormList.indexOf(iddata) === -1) {
+                            if (notiFormList.length >= 5) {
+                              var lastElement = notiFormList[4];
+                              //console.log(lastElement);
+                              removeAByValueNoti(lastElement);
+                              // Xoá phần tử cuối cùng
+                              notiFormList.pop();
+                            }
+                            //thêm đầu mảng, push là thêm cuối mảng
+                            notiFormList.unshift(iddata);
+                          }
+                          //Có tồn tại trong mảng rồi
+                          else{
+                              removeAByValueNoti(iddata);
+                          }
+                          //console.log("New ",notiFormList);
+
+                          var divData = 
+                              '<a data-value="'+iddata+'" data-href="'+data.TB_DUONGDAN+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1 noti-href" style="flex-wrap: wrap;">' +
+                              '  <img src="'+ (data.TB_ANHDINHKEM != null ? data.TB_ANHDINHKEM : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
+                              '    class="rounded-circle">'+
+                              '  <p class="mb-0 fs-3 wrap-noti-text">' +
+                              data.TB_NOIDUNG +
+                              '  </p>' +
+                              (data.TB_TRANGTHAI==0 ? '<div class="notification bg-primary rounded-circle"></div>' : '') +
+                              '</a>';
+
+                          var listnoti = document.getElementById('list-noti');
+                          listnoti.insertAdjacentHTML('afterbegin', divData);
+                      }
+                  });
+                  //console.log("Current data: ", messages.join(", "));
+              });
+
+              //|-----------------------------------------------------
+              //|HÀM XỬ LÝ KHÁC
+              //|-----------------------------------------------------
+
+              //XOÁ A CÓ DATA-VALUE YÊU CẦU
+              function removeAByValueNoti(value) {
+                  var div = document.getElementById('list-noti');
+
+                  var as = div.querySelectorAll('a[data-value]');
+
+                  // Lặp qua từng li để tìm li có data-value trùng với giá trị cần xoá
+                  as.forEach(function(a) {
+                      var aValue = a.getAttribute('data-value');
+                      if (aValue === value) {
+                          a.parentNode.removeChild(a);
+                      }
+                  });
+              }
+
+              $(document).on('click', '.noti-href', function() {
+                  var element = $(this);
+                  var iddata = element.data('value');
+                  var href = element.data('href');
+
+                  (async () => {
+                      const ref = doc(db, "THONG_BAO", iddata);
+
+                      await updateDoc(ref, {
+                          TB_TRANGTHAI: 1
+                      });
+                  })().catch((error) => {
+                      console.error("Error in script: ", error);
+                  });
+                  window.location.href = href;
+              });
+              //|*****************************************************
+              //|THÔNG BÁO END
+              //|***************************************************** 
             <?php } ?>
         });
     </script>

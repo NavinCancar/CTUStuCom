@@ -78,3 +78,17 @@ Route::resource('/tin-nhan', 'App\Http\Controllers\MessageController_FB')->only(
 
 //Đánh dấu file: Người dùng và file đính kèm
 Route::resource('/danh-dau-file', 'App\Http\Controllers\FileofUserController_FB')->only(['store']); ///ok: C_ND
+
+//Notificaton: Thông báo
+Route::get('/thong-bao', 'App\Http\Controllers\NotificatonController_FB@index');
+
+//-- Cập nhật thông báo thích
+Route::get('/thong-bao-thich-bai-dang/{BV_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_LikePost');
+Route::get('/thong-bao-thich-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_LikeComment');
+
+//-- Cập nhật thông báo bình luận
+Route::get('/thong-bao-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_CommentPost');
+
+//-- Cập nhật thông báo báo cáo
+Route::get('/thong-bao-bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_ReportPost');
+Route::get('/thong-bao-bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_ReportComment');

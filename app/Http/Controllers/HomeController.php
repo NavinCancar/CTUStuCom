@@ -45,12 +45,22 @@ class HomeController extends Controller
      */
     public function index(Request $request){ ///
         //Bài viết Start
-        $bai_viet_not_in = DB::table('baiviet_baocao')->pluck('BV_MA')->toArray();
-        $bai_viet = DB::table('bai_viet')
-        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
-        ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
-        ->orderBy('BV_THOIGIANDANG', 'desc')
-        ->whereNotIn('BV_MA', $bai_viet_not_in)->paginate(5);
+
+        $userLog = Session::get('userLog');
+        if($userLog){
+            $bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
+            $bai_viet = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->orderBy('BV_THOIGIANDANG', 'desc')
+            ->whereNotIn('BV_MA', $bai_viet_not_in)->paginate(5);
+        }
+        else{
+            $bai_viet = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->orderBy('BV_THOIGIANDANG', 'desc')->paginate(5);
+        }
         
         $hashtag_bai_viet = DB::table('hashtag')
         ->join('cua_bai_viet', 'cua_bai_viet.H_HASHTAG', '=', 'hashtag.H_HASHTAG')->get();
