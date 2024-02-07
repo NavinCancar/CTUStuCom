@@ -110,7 +110,7 @@
               <?php if(!$userLog || ($userLog && $userLog->VT_MA==3)) echo "show";?>
             ">
               <li class="sidebar-item">
-                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+                <a class="sidebar-link" href="{{URL::to('/hashtag')}}" aria-expanded="false">
                   <span>
                     <i class="fa fa-hashtag"></i>
                   </span>

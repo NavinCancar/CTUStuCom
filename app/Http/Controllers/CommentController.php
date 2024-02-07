@@ -24,7 +24,8 @@ class CommentController extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - Tạo bình luận mới(*), Bình luận - thích (*)
+    - Tạo bình luận mới(*), 
+    - Bình luận - thích (*), Bình luận - lưu (*), Bình luận - báo cáo (*)
     |--------------------------------------------------------------------------
     */
 

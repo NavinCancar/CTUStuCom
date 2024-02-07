@@ -28,6 +28,7 @@ class UserSysController extends Controller
     NGƯỜI DÙNG
     - Đối với cá nhân: Đăng nhập tài khoản, Đăng xuất tài khoản(*), Đăng ký tài khoản, 
         Cập nhật tài khoản người dùng (****), Vô hiệu hoá tài khoản người dùng (****),
+        Đổi mật khẩu (*)
     - Đối với người dùng khác: 
     |--------------------------------------------------------------------------
     */

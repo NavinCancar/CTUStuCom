@@ -23,7 +23,8 @@ class NotificatonController_FB extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - Tạo bài đăng mới(*), Bài viết - thích (*)
+    - Thông báo(*)
+    - Cập nhật thông báo thích(*), Cập nhật thông báo bình luận(*), Cập nhật thông báo báo cáo(*)
     |--------------------------------------------------------------------------
     */
 
@@ -150,7 +151,7 @@ class NotificatonController_FB extends Controller
     /**
      * Cập nhật thông báo bình luận(*)
      */
-     public function UpdateNotification_CommentPost($BL_MA){ 
+     public function UpdateNotification_CommentPost($BL_MA){ ///
         $this->AuthLogin_ND();
 
         $userLog = Session::get('userLog');
@@ -239,7 +240,7 @@ class NotificatonController_FB extends Controller
     /**
      * Cập nhật thông báo báo cáo(*)
      */
-    public function UpdateNotification_ReportPost($BV_MA){
+    public function UpdateNotification_ReportPost($BV_MA){ ///
         $this->AuthLogin_ND();
 
         $userLog = Session::get('userLog');
@@ -289,7 +290,7 @@ class NotificatonController_FB extends Controller
         }
     }
 
-    public function UpdateNotification_ReportComment($BL_MA){
+    public function UpdateNotification_ReportComment($BL_MA){ ///
         $this->AuthLogin_ND();
 
         $userLog = Session::get('userLog');

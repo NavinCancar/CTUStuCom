@@ -24,7 +24,8 @@ class PostController extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - Tạo bài đăng mới(*), Bài viết - thích (*)
+    - Tạo bài đăng mới(*), Xem chi tiết bài đăng
+    - Bài viết - thích (*), Bài viết - lưu (*), Bài viết - báo cáo (*)
     |--------------------------------------------------------------------------
     */
 

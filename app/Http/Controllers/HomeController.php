@@ -84,7 +84,8 @@ class HomeController extends Controller
         if ($request->ajax()) {//Chạy nút load-more
             $view = view('main_component.post_loadmore')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag)
             ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
-            ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)->render();
+            ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
+            ->with('thich_no_get', $thich_no_get)->render();
   
             return response()->json(['html' => $view]);
         }

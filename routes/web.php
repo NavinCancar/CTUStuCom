@@ -47,32 +47,41 @@ Route::resource('/tai-khoan', 'App\Http\Controllers\UserSysController')->except(
 Route::resource('/bai-dang', 'App\Http\Controllers\PostController')->except(['create']); ///ok: C_ND
 
 //-- Bài viết và thích
-Route::get('/thich-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@baidang_thich');
-Route::get('/huy-thich-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@destroy_baidang_thich');
+Route::get('/thich-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@baidang_thich'); ///ok
+Route::get('/huy-thich-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@destroy_baidang_thich'); ///ok
 
 //-- Bài viết và lưu: Đánh dâu
-Route::get('/luu-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@baidang_luu');
-Route::get('/huy-luu-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@destroy_baidang_luu');
+Route::get('/luu-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@baidang_luu'); ///ok
+Route::get('/huy-luu-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@destroy_baidang_luu'); ///ok
 
 //-- Bài viết và báo cáo
-Route::post('/bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@baidang_baocao');
+Route::post('/bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@baidang_baocao'); ///ok
 
 
 //Comment: Bình luận
 Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(['create']); ///ok: C_ND
 
 //-- Bình luận và thích
-Route::get('/thich-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_thich');
-Route::get('/huy-thich-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@destroy_binhluan_thich');
+Route::get('/thich-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_thich'); ///ok
+Route::get('/huy-thich-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@destroy_binhluan_thich'); ///ok
 
 //-- Bình luận và lưu: Đánh dấu bởi
-Route::get('/luu-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_luu');
-Route::get('/huy-luu-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@destroy_binhluan_luu');
+Route::get('/luu-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_luu'); ///ok
+Route::get('/huy-luu-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@destroy_binhluan_luu'); ///ok
 
 //-- Bình luận và lưu: Đánh dấu bởi
-Route::post('/bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_baocao');
+Route::post('/bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_baocao'); ///ok
 
 
+//Hashtag
+Route::resource('/hashtag', 'App\Http\Controllers\HashtagController')->only(['index', 'show']);
+
+//--Theo dõi hashtag
+Route::get('/theo-doi-hashtag/{H_HASHTAG}', 'App\Http\Controllers\HashtagController@hashtag_theodoi'); ///ok
+Route::get('/huy-theo-doi-hashtag/{H_HASHTAG}', 'App\Http\Controllers\HashtagController@destroy_hashtag_theodoi'); ///ok
+
+
+//FIREBASE
 //Message: Tin nhắn
 Route::resource('/tin-nhan', 'App\Http\Controllers\MessageController_FB')->only(['index', 'show']); ///ok
 
@@ -80,15 +89,15 @@ Route::resource('/tin-nhan', 'App\Http\Controllers\MessageController_FB')->only(
 Route::resource('/danh-dau-file', 'App\Http\Controllers\FileofUserController_FB')->only(['store']); ///ok: C_ND
 
 //Notificaton: Thông báo
-Route::get('/thong-bao', 'App\Http\Controllers\NotificatonController_FB@index');
+Route::get('/thong-bao', 'App\Http\Controllers\NotificatonController_FB@index'); ///ok
 
 //-- Cập nhật thông báo thích
-Route::get('/thong-bao-thich-bai-dang/{BV_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_LikePost');
-Route::get('/thong-bao-thich-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_LikeComment');
+Route::get('/thong-bao-thich-bai-dang/{BV_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_LikePost'); ///ok
+Route::get('/thong-bao-thich-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_LikeComment'); ///ok
 
 //-- Cập nhật thông báo bình luận
-Route::get('/thong-bao-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_CommentPost');
+Route::get('/thong-bao-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_CommentPost'); ///ok
 
 //-- Cập nhật thông báo báo cáo
-Route::get('/thong-bao-bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_ReportPost');
-Route::get('/thong-bao-bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_ReportComment');
+Route::get('/thong-bao-bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_ReportPost'); ///ok
+Route::get('/thong-bao-bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_ReportComment'); ///ok

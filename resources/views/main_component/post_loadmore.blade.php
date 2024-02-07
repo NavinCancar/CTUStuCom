@@ -40,7 +40,7 @@
 
                       @foreach($hashtag_bai_viet as $key => $hbv)
                         @if($bv->BV_MA==$hbv->BV_MA)
-                        <a href="javascript:void(0)"><span class="badge bg-primary rounded-3">#{{$hbv->H_HASHTAG}}</span></a>
+                        <a href="{{URL::to('/hashtag/'.$hbv->H_HASHTAG)}}"><span class="badge bg-primary rounded-3">#{{$hbv->H_HASHTAG}}</span></a>
                         @endif
                       @endforeach
                     </div>
