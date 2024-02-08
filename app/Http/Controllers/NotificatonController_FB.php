@@ -25,6 +25,7 @@ class NotificatonController_FB extends Controller
     NGƯỜI DÙNG
     - Thông báo(*)
     - Cập nhật thông báo thích(*), Cập nhật thông báo bình luận(*), Cập nhật thông báo báo cáo(*)
+      Cập nhật thông báo theo dõi (*)
     |--------------------------------------------------------------------------
     */
 
@@ -344,5 +345,29 @@ class NotificatonController_FB extends Controller
                 ]);
             }
         }
+    }
+
+
+    /**
+     * Cập nhật thông báo theo dõi (*)
+     */
+
+     public function UpdateNotification_FollowUser($ND_MA){ ///
+        $this->AuthLogin_ND();
+
+        $userLog = Session::get('userLog');
+
+        $string = $userLog->ND_HOTEN.' đã bắt đầu theo dõi bạn';
+
+        $documentRoot = 'THONG_BAO/'.$userLog->ND_MA.'theodoi'.$ND_MA;
+        $this->firestoreClient->updateDocument($documentRoot, [
+            'ND_NHAN_MA' =>  intval($ND_MA),  
+            'TB_ANHDINHKEM' => $userLog->ND_ANHDAIDIEN,
+            'TB_NOIDUNG' =>  $string,
+            'TB_DUONGDAN'=> URL::to('/tai-khoan/'.$userLog->ND_MA),
+            'TB_LOAI' => 'theo dõi',
+            'TB_TRANGTHAI' => 0,
+            'TB_REALTIME' => new FirestoreTimestamp,
+        ]);
     }
 }

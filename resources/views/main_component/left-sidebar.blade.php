@@ -134,7 +134,7 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+                <a class="sidebar-link" href="{{URL::to('/danh-sach-nguoi-dung')}}" aria-expanded="false">
                   <span>
                     <i class="fa fa-user-tag"></i>
                   </span>
@@ -160,11 +160,19 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+                <a class="sidebar-link" href="{{URL::to('/danh-sach-theo-doi')}}" aria-expanded="false">
                   <span>
                     <i class="fa fa-portrait"></i>
                   </span>
                   <span class="hide-menu">Theo dõi</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{{URL::to('/danh-sach-chan')}}" aria-expanded="false">
+                  <span>
+                    <i class="fa fa-ban"></i>
+                  </span>
+                  <span class="hide-menu">Chặn</span>
                 </a>
               </li>
             </div>

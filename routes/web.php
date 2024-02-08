@@ -40,7 +40,18 @@ Route::get('/doi-mat-khau', 'App\Http\Controllers\UserSysController@change_passw
 Route::post('/kiem-tra-mat-khau', 'App\Http\Controllers\UserSysController@password_check'); ///ok
 
 //--Tài khoản
+Route::get('/danh-sach-nguoi-dung', 'App\Http\Controllers\UserSysController@list_user'); ///ok
+Route::get('/danh-sach-theo-doi', 'App\Http\Controllers\UserSysController@list_follow'); ///ok
+Route::get('/danh-sach-chan', 'App\Http\Controllers\UserSysController@list_block'); ///ok
 Route::resource('/tai-khoan', 'App\Http\Controllers\UserSysController')->except(['create', 'store']); ///ok: CUD_ND
+
+//-- Theo dõi
+Route::get('/theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysController@theodoi'); ///ok
+Route::get('/huy-theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysController@destroy_theodoi'); ///ok
+
+//-- Chặn
+Route::get('/chan/{ND_MA}', 'App\Http\Controllers\UserSysController@chan'); ///ok
+Route::get('/bo-chan/{ND_MA}', 'App\Http\Controllers\UserSysController@destroy_chan'); ///ok
 
 
 //Post: Bài đăng
@@ -112,3 +123,6 @@ Route::get('/thong-bao-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonCont
 //-- Cập nhật thông báo báo cáo
 Route::get('/thong-bao-bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_ReportPost'); ///ok
 Route::get('/thong-bao-bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_ReportComment'); ///ok
+
+//-- Cập nhật thông báo theo dõi
+Route::get('/thong-bao-theo-doi/{ND_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_FollowUser');

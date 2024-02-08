@@ -27,9 +27,11 @@ class UserSysController extends Controller
     
     NGƯỜI DÙNG
     - Đối với cá nhân: Đăng nhập tài khoản, Đăng xuất tài khoản(*), Đăng ký tài khoản, 
+        Tài khoản cá nhân người dùng,
         Cập nhật tài khoản người dùng (****), Vô hiệu hoá tài khoản người dùng (****),
         Đổi mật khẩu (*)
-    - Đối với người dùng khác: 
+    - Đối với người dùng khác: Chặn người dùng (*), Theo dõi người dùng khác (*),
+      Danh sách người dùng, Danh sách theo dõi (*), Danh sách chặn (*)s
     |--------------------------------------------------------------------------
     */
 
@@ -193,9 +195,42 @@ class UserSysController extends Controller
     /**
      * Tài khoản cá nhân người dùng
      */
-    public function show(UserSys $tai_khoan)
-    {
-        //
+    public function show(UserSys $tai_khoan){ ///
+        $account_info = DB::table('nguoi_dung')
+            ->where('ND_MA', $tai_khoan->ND_MA)->get();
+
+        $college = DB::table('khoa_truong')->get();
+
+        //Theo dõi
+        $nguoi_theo_doi = DB::table('theo_doi')->where('ND_DUOCTHEODOI_MA', $tai_khoan->ND_MA)->count(); //được theo
+        $dang_theo_doi = DB::table('theo_doi')->where('ND_THEODOI_MA', $tai_khoan->ND_MA)->count();
+        $nguoi_theo_doi_no_get = DB::table('theo_doi')->where('ND_DUOCTHEODOI_MA', $tai_khoan->ND_MA);
+
+
+        $nguoi_bi_chan_no_get = DB::table('chan')->where('ND_BICHAN_MA', $tai_khoan->ND_MA);
+
+        //Bài viết nổi bật
+        $bai_viet_notget = DB::table('bai_viet')->where('ND_MA', $tai_khoan->ND_MA)->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt');
+        $bai_viet_count = $bai_viet_notget->clone()->count();
+        $bai_viet = $bai_viet_notget->clone()->take(5)->get();
+
+        //Bình luân nổi bật
+        $binh_luan_notget = DB::table('binh_luan')->where('ND_MA', $tai_khoan->ND_MA);
+        $binh_luan_count = $binh_luan_notget->clone()->count();
+        $binh_luan = $binh_luan_notget->clone()->take(5)->get();
+
+        $binh_luan_no_get= DB::table('binh_luan');
+        $binh_luan_thich_no_get = DB::table('binh_luan')
+        ->join('binhluan_thich', 'binhluan_thich.BL_MA', '=', 'binh_luan.BL_MA')
+        ->where('binh_luan.ND_MA', $tai_khoan->ND_MA);
+        
+        return view('main_content.user.show_user')
+        ->with('account_info', $account_info)->with('college', $college)
+        ->with('nguoi_theo_doi', $nguoi_theo_doi)->with('dang_theo_doi', $dang_theo_doi)
+        ->with('nguoi_theo_doi_no_get', $nguoi_theo_doi_no_get)->with('nguoi_bi_chan_no_get', $nguoi_bi_chan_no_get)
+        ->with('bai_viet_count', $bai_viet_count)->with('bai_viet', $bai_viet)
+        ->with('binh_luan_count', $binh_luan_count)->with('binh_luan', $binh_luan)
+        ->with('binh_luan_no_get', $binh_luan_no_get)->with('binh_luan_thich_no_get', $binh_luan_thich_no_get);
     }
 
     /**
@@ -209,7 +244,7 @@ class UserSysController extends Controller
 
         $college = DB::table('khoa_truong')->get();
         
-        return view('main_content.personal_account.edit_personal_account')
+        return view('main_content.user.edit_user')
         ->with('account_info', $account_info)->with('college', $college);
     }
 
@@ -297,7 +332,7 @@ class UserSysController extends Controller
     public function change_password(){///
         $this->AuthLogin_ND();
 
-        return view('main_content.personal_account.change_password');
+        return view('main_content.user.change_password');
     }
 
     public function password_check(Request $request){///
@@ -331,13 +366,139 @@ class UserSysController extends Controller
     //TÁC ĐỘNG TÀI KHOẢN HỆ THỐNG
 
     /**
-     * Chặn người dùng
+     * Chặn người dùng (*)
      */
 
+     public function chan($ND_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('chan')
+            ->where('ND_BICHAN_MA', $ND_MA)->where("ND_CHAN_MA", $userLog->ND_MA)
+            ->exists();
+
+        if(!$isExist){
+            DB::table('chan')->insert([
+                'ND_BICHAN_MA' => $ND_MA,
+                'ND_CHAN_MA' => $userLog->ND_MA
+            ]);
+
+            Session::put('alert', ['type' => 'success', 'content' => 'Chặn người dùng thành công!']);            
+        }
+    }
+
+    public function destroy_chan($ND_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('chan')
+            ->where('ND_BICHAN_MA', $ND_MA)->where("ND_CHAN_MA", $userLog->ND_MA)
+            ->exists();
+
+        if($isExist){
+            DB::table('chan')
+            ->where('ND_BICHAN_MA', $ND_MA)->where("ND_CHAN_MA", $userLog->ND_MA)
+            ->delete();
+
+            Session::put('alert', ['type' => 'success', 'content' => 'Bỏ chặn người dùng này thành công!']);    
+        }
+    }
 
      /**
-     * Theo dõi người dùng khác
+     * Theo dõi người dùng khác (*)
      */
+
+    public function theodoi($ND_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('theo_doi')
+            ->where('ND_DUOCTHEODOI_MA', $ND_MA)->where("ND_THEODOI_MA", $userLog->ND_MA)
+            ->exists();
+
+        if(!$isExist){
+            DB::table('theo_doi')->insert([
+                'ND_THEODOI_MA' => $userLog->ND_MA,
+                'ND_DUOCTHEODOI_MA' => $ND_MA
+            ]);
+        }
+    }
+
+    public function destroy_theodoi($ND_MA){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $isExist = DB::table('theo_doi')
+            ->where('ND_DUOCTHEODOI_MA', $ND_MA)->where("ND_THEODOI_MA", $userLog->ND_MA)
+            ->exists();
+
+        if($isExist){
+            DB::table('theo_doi')
+            ->where('ND_DUOCTHEODOI_MA', $ND_MA)->where("ND_THEODOI_MA", $userLog->ND_MA)
+            ->delete();
+        }
+    }
+
+    /**
+     * Danh sách người dùng
+     */
+
+    public function list_user(){ ///
+        $userLog= Session::get('userLog');
+        if($userLog){
+            $account_info_not_in = DB::table('theo_doi')
+            ->where('ND_THEODOI_MA', $userLog->ND_MA)
+            ->pluck('ND_DUOCTHEODOI_MA')->toArray();
+
+            $account_info = DB::table('nguoi_dung')
+            ->whereNotIn('ND_MA', $account_info_not_in)->get();
+        }
+        else{
+            $account_info = DB::table('nguoi_dung')
+            ->get();
+        }
+
+        $college = DB::table('khoa_truong')->get();
+
+        return view('main_content.user.list_user')
+        ->with('account_info', $account_info)->with('college', $college);
+    }
+
+    /**
+     * Danh sách theo dõi (*)
+     */
+
+    public function list_follow(){ ///
+        $this->AuthLogin_ND();
+        $userLog= Session::get('userLog');
+
+        $account_info = DB::table('nguoi_dung')
+        ->join('theo_doi', 'nguoi_dung.ND_MA', '=', 'theo_doi.ND_DUOCTHEODOI_MA')
+        ->where('ND_THEODOI_MA', $userLog->ND_MA)->get();
+
+        $college = DB::table('khoa_truong')->get();
+
+        return view('main_content.user.list_follow')
+        ->with('account_info', $account_info)->with('college', $college);
+    }
+
+    /**
+     * Danh sách chặn (*)
+     */
+
+    public function list_block(){ ///
+        $this->AuthLogin_ND();
+        $userLog= Session::get('userLog');
+
+        $account_info = DB::table('nguoi_dung')
+        ->join('chan', 'nguoi_dung.ND_MA', '=', 'chan.ND_BICHAN_MA')
+        ->where('ND_CHAN_MA', $userLog->ND_MA)->get();
+
+        $college = DB::table('khoa_truong')->get();
+
+        return view('main_content.user.list_block')
+        ->with('account_info', $account_info)->with('college', $college);
+    }
 
     /*
     |--------------------------------------------------------------------------
