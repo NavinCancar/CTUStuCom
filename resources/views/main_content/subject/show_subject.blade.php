@@ -6,18 +6,7 @@
   <div class="row">
     <div class="col-lg-12">
         <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
-              <h5 class="card-title fw-semibold">#<?php echo $hashtag_get->H_HASHTAG ?></h5>
-              <?php if($userLog) { ?>
-              @if(!$isFollowHashtag)
-              <a class="btn btn-primary follow-hashtag" data-hashtag-value="<?php echo $hashtag_get->H_HASHTAG ?>">
-                  <i class="fas fa-plus"></i> &nbsp;Theo dõi hashtag
-              </a>
-              @else
-              <a class="btn btn-outline-primary unfollow-hashtag" data-hashtag-value="<?php echo $hashtag_get->H_HASHTAG ?>">
-                  <i class="fas fa-check"></i> &nbsp;Theo dõi hashtag
-              </a>
-              @endif
-              <?php } ?>
+            <h5 class="card-title fw-semibold">Học phần: <?php echo $subject_get->HP_MA .' '. $subject_get->HP_TEN ?></h5>
         </div>
       
         <hr>
@@ -50,7 +39,7 @@
 
   <!--XỬ LÝ LOAD MORE START-->
   <script>
-      var ENDPOINT = "{{ URL::to('/hashtag/'.$hashtag_get->H_HASHTAG) }}"
+      var ENDPOINT = "{{ URL::to('/hoc-phan/'.$subject_get->HP_MA) }}"
       var page = 1;
 
       //Load thêm bài: 2 cách
@@ -105,88 +94,6 @@
   <!-- MAIN START -->
     <script>
         $(document).ready(function() {
-          //|*****************************************************
-          //|LIKE HASHTAG START 
-          //|*****************************************************
-          <?php if($userLog) { ?>
-            $(document).on('click', '.follow-hashtag', function() {
-                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
-                var element = $(this);
-                var H_HASHTAG = $(this).data('hashtag-value');
-                var iconElement = $(this).find('i');
-
-                iconElement.removeClass('fa-plus');
-                iconElement.removeClass('fa-check');
-                iconElement.removeClass('fa-exclamation-circle');
-                element.removeClass('btn-danger');
-                element.removeClass('btn-primary');
-
-                element.addClass('btn-outline-primary');
-                iconElement.addClass('spinner-border text-primary spinner-border-sm');
-
-                $.ajax({
-                  url: '{{URL::to('/theo-doi-hashtag/')}}' +'/'+ H_HASHTAG,
-                  type: 'GET',
-                  success: function(response) {
-                    element.removeClass('btn-outline-primary follow-hashtag');
-                    element.addClass('btn-outline-primary unfollow-hashtag');
-
-                    iconElement.removeClass('spinner-border text-primary spinner-border-sm');
-                    iconElement.addClass('fa-check');
-                    //console.log(number);
-                  },
-                  error: function(error) {
-                    element.removeClass('btn-outline-primary');
-                    element.addClass('btn-danger');
-
-                    iconElement.removeClass('spinner-border text-primary spinner-border-sm');
-                    iconElement.addClass('fa-exclamation-circle');
-                    console.log(error);
-                  }
-                });
-                    
-            });
-            $(document).on('click', '.unfollow-hashtag', function() {
-                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
-                var element = $(this);
-                var H_HASHTAG = $(this).data('hashtag-value');
-                var iconElement = $(this).find('i');
-
-                iconElement.removeClass('fa-plus');
-                iconElement.removeClass('fa-check');
-                iconElement.removeClass('fa-exclamation-circle');
-                element.removeClass('btn-danger');
-                element.removeClass('btn-primary');
-
-                element.addClass('btn-outline-primary');
-                iconElement.addClass('spinner-border text-primary spinner-border-sm');
-
-                $.ajax({
-                  url: '{{URL::to('/huy-theo-doi-hashtag/')}}' +'/'+ H_HASHTAG,
-                  type: 'GET',
-                  success: function(response) {
-                    element.removeClass('btn-outline-primary unfollow-hashtag');
-                    element.addClass('btn-primary follow-hashtag');
-
-                    iconElement.removeClass('spinner-border text-primary spinner-border-sm');
-                    iconElement.addClass('fa-plus');
-                    //console.log(number);
-                  },
-                  error: function(error) {
-                    element.removeClass('btn-outline-primary');
-                    element.addClass('btn-danger');
-
-                    iconElement.removeClass('spinner-border text-primary spinner-border-sm');
-                    iconElement.addClass('fa-exclamation-circle');
-                    console.log(error);
-                  }
-                });
-                    
-            });
-          <?php } ?>
-          //|*****************************************************
-          //|LIKE HASHTAG END
-          //|*****************************************************
           //|*****************************************************
           //|LIKE BÀI VIẾT START
           //|*****************************************************

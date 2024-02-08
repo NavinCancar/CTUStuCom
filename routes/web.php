@@ -74,11 +74,22 @@ Route::post('/bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentControlle
 
 
 //Hashtag
-Route::resource('/hashtag', 'App\Http\Controllers\HashtagController')->only(['index', 'show']);
+Route::get('/danh-sach-hashtag', 'App\Http\Controllers\HashtagController@list'); ///ok
+Route::resource('/hashtag', 'App\Http\Controllers\HashtagController')->only(['show']);
 
 //--Theo dõi hashtag
 Route::get('/theo-doi-hashtag/{H_HASHTAG}', 'App\Http\Controllers\HashtagController@hashtag_theodoi'); ///ok
 Route::get('/huy-theo-doi-hashtag/{H_HASHTAG}', 'App\Http\Controllers\HashtagController@destroy_hashtag_theodoi'); ///ok
+
+
+//College: Khoa trường
+Route::get('/danh-sach-khoa-truong', 'App\Http\Controllers\CollegeController@list'); ///ok
+Route::resource('/khoa-truong', 'App\Http\Controllers\CollegeController');
+
+
+//Subject: Học phần
+Route::get('/danh-sach-hoc-phan', 'App\Http\Controllers\SubjectController@list'); ///ok
+Route::resource('/hoc-phan', 'App\Http\Controllers\SubjectController')->only(['show']);
 
 
 //FIREBASE

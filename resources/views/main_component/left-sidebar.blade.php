@@ -110,7 +110,7 @@
               <?php if(!$userLog || ($userLog && $userLog->VT_MA==3)) echo "show";?>
             ">
               <li class="sidebar-item">
-                <a class="sidebar-link" href="{{URL::to('/hashtag')}}" aria-expanded="false">
+                <a class="sidebar-link" href="{{URL::to('/danh-sach-hashtag')}}" aria-expanded="false">
                   <span>
                     <i class="fa fa-hashtag"></i>
                   </span>
@@ -118,11 +118,19 @@
                 </a>
               </li>
               <li class="sidebar-item">
-                <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+                <a class="sidebar-link" <?php if($userLog && $userLog->KT_MA!=null) { ?> href="{{URL::to('/khoa-truong/'.$userLog->KT_MA)}}" <?php } else { ?> href="{{URL::to('/danh-sach-khoa-truong')}}" <?php } ?> aria-expanded="false">
                   <span>
                     <i class="fa fa-school"></i>
                   </span>
                   <span class="hide-menu">Khoa/Trường</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="{{URL::to('/danh-sach-hoc-phan')}}" aria-expanded="false">
+                  <span>
+                    <i class="fa fa-folder"></i>
+                  </span>
+                  <span class="hide-menu">Học phần</span>
                 </a>
               </li>
               <li class="sidebar-item">

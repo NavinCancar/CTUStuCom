@@ -171,9 +171,9 @@
                         <input class="form-control" list="datalistOptions" id="exampleDataList"
                           placeholder="Tìm kiếm học phần">
                         <datalist id="datalistOptions">
-                          <option value="CT204">
-                          <option value="ML101">
-                          <option value="CT212">
+                          @foreach($hoc_phan as $key => $hp)
+                            <option value="{{$hp->HP_MA}}">{{ $hp->HP_TEN }}</option>
+                          @endforeach
                         </datalist>
                       </div>
                       <button type="submit" class="btn btn-primary float-sm-end">Lọc</button>

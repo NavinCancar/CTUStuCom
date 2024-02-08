@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Hashtag;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 use DB;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Redirect;
 use Carbon\Carbon;
 session_start();
 
-class HashtagController extends Controller
+class SubjectController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
@@ -21,8 +21,7 @@ class HashtagController extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - Danh sách hashtag, Chi tiết hashtag
-    - Theo dõi hashtag (*)
+    - Danh sách học phần, Chi tiết học phần
     |--------------------------------------------------------------------------
     */
 
@@ -45,42 +44,35 @@ class HashtagController extends Controller
     */
 
     /**
-     * Danh sách hashtag
+     * Danh sách học phần
      */
     public function list(){ ///
-        $hashtag = DB::table('hashtag')->paginate(20);
-        return view('main_content.hashtag.list_hashtag')->with('hashtag', $hashtag);
+        $subject = DB::table('hoc_phan')->orderby('HP_TEN')->paginate(30);
+        return view('main_content.subject.list_subject')->with('subject', $subject);
     }
 
     /**
-     * Chi tiết hashtag
+     * Chi tiết học phần
      */
-    public function show(Request $request, Hashtag $hashtag){ ///
+    public function show(Request $request, Subject $hoc_phan){ ///
         $userLog = Session::get('userLog');
-        $hashtag_get = DB::table('hashtag')->where('H_HASHTAG', $hashtag->H_HASHTAG)->first();
+        $subject_get = DB::table('hoc_phan')->where('HP_MA', $hoc_phan->HP_MA)->first();
 
         if($userLog){
             $bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
             $bai_viet = DB::table('bai_viet')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
-            ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
             ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
-            ->where('cua_bai_viet.H_HASHTAG', '=', $hashtag->H_HASHTAG)
+            ->where('bai_viet.HP_MA', '=', $hoc_phan->HP_MA)
             ->orderBy('bai_viet.BV_THOIGIANDANG', 'desc')
             ->whereNotIn('bai_viet.BV_MA', $bai_viet_not_in)->paginate(5);
-
-            $isFollowHashtag = DB::table('theo_doi_boi')
-            ->where("H_HASHTAG", $hashtag->H_HASHTAG)->where("ND_MA", $userLog->ND_MA)->exists();
         }
         else{
             $bai_viet = DB::table('bai_viet')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
-            ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
             ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
-            ->where('cua_bai_viet.H_HASHTAG', '=', $hashtag->H_HASHTAG)
+            ->where('bai_viet.HP_MA', '=', $hoc_phan->HP_MA)
             ->orderBy('bai_viet.BV_THOIGIANDANG', 'desc')->paginate(5);
-
-            $isFollowHashtag = null;
         }
         
         $hashtag_bai_viet = DB::table('hashtag')
@@ -106,90 +98,62 @@ class HashtagController extends Controller
             $view = view('main_component.post_loadmore')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
             ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
             ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
-            ->with('thich_no_get', $thich_no_get)->with('hashtag_get', $hashtag_get)
-            ->with('isFollowHashtag', $isFollowHashtag)->render();
+            ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get)->render();
   
             return response()->json(['html' => $view]);
         }
         //Bài viết End
 
-        return view('main_content.hashtag.show_hashtag')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
+        return view('main_content.subject.show_subject')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
         ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
-        ->with('thich_no_get', $thich_no_get)->with('hashtag_get', $hashtag_get)
-        ->with('isFollowHashtag', $isFollowHashtag);
+        ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get);
     }
-
-
-    /**
-     * Theo dõi hashtag (*)
-     */
-    public function hashtag_theodoi(String $H_HASHTAG){ ///
-        $this->AuthLogin_ND();
-        $userLog = Session::get('userLog');
-
-        $isExist = DB::table('theo_doi_boi')
-            ->where("H_HASHTAG", $H_HASHTAG)->where("ND_MA", $userLog->ND_MA)
-            ->exists();
-
-        if(!$isExist){
-             DB::table('theo_doi_boi')->insert([
-                'ND_MA' => $userLog->ND_MA,
-                'H_HASHTAG' => $H_HASHTAG
-            ]);
-        }
-    }
-
-    public function destroy_hashtag_theodoi(String $H_HASHTAG){ ///
-        $this->AuthLogin_ND();
-        $userLog = Session::get('userLog');
-
-        $isExist = DB::table('theo_doi_boi')
-            ->where("H_HASHTAG", $H_HASHTAG)->where("ND_MA", $userLog->ND_MA)
-            ->exists();
-
-        if($isExist){
-            DB::table('theo_doi_boi')
-            ->where('ND_MA',$userLog->ND_MA)->where("H_HASHTAG", $H_HASHTAG)
-            ->delete();
-        }
-    }
-
 
     /*
     |--------------------------------------------------------------------------
-    | KIỂM DUYỆT VIÊN
+    |  QUẢN TRỊ VIÊN
     |--------------------------------------------------------------------------
     */
 
     /**
-     * Tất cả hashtag
+     * Tất cả học phần
      */
     public function index()
     {
-    }
-    /**
-     * Thêm hashtag
-     */
-    public function create(){ //Không dùng
-    }
-
-    public function store(Request $request){ //Không dùng
+        //
     }
 
     /**
-     * Sửa hashtag
+     * Thêm học phần
      */
-    public function edit(Hashtag $hashtag){ //Không dùng
+    public function create()
+    {
+        //
     }
 
-    public function update(Request $request, Hashtag $hashtag){ //Không dùng
+    public function store(Request $request)
+    {
+        //
     }
 
     /**
-     * Xoá hashtag
+     * Sửa học phần
      */
-    public function destroy(Hashtag $hashtag)
+    public function edit(Subject $hoc_phan)
+    {
+        //
+    }
+
+    public function update(Request $request, Subject $hoc_phan)
+    {
+        //
+    }
+
+    /**
+     * Xoá học phần
+     */
+    public function destroy(Subject $hoc_phan)
     {
         //
     }
