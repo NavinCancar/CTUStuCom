@@ -286,3 +286,16 @@
   width:76%;
   margin: 0 auto;
 }
+
+.delete-form {
+  display: inline-block;
+  margin: 0; /* Remove any default form margin */
+}
+
+.delete-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+}

@@ -6,7 +6,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="mb-3 mb-sm-0">
-                <h5 class="card-title fw-semibold">Những người dùng bạn có thể muốn biết</h5>
+                <h5 class="card-title fw-semibold">Danh sách chặn</h5>
                 </div>
                 <hr>
                 <div class="row">

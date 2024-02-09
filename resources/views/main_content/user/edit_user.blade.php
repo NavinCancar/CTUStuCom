@@ -73,6 +73,20 @@
                             <label class="form-label">Email: <span class="text-danger">(*)</span>:</label>
                             <input type="text" name="ND_EMAIL" value="{{$account_info->ND_EMAIL}}" class="form-control" required=""  pattern="/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/">
                         </div> 
+                        @if($account_info->ND_MA != $userLog->ND_MA)
+                        <div class="form-group mb-3">
+                            <label class="form-label">Vai trò:</label>
+                            <select name="VT_MA" class="form-control">
+                                @foreach($role as $key => $r)
+                                    @if($account_info->VT_MA == $r->VT_MA)
+                                    <option selected value="{{$r->VT_MA}}">{{ $r->VT_TEN }}</option>
+                                    @else
+                                    <option value="{{$r->VT_MA}}">{{ $r->VT_TEN }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div> 
+                        @endif
                         <div class="form-group mb-3">
                             <label class="form-label">Khoa trường theo học:</label>
                             <select name="KT_MA" class="form-control">
@@ -211,7 +225,12 @@
 
                             //console.log('Thành công');
                             //console.log(response.message);
-                            window.location.href = '{{URL::to('/trang-chu')}}';
+                            <?php if($userAcc != $userLog->ND_MA) { ?>
+                              window.location.href = '{{URL::to('/tai-khoan')}}';
+                            <?php } 
+                            else {  ?>
+                              window.location.href = '{{URL::to('/trang-chu')}}';
+                            <?php } ?>
                         },
                         error: function(error) {
                             // Handle errors here
@@ -237,7 +256,7 @@
                 });
                 //alert('Tài khoản đã được vô hiệu hoá!');
             } else {
-                alert('Hủy bỏ  vô hiệu hoá tài khoản.');
+                alert('Hủy bỏ vô hiệu hoá tài khoản.');
             }
         });
 
@@ -267,6 +286,7 @@
           var ND_HOTEN = form.find('input[name="ND_HOTEN"]').val();
           var ND_EMAIL = form.find('input[name="ND_EMAIL"]').val();
           var KT_MA = form.find('select[name="KT_MA"]').val();
+          var VT_MA = form.find('select[name="VT_MA"]').val();
           var ND_ANHDAIDIEN = form.find('input[name="ND_ANHDAIDIEN"]').val();
           var ND_MOTA = form.find('textarea[name="ND_MOTA"]').val();
           var _token = $('input[name="_token"]').val();
@@ -352,6 +372,7 @@
                         ND_EMAIL: ND_EMAIL,
                         KT_MA: KT_MA,
                         ND_MOTA: ND_MOTA,
+                        VT_MA: VT_MA,
                         downloadURL: downloadURL,
                         idFirestore: doc.id,
                         _token: _token // Include the CSRF token in the data

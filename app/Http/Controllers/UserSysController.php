@@ -23,6 +23,7 @@ class UserSysController extends Controller
     HÀM HỖ TRỢ
     - Hàm xây dựng FireStore
     - Kiểm tra đăng nhập: Người dùng => (*)
+    - Kiểm tra đăng nhập: Quản trị viên => (***)
     - Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
     
     NGƯỜI DÙNG
@@ -50,6 +51,22 @@ class UserSysController extends Controller
     public function AuthLogin_ND(){ ///
         $userLog = Session::get('userLog');
         if($userLog){
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
+
+    /**
+     * Kiểm tra đăng nhập: Quản trị viên => (***)
+     */
+    public function AuthLogin_QTV(){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->VT_MA == 1){
+            }
+            else{
+                return Redirect::to('/')->send();
+            }
         }else{
             return Redirect::to('dang-nhap')->send();
         }
@@ -258,14 +275,16 @@ class UserSysController extends Controller
             ->where('ND_MA', $tai_khoan->ND_MA)->get();
 
         $college = DB::table('khoa_truong')->get();
+
+        $role = DB::table('vai_tro')->get();
         
-        return view('main_content.user.edit_user')
+        return view('main_content.user.edit_user')->with('role', $role)
         ->with('account_info', $account_info)->with('college', $college);
     }
 
     public function update(Request $request, UserSys $tai_khoan){///
         $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
-
+        $userLog = Session::get('userLog');
         //Dò trùng
         $dsnd=DB::table('nguoi_dung')->get();
         foreach ($dsnd as $ds){
@@ -283,6 +302,14 @@ class UserSysController extends Controller
             'ND_EMAIL' => $request->ND_EMAIL,
             'ND_MOTA' => $request->ND_MOTA
         ]);
+
+        if ($tai_khoan->ND_MA != $userLog->ND_MA) {
+            DB::table('nguoi_dung')
+            ->where('ND_MA', $tai_khoan->ND_MA)
+            ->update([ 
+                'VT_MA' => $request->VT_MA,
+            ]);
+        }
 
         //FIRESTORE
         $documentPath = 'ANH_DAI_DIEN/' . $request->idFirestore;
@@ -323,6 +350,8 @@ class UserSysController extends Controller
      */
     public function destroy(UserSys $tai_khoan){ ///
         $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
+        $userLog = Session::get('userLog');
+        
         DB::table('nguoi_dung')
         ->where('ND_MA', $tai_khoan->ND_MA)
         ->update([ 
@@ -335,9 +364,8 @@ class UserSysController extends Controller
         $this->firestoreClient->updateDocument($documentPath, [
             'ND_TRANGTHAI' => 0
         ], true);
-
-        Session::put('userLog',null);
         Session::put('alert', ['type' => 'success', 'content' => 'Tài khoản bị vô hiệu hoá thành công!']);
+        if ($tai_khoan->ND_MA == $userLog->ND_MA) {Session::put('userLog',null);}
         return;
     }
 
@@ -590,9 +618,12 @@ class UserSysController extends Controller
     /**
      * Danh sách người dùng hệ thống
      */
-    public function index()
-    {
-        //
+    public function index(){ ///
+        $this->AuthLogin_QTV();
+        $all_user = DB::table('nguoi_dung')
+        ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+        ->orderby('ND_MA')->paginate(10);
+        return view('main_content.user.all_user')->with('all_user', $all_user);
     }
 
 }

@@ -96,12 +96,16 @@ Route::get('/huy-theo-doi-hashtag/{H_HASHTAG}', 'App\Http\Controllers\HashtagCon
 
 //College: Khoa trường
 Route::get('/danh-sach-khoa-truong', 'App\Http\Controllers\CollegeController@list'); ///ok
-Route::resource('/khoa-truong', 'App\Http\Controllers\CollegeController');
+Route::resource('/khoa-truong', 'App\Http\Controllers\CollegeController'); ///ok
+
+
+//Role: Vai trò
+Route::resource('/vai-tro', 'App\Http\Controllers\RoleController')->except(['show']); ///ok
 
 
 //Subject: Học phần
 Route::get('/danh-sach-hoc-phan', 'App\Http\Controllers\SubjectController@list'); ///ok
-Route::resource('/hoc-phan', 'App\Http\Controllers\SubjectController')->only(['show']);
+Route::resource('/hoc-phan', 'App\Http\Controllers\SubjectController'); ///ok
 
 
 //FIREBASE

@@ -19,9 +19,13 @@ class CollegeController extends Controller
     |--------------------------------------------------------------------------
     HÀM HỖ TRỢ
     - Kiểm tra đăng nhập: Người dùng => (*)
+    - Kiểm tra đăng nhập: Quản trị viên => (***)
     
     NGƯỜI DÙNG
     - Danh sách khoa trường, Chi tiết khoa trường
+
+    QUẢN TRỊ VIÊN
+    - Tất cả khoa trường (***), Thêm khoa trường (***), Sửa khoa trường (***), Xoá khoa trường (***)
     |--------------------------------------------------------------------------
     */
 
@@ -36,6 +40,21 @@ class CollegeController extends Controller
         }
     }
 
+    /**
+     * Kiểm tra đăng nhập: Quản trị viên => (***)
+     */
+    public function AuthLogin_QTV(){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->VT_MA == 1){
+            }
+            else{
+                return Redirect::to('/')->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
     
     /*
     |--------------------------------------------------------------------------
@@ -129,46 +148,118 @@ class CollegeController extends Controller
     |--------------------------------------------------------------------------
     */
     /**
-     * Tất cả khoa trường
+     * Tất cả khoa trường (***)
      */
-    public function index()
-    {
-        //
+    public function index(){ ///
+        $this->AuthLogin_QTV();
+        $all_college = DB::table('khoa_truong')->orderby('KT_MA')->paginate(10);
+        return view('main_content.college.all_college')->with('all_college', $all_college);
     }
 
 
     /**
-     * Thêm khoa trường
+     * Thêm khoa trường (***)
      */
-    public function create()
-    {
-        //
+    public function create(){ ///
+        $this->AuthLogin_QTV();
+        return view('main_content.college.add_college');
     }
 
-    public function store(Request $request)
-    {
-        //
+    public function store(Request $request){ ///
+        $this->AuthLogin_QTV();
+        //Dò rỗng
+        if(trim($request->KT_MA) == ""){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Mã khoa/trường không thể rỗng!']);
+            return Redirect::to('khoa-truong/create');
+        }
+        if(trim($request->KT_TEN) == ""){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Tên khoa/trường không thể rỗng!']);
+            return Redirect::to('khoa-truong/create');
+        }
+
+        //Dò trùng
+        $dskt=DB::table('khoa_truong')->get();
+        foreach ($dskt as $ds){
+            if (strtolower($ds->KT_MA)==strtolower(trim($request->KT_MA))) {
+                Session::put('alert', ['type' => 'warning', 'content' => 'Mã khoa/trường không thể trùng!']);
+                return Redirect::to('khoa-truong/create');
+            }
+            if (strtolower($ds->KT_TEN)==strtolower(trim($request->KT_TEN))) {
+                Session::put('alert', ['type' => 'warning', 'content' => 'Tên khoa/trường không thể trùng!']);
+                return Redirect::to('khoa-truong/create');
+            }
+        }
+
+        DB::table('khoa_truong')->insert([
+            'KT_MA' => trim($request->KT_MA),
+            'KT_TEN' => trim($request->KT_TEN),
+        ]);
+        Session::put('alert', ['type' => 'success', 'content' => 'Thêm khoa/trường thành công!']);
+        return Redirect::to('khoa-truong');
     }
 
     
     /**
-     * Sửa khoa trường
+     * Sửa khoa trường (***)
      */
-    public function edit(College $khoa_truong)
-    {
-        //
+    public function edit(College $khoa_truong){ ///
+        $this->AuthLogin_QTV();
+        $all_college = DB::table('khoa_truong')->where('KT_MA', $khoa_truong->KT_MA)->get();
+        return view('main_content.college.edit_college')->with('all_college', $all_college);
     }
 
-    public function update(Request $request, College $khoa_truong)
-    {
-        //
+    public function update(Request $request, College $khoa_truong){ ///
+        $this->AuthLogin_QTV();
+        
+        //Dò rỗng
+        if(trim($request->KT_TEN) == ""){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Tên khoa/trường không thể rỗng!']);
+            return Redirect::to('khoa-truong/'.$khoa_truong->KT_MA.'/edit');
+        }
+
+        //Dò trùng
+        $dskt=DB::table('khoa_truong')->get();
+        foreach ($dskt as $ds){
+            if ($ds->KT_TEN != $khoa_truong->KT_TEN && strtolower($ds->KT_TEN)==strtolower(trim($request->KT_TEN))) {
+                Session::put('alert', ['type' => 'warning', 'content' => 'Tên khoa/trường không thể trùng!']);
+                return Redirect::to('khoa-truong/'.$khoa_truong->KT_MA.'/edit');
+            }
+        }
+
+        DB::table('khoa_truong') 
+        ->where('KT_MA', $khoa_truong->KT_MA)
+        ->update([
+            'KT_TEN' => trim($request->KT_TEN),
+        ]);
+        Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật khoa/trường thành công!']);
+        return Redirect::to('khoa-truong');
     }
 
     /**
-     * Xoá khoa trường
+     * Xoá khoa trường (***)
      */
-    public function destroy(College $khoa_truong)
-    {
-        //
+    public function destroy(College $khoa_truong){ ///
+        $this->AuthLogin_QTV();
+
+        //Kiểm tra khoá ngoại
+        $checkforeign = DB::table('nguoi_dung')
+        ->where('nguoi_dung.KT_MA',$khoa_truong->KT_MA)->exists();
+
+        if($checkforeign){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Có người dùng thuộc khoa/trường này, khoa/trường này không thể xoá!']);
+            return Redirect::to('khoa-truong');
+        }
+
+        $checkforeign2 = DB::table('hoc_phan')
+        ->where('hoc_phan.KT_MA',$khoa_truong->KT_MA)->exists();
+
+        if($checkforeign2){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Có học phần thuộc khoa/trường này, khoa/trường này không thể xoá!']);
+            return Redirect::to('khoa-truong');
+        }
+
+        DB::table('khoa_truong')->where('KT_MA', $khoa_truong->KT_MA)->delete();
+        Session::put('alert', ['type' => 'success', 'content' => 'Xoá khoa/trường thành công!']);
+        return Redirect::to('khoa-truong');
     }
 }

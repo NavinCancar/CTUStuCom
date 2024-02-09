@@ -59,15 +59,15 @@
           </li>
           <div id="quantri" class="collapse show">
             <li class="sidebar-item">
-              <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+              <a class="sidebar-link" href="{{URL::to('/khoa-truong')}}" aria-expanded="false">
                 <span>
                   <i class="fas fa-school"></i>
                 </span>
-                <span class="hide-menu">Quản lý trường\khoa</span>
+                <span class="hide-menu">Quản lý khoa/trường</span>
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+              <a class="sidebar-link" href="{{URL::to('/hoc-phan')}}" aria-expanded="false">
                 <span>
                   <i class="fas fa-folder"></i>
                 </span>
@@ -75,7 +75,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+              <a class="sidebar-link" href="{{URL::to('/tai-khoan')}}" aria-expanded="false">
                 <span>
                   <i class="fa fa-users"></i>
                 </span>
@@ -83,7 +83,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+              <a class="sidebar-link" href="{{URL::to('/vai-tro')}}" aria-expanded="false">
                 <span>
                   <i class="fas fa-user-tag"></i>
                 </span>
