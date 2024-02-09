@@ -229,7 +229,7 @@
               <div class="card-body p-4">
                 <div class="mb-3 mb-sm-0">
                   <h5 class="card-title fw-semibold">Hashtag</h5>
-                  <a href="./tag.php"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+                  <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
                   <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
                   <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
                   <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
@@ -246,7 +246,7 @@
               <div class="card-body p-4">
                 <div class="mb-3 mb-sm-0">
                   <h5 class="card-title fw-semibold">Học phần</h5>
-                  <a href="hoc-phan.php"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Kỹ
+                  <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Kỹ
                     năng đại học</span></a><br>
                   <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> CT101 Nền
                     tảng công nghệ thông tin</span></a><br>

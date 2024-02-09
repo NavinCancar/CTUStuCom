@@ -24,6 +24,9 @@
                                                 </div>
                                                 <div class="pt-1">
                                                     <b>{{$info->ND_HOTEN}}</b>
+                                                    @if($info->VT_MA != 3)
+                                                        <span class="badge-sm bg-warning rounded-pill"><i>{{$info->VT_TEN}}</i></span>
+                                                    @endif
                                                     <p>
                                                         @if($info->KT_MA != null)
                                                             <?php $c = $college->where('KT_MA', $info->KT_MA)->first(); echo $c->KT_TEN; ?>
@@ -31,7 +34,7 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                            <button class="btn btn-muted ms-2 unblock" data-user-id-value="<?php echo $info->ND_MA;?>" type="button"><i class="fas fa-ban"></i> Bỏ chặn</button>
+                                            <button class="btn btn-muted ms-2 w-100 unblock" data-user-id-value="<?php echo $info->ND_MA;?>" type="button"><i class="fas fa-ban"></i> Bỏ chặn</button>
                                         </div>
                                     </div>
                                 </div>

@@ -11,9 +11,11 @@
             <div class="col-md-8">
                 <div class="card" id="chat">
                     <div class="d-flex justify-content-start align-items-center p-1 bg-secondary" style="border-radius: 15px 15px 0 0">
+                    <?php if($userChat){ ?> <a href="{{URL::to('/tai-khoan/'.$userChat->ND_MA)}}" class="text-muted"> <?php  } ?>
                         <?php if($userChat){ ?> <img src="<?php if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'; ?>" alt="" width="40" height="40" 
                             class="rounded-circle me-2"><?php  } else { echo '<div style="height:40px"></div>';} ?>
                         <b><?php if($userChat) echo $userChat->ND_HOTEN; ?></b>
+                        <?php if($userChat){ ?> </a> <?php  } ?>
                     </div>
                     <div class="card-body p-3">
                         <!--Chat Start-->
@@ -78,7 +80,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <button class="btn btn-primary btn-block me-2 mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#kholuutru" id="kholuutru-btn">
+                <button class="btn btn-primary btn-block me-2 mb-3 w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#kholuutru" id="kholuutru-btn">
                     <i class="fas fa-box"></i> Kho lưu trữ
                 </button>
                 <!-- Kho lưu trữ Start-->
@@ -668,8 +670,8 @@
                                 
                                 var divData = 
                                     '<li data-value="'+checkUser+'" class="p-2 border-bottom">'+
-                                    '    <a href="'+linkChat+'/'+checkUser+'" class="d-flex justify-content-between">'+
-                                    '        <div class="d-flex flex-row" style="max-width:200px">'+
+                                    '    <a href="'+linkChat+'/'+checkUser+'" class="row">'+
+                                    '        <div class="col-sm-8 d-flex flex-row">'+
                                     '            <div>'+
                                     '                <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" '+
                                     '                    width="40" height="40" class="rounded-circle me-2">'+
@@ -679,7 +681,7 @@
                                     '                <p class="small text-muted wrap-friend-text">' + (checkUser == doc.data().ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (doc.data().TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : doc.data().TN_NOIDUNG) +'</p>'+
                                     '            </div>'+
                                     '        </div>'+
-                                    '        <div class="pt-1">'+
+                                    '        <div class="pt-1 col-sm-4">'+
                                     '            <p class="small text-muted mb-0">'+ (secondsDifference(doc.data().TN_REALTIME.toDate()) == -1 ? doc.data().TN_THOIGIANGUI : secondsDifference(doc.data().TN_REALTIME.toDate())) +'</p>'+
                                     ((noCheckMess == 0)? '' : '<span class="badge bg-primary rounded-pill float-end fs-1">'+ noCheckMess +'</span>' ) +
                                     '        </div>'+
@@ -910,8 +912,8 @@
                                 
                                 var divData = 
                                     '<li data-value="'+checkUser+'" class="p-2 border-bottom">'+
-                                    '    <a href="'+linkChat+'/'+checkUser+'" class="d-flex justify-content-between">'+
-                                    '        <div class="d-flex flex-row" style="max-width:200px">'+
+                                    '    <a href="'+linkChat+'/'+checkUser+'" class="row">'+
+                                    '        <div class="col-sm-8 d-flex flex-row">'+
                                     '            <div>'+
                                     '                <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" '+
                                     '                    width="40" height="40" class="rounded-circle me-2">'+
@@ -921,7 +923,7 @@
                                     '                <p class="small text-muted wrap-friend-text">' + (checkUser == data.ND_NHAN_MA ? '<i>Bạn: </i>' : '') + (data.TN_NOIDUNG == "" ? '<i>Đã gửi file đính kèm</i>' : data.TN_NOIDUNG) +'</p>'+
                                     '            </div>'+
                                     '        </div>'+
-                                    '        <div class="pt-1">'+
+                                    '        <div class="pt-1 col-sm-4">'+
                                     '            <p class="small text-muted mb-0">'+ (secondsDifference(data.TN_REALTIME.toDate()) == -1 ? data.TN_THOIGIANGUI : secondsDifference(data.TN_REALTIME.toDate())) +'</p>'+
                                     ((noCheckMess == 0)? '' : '<span class="badge bg-primary rounded-pill float-end fs-1">'+ noCheckMess +'</span>' ) +
                                     '        </div>'+

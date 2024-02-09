@@ -157,6 +157,7 @@ class PostController extends Controller
 
         $bai_viet = DB::table('bai_viet')
         ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+        ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
         ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->get();
         
         $hashtag_bai_viet = DB::table('hashtag')
@@ -179,29 +180,45 @@ class PostController extends Controller
         ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->count();
 
         $userLog = Session::get('userLog');
+        $isBlock=0;
         if($userLog){
+            $checkBlockBV = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->where('BV_MA', '=', $bai_dang->BV_MA)->exists();
+            $checkBlockND = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->where('ND_BICHAN_MA', '=', $bai_dang->ND_MA)->exists(); 
+            $checkBlockND2 = DB::table('chan')->where('ND_CHAN_MA', $bai_dang->ND_MA)->where('ND_BICHAN_MA', '=', $userLog->ND_MA)->exists(); 
+            if($checkBlockBV || $checkBlockND || $checkBlockND2) $isBlock=1;
+
             $binh_luan_not_in = DB::table('binhluan_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BL_MA')->toArray();
-            
+            $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
+            $nguoi_dung_not_in2 = DB::table('chan')->where('ND_BICHAN_MA', $userLog->ND_MA)->pluck('ND_CHAN_MA')->toArray();
+
             $binh_luan_goc = DB::table('binh_luan')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
             ->where('binh_luan.BL_TRALOI_MA', '=', null)
-            ->whereNotIn('BL_MA', $binh_luan_not_in)->get();
+            ->whereNotIn('BL_MA', $binh_luan_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)->get();
 
             $binh_luan_traloi = DB::table('binh_luan')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
             ->where('binh_luan.BL_TRALOI_MA', '!=', null)
-            ->whereNotIn('BL_MA', $binh_luan_not_in)->get();
+            ->whereNotIn('BL_MA', $binh_luan_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)->get();
             }
         else{
             $binh_luan_goc = DB::table('binh_luan')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
             ->where('binh_luan.BL_TRALOI_MA', '=', null)->get();
 
             $binh_luan_traloi = DB::table('binh_luan')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
             ->where('binh_luan.BL_TRALOI_MA', '!=', null)->get();
         }
@@ -224,7 +241,7 @@ class PostController extends Controller
 
         return view('main_content.post.show_post')->with('bai_viet', $bai_viet)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
-        ->with('count_thich', $count_thich)->with('thich_no_get', $thich_no_get)
+        ->with('count_thich', $count_thich)->with('thich_no_get', $thich_no_get)->with('isBlock', $isBlock)
         ->with('count_binh_luan', $count_binh_luan)->with('binh_luan_goc', $binh_luan_goc)
         ->with('binh_luan_traloi', $binh_luan_traloi)->with('binh_luan_bv', $binh_luan_bv)
         ->with('binh_luan_no_get', $binh_luan_no_get)->with('binh_luan_thich_no_get', $binh_luan_thich_no_get)

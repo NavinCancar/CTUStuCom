@@ -146,16 +146,16 @@
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0">
             <h5 class="card-title fw-semibold">Hashtag</h5>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
           </div>
         </div>
       </div>
@@ -167,11 +167,11 @@
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0">
             <h5 class="card-title fw-semibold">Khoa/trường</h5>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Trường Kinh tế</span></a><br>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Khoa Khoa học tự nhiên</span></a><br>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Khoa Chính trị</span></a><br>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Khoa Luật</span></a><br>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Trường Bách khoa</span></a><br>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Trường Kinh tế</span></a><br>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Khoa Khoa học tự nhiên</span></a><br>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Khoa Chính trị</span></a><br>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Khoa Luật</span></a><br>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Trường Bách khoa</span></a><br>
           </div>
         </div>
       </div>

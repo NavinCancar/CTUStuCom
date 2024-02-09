@@ -32,7 +32,7 @@
               <ul class="pagination pagination-sm m-t-none m-b-none ">
                   {{-- Previous Page Link --}}
                   @if ($hashtag->onFirstPage())
-                      <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-angle-left"></i></a></li>
+                      <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-left"></i></a></li>
                   @else
                       <li class="page-item">
                           <a class="page-link" href="{{ $hashtag->previousPageUrl() }}"><i class="fas fa-angle-left"></i></a>
@@ -57,7 +57,7 @@
                           <a class="page-link" href="{{ $hashtag->nextPageUrl() }}"><i class="fas fa-angle-right"></i></a>
                       </li>
                   @else
-                      <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-angle-right"></i></a></li>
+                      <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-right"></i></a></li>
                   @endif
               </ul>
           </div>
@@ -74,11 +74,11 @@
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0">
             <h5 class="card-title fw-semibold">Bạn tương tác nhiều nhất:</h5>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="#"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
           </div>
         </div>
       </div>
@@ -86,11 +86,11 @@
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0">
             <h5 class="card-title fw-semibold">Có thể bạn muốn khám phá thêm:</h5>
-            <a href="#"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="#"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="#"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="#"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-            <a href="#"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
           </div>
         </div>
       </div>
@@ -98,16 +98,16 @@
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0">
             <h5 class="card-title fw-semibold">Hot nhất gần đây:</h5>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="#"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0 row">
               @foreach($subject as $key => $sb)
-                  <a href="{{URL::to('/hoc-phan/'.$sb->HP_MA)}}" class="col-lg-4 col-md-6 col-sm-6"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-4 p-2">{{$sb->HP_TEN}}</span></a>
+                  <a href="{{URL::to('/hoc-phan/'.$sb->HP_MA)}}" class="col-lg-4 col-md-6 col-sm-6"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-4 p-2">{{$sb->HP_MA}} {{$sb->HP_TEN}}</span></a>
               @endforeach
           </div>
         </div>
@@ -32,7 +32,7 @@
               <ul class="pagination pagination-sm m-t-none m-b-none ">
                   {{-- Previous Page Link --}}
                   @if ($subject->onFirstPage())
-                      <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-angle-left"></i></a></li>
+                      <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-left"></i></a></li>
                   @else
                       <li class="page-item">
                           <a class="page-link" href="{{ $subject->previousPageUrl() }}"><i class="fas fa-angle-left"></i></a>
@@ -57,7 +57,7 @@
                           <a class="page-link" href="{{ $subject->nextPageUrl() }}"><i class="fas fa-angle-right"></i></a>
                       </li>
                   @else
-                      <li class="page-item disabled"><a class="page-link" href="#"><i class="fas fa-angle-right"></i></a></li>
+                      <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-right"></i></a></li>
                   @endif
               </ul>
           </div>

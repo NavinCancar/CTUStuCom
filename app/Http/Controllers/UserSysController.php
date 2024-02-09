@@ -31,7 +31,7 @@ class UserSysController extends Controller
         Cập nhật tài khoản người dùng (****), Vô hiệu hoá tài khoản người dùng (****),
         Đổi mật khẩu (*)
     - Đối với người dùng khác: Chặn người dùng (*), Theo dõi người dùng khác (*),
-      Danh sách người dùng, Danh sách theo dõi (*), Danh sách chặn (*)s
+      Danh sách người dùng, Danh sách theo dõi (*), Danh sách chặn (*)
     |--------------------------------------------------------------------------
     */
 
@@ -185,18 +185,18 @@ class UserSysController extends Controller
     }
 
     /**
-     * Danh sách người dùng gợi ý
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
      * Tài khoản cá nhân người dùng
      */
     public function show(UserSys $tai_khoan){ ///
+        $userLog = Session::get('userLog');
+        $checkBlockND = 0;
+        $checkBlockND2 = 0;
+        if($userLog){
+            $checkBlockND = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->where('ND_BICHAN_MA', '=', $tai_khoan->ND_MA)->exists(); 
+            $checkBlockND2 = DB::table('chan')->where('ND_CHAN_MA', $tai_khoan->ND_MA)->where('ND_BICHAN_MA', '=', $userLog->ND_MA)->exists(); 
+        }
         $account_info = DB::table('nguoi_dung')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('ND_MA', $tai_khoan->ND_MA)->get();
 
         $college = DB::table('khoa_truong')->get();
@@ -226,6 +226,7 @@ class UserSysController extends Controller
         
         return view('main_content.user.show_user')
         ->with('account_info', $account_info)->with('college', $college)
+        ->with('checkBlockND', $checkBlockND)->with('checkBlockND2', $checkBlockND2)
         ->with('nguoi_theo_doi', $nguoi_theo_doi)->with('dang_theo_doi', $dang_theo_doi)
         ->with('nguoi_theo_doi_no_get', $nguoi_theo_doi_no_get)->with('nguoi_bi_chan_no_get', $nguoi_bi_chan_no_get)
         ->with('bai_viet_count', $bai_viet_count)->with('bai_viet', $bai_viet)
@@ -451,6 +452,7 @@ class UserSysController extends Controller
             ->pluck('ND_DUOCTHEODOI_MA')->toArray();
 
             $account_info = DB::table('nguoi_dung')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->whereNotIn('ND_MA', $account_info_not_in)->get();
         }
         else{
@@ -474,6 +476,7 @@ class UserSysController extends Controller
 
         $account_info = DB::table('nguoi_dung')
         ->join('theo_doi', 'nguoi_dung.ND_MA', '=', 'theo_doi.ND_DUOCTHEODOI_MA')
+        ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
         ->where('ND_THEODOI_MA', $userLog->ND_MA)->get();
 
         $college = DB::table('khoa_truong')->get();
@@ -492,6 +495,7 @@ class UserSysController extends Controller
 
         $account_info = DB::table('nguoi_dung')
         ->join('chan', 'nguoi_dung.ND_MA', '=', 'chan.ND_BICHAN_MA')
+        ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
         ->where('ND_CHAN_MA', $userLog->ND_MA)->get();
 
         $college = DB::table('khoa_truong')->get();
@@ -509,7 +513,7 @@ class UserSysController extends Controller
     /**
      * Danh sách người dùng hệ thống
      */
-    public function a_index()
+    public function index()
     {
         //
     }

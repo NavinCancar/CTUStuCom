@@ -19,281 +19,301 @@
             Session::put('alert',null);
           ?>
           <hr>
-          @foreach($bai_viet as $key => $bv)
-          <?php $BV_MA = $bv->BV_MA; ?>
-            <div class="card">
-              <div class="card-body p-4">
-                <div class="mb-3 mb-sm-0">
-                  <p>
-                    <a href="javascript:void(0)" class="text-body">
-                      <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="40" height="40" class="rounded-circle">
-                      <b>{{$bv->ND_HOTEN}}</b> 
-                    </a>
-                    đã đăng vào {{date('H:i', strtotime($bv->BV_THOIGIANDANG))}} ngày {{date('d/m/Y', strtotime($bv->BV_THOIGIANDANG))}}
-                  </p>
-                  <h5 class="card-title fw-semibold post-title">{{$bv->BV_TIEUDE}}</h5>
-                  <span class="limited-lines">{!! nl2br(e($bv->BV_NOIDUNG)) !!}</span>
+          @if($isBlock != 1)
+            @foreach($bai_viet as $key => $bv)
+            <?php $BV_MA = $bv->BV_MA; ?>
+              <div class="card">
+                <div class="card-body p-4">
+                  <div class="mb-3 mb-sm-0">
+                    <p>
+                      <a href="{{URL::to('/tai-khoan/'.$bv->ND_MA)}}" class="text-body">
+                        <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="40" height="40" class="rounded-circle">
+                        <b>{{$bv->ND_HOTEN}}</b> 
+                      </a>
+                      @if($bv->VT_MA != 3)
+                        <span class="badge-sm bg-warning rounded-pill"><i>{{$bv->VT_TEN}}</i></span>
+                      @endif
+                      đã đăng vào {{date('H:i', strtotime($bv->BV_THOIGIANDANG))}} ngày {{date('d/m/Y', strtotime($bv->BV_THOIGIANDANG))}}
+                    </p>
+                    <h5 class="card-title fw-semibold post-title">{{$bv->BV_TIEUDE}}</h5>
+                    <span class="limited-lines">{!! nl2br(e($bv->BV_NOIDUNG)) !!}</span>
 
-                  <!-- Images Container -->
-                  <div id="images-container" class="m-2 mt-3 mb-3 position-relative">
-                    <!--<span data-value="1" class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">    
-                      <a target="_blank" href="https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/files%2F1706752716087_ldm1.png?alt=media&amp;token=0af3fc1b-79fa-480a-b8bc-63977782e1bc" previewlistener="true">
-                        <img src="https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/files%2F1706752716087_ldm1.png?alt=media&token=0af3fc1b-79fa-480a-b8bc-63977782e1bc" width="100px" height="100px" alt="Banner Image" class="d-block mx-auto">    
-                      </a>                        <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn" style="transform: translateX(-50%);">
+                    <!-- Images Container -->
+                    <div id="images-container" class="m-2 mt-3 mb-3 position-relative">
+                      <!--<span data-value="1" class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">    
+                        <a target="_blank" href="https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/files%2F1706752716087_ldm1.png?alt=media&amp;token=0af3fc1b-79fa-480a-b8bc-63977782e1bc" previewlistener="true">
+                          <img src="https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/files%2F1706752716087_ldm1.png?alt=media&token=0af3fc1b-79fa-480a-b8bc-63977782e1bc" width="100px" height="100px" alt="Banner Image" class="d-block mx-auto">    
+                        </a>                        <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn" style="transform: translateX(-50%);">
+                            <i class="fas fa-bookmark"></i>
+                          </button>
+                      </span>-->
+                    </div>
+
+                    <!-- File Container -->
+                    <div id="files-container" class=" m-2 mt-3">
+                      <!--<span data-value="0" class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">    
+                        <i class="fas fa-file-pdf fs-5 me-2"></i> Đề tài.pdf    
+                        <button class="btn btn-secondary btn-sm file-item-btn">
                           <i class="fas fa-bookmark"></i>
                         </button>
-                    </span>-->
-                  </div>
-
-                  <!-- File Container -->
-                  <div id="files-container" class=" m-2 mt-3">
-                    <!--<span data-value="0" class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">    
-                      <i class="fas fa-file-pdf fs-5 me-2"></i> Đề tài.pdf    
-                      <button class="btn btn-secondary btn-sm file-item-btn">
-                        <i class="fas fa-bookmark"></i>
-                      </button>
-                    </span>-->
-                  </div>
-                  
-                  <div class="m-2">
-                    @if($bv->HP_MA)
-                    <?php
-                      $hoc_phan_tim= $hoc_phan->where('HP_MA',$bv->HP_MA)->first();
-                    ?>
-                    <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3"><i class="fa fa-folder"></i> {{$hoc_phan_tim->HP_MA}} {{$hoc_phan_tim->HP_TEN}}</span></a>
-                    @endif
-
-                    @foreach($hashtag_bai_viet as $key => $hbv)
-                      <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold">#{{$hbv->H_HASHTAG}}</span></a>
-                    @endforeach
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-6 d-flex mt-2 justify-content-start">
-                      <a class="ms-3 text-muted"><i class="fas fa-eye"></i> Lượt xem: <b>{{$bv->BV_LUOTXEM}}</b></a>
-                      <a class="ms-3 text-muted cursor-pointer report-post" data-post-id-value="{{$bv->BV_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
+                      </span>-->
                     </div>
-                    <div class="col-sm-6 d-flex mt-2 justify-content-end">
-                      <a class="ms-3 cursor-pointer <?php 
-                          if($userLog){
-                              $check_bv_thich = $thich_no_get->clone()
-                              ->where('baiviet_thich.BV_MA', $bv->BV_MA)->where('baiviet_thich.ND_MA', $userLog->ND_MA)->exists();
-                              if($check_bv_thich) echo 'text-danger unlike-post'; else echo 'text-muted like-post';
-                          } else echo "text-muted" ?> " data-post-id-value="{{$bv->BV_MA}}">
-                        <i class="fas fa-heart"></i> Thích: <b><?php if($count_thich) echo $count_thich; else echo 0;?></b></a>
-                      <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-reply"></i> Trả lời: <b><?php if($count_binh_luan) echo $count_binh_luan; else echo 0;?></b></a>
-                      <a class="ms-3 cursor-pointer text-muted<?php 
-                          if($userLog){
-                              $check_bv_luu = $bai_viet_luu->clone()
-                              ->where('danh_dau.BV_MA', $bv->BV_MA)->where('danh_dau.ND_MA', $userLog->ND_MA)->exists();
-                              if($check_bv_luu) echo ' unbookmark-post'; else echo ' bookmark-post';
-                          } ?> " data-post-id-value="{{$bv->BV_MA}}">
-                        <?php 
-                          if($userLog){
-                            if($check_bv_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
-                            else echo '<i class="fas fa-bookmark"></i> Lưu';
-                        } else echo '<i class="fas fa-bookmark"></i> Lưu';
-                        ?></a>
+                    
+                    <div class="m-2">
+                      @if($bv->HP_MA)
+                      <?php
+                        $hoc_phan_tim= $hoc_phan->where('HP_MA',$bv->HP_MA)->first();
+                      ?>
+                      <a href="{{URL::to('/hoc-phan/'.$bv->HP_MA)}}"><span class="badge bg-indigo rounded-3"><i class="fa fa-folder"></i> {{$hoc_phan_tim->HP_MA}} {{$hoc_phan_tim->HP_TEN}}</span></a>
+                      @endif
+
+                      @foreach($hashtag_bai_viet as $key => $hbv)
+                        <a href="{{URL::to('/hashtag/'.$hbv->H_HASHTAG)}}"><span class="badge bg-primary rounded-3 fw-semibold">#{{$hbv->H_HASHTAG}}</span></a>
+                      @endforeach
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-6 d-flex mt-2 justify-content-start">
+                        <a class="ms-3 text-muted"><i class="fas fa-eye"></i> Lượt xem: <b>{{$bv->BV_LUOTXEM}}</b></a>
+                        <a class="ms-3 text-muted cursor-pointer report-post" data-post-id-value="{{$bv->BV_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
+                      </div>
+                      <div class="col-sm-6 d-flex mt-2 justify-content-end">
+                        <a class="ms-3 cursor-pointer <?php 
+                            if($userLog){
+                                $check_bv_thich = $thich_no_get->clone()
+                                ->where('baiviet_thich.BV_MA', $bv->BV_MA)->where('baiviet_thich.ND_MA', $userLog->ND_MA)->exists();
+                                if($check_bv_thich) echo 'text-danger unlike-post'; else echo 'text-muted like-post';
+                            } else echo "text-muted" ?> " data-post-id-value="{{$bv->BV_MA}}">
+                          <i class="fas fa-heart"></i> Thích: <b><?php if($count_thich) echo $count_thich; else echo 0;?></b></a>
+                        <a class="ms-3 text-muted cursor-pointer"><i class="fas fa-reply"></i> Trả lời: <b><?php if($count_binh_luan) echo $count_binh_luan; else echo 0;?></b></a>
+                        <a class="ms-3 cursor-pointer text-muted<?php 
+                            if($userLog){
+                                $check_bv_luu = $bai_viet_luu->clone()
+                                ->where('danh_dau.BV_MA', $bv->BV_MA)->where('danh_dau.ND_MA', $userLog->ND_MA)->exists();
+                                if($check_bv_luu) echo ' unbookmark-post'; else echo ' bookmark-post';
+                            } ?> " data-post-id-value="{{$bv->BV_MA}}">
+                          <?php 
+                            if($userLog){
+                              if($check_bv_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
+                              else echo '<i class="fas fa-bookmark"></i> Lưu';
+                          } else echo '<i class="fas fa-bookmark"></i> Lưu';
+                          ?></a>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          @endforeach
+            @endforeach
 
-          
-          <div class="mb-3 mb-sm-0">
-            <h5 class="card-title fw-semibold">Trả lời bài viết</h5>
-          </div>
-          <hr>
-          @if($userLog)  
-            <div class="card" id="form-comment0">
-                <div class="card-body p-3">
-                    <form id="reply-form0" class="text-muted d-flex justify-content-start align-items-center pe-3 mt-3">
-                        {{ csrf_field() }}
-                        <textarea name="BL_NOIDUNG0" class="form-control border-secondary ms-3" placeholder="Nhập bình luận" rows="3" style="resize: none;"></textarea>
-                        <label for="file-input0" class="ms-3 text-muted" style="cursor: pointer;">
-                            <i class="fas fa-paperclip"></i>
-                        </label>
-                        <input name="BL_TRALOI_MA0" value="0" type="number" style="display: none"/>
-                        <!-- Input type file ẩn -->
-                        <input name="TN_FDK0[]" type="file" id="file-input0" style="display: none" multiple accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx"/>
-                        <input type="hidden" name="linkFile0" id="linkFileInput0" value="">
-                        
-                        <button type="button" id="reply-btn0" class="btn text-primary"><i class="fas fa-paper-plane"></i></button>
-                    </form>
-                  
-                    <!-- File Container -->
-                    <div id="selected-files-container0" class=" m-2">
-                        <!--<span class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3">
-                            <a class="text-white" href="../assets/file/TB4823-DHCT_Thong bao Vv dang ky hoc cung luc hai chuong trinh nam 2024.pdf">
-                            <i class="far fa-file-pdf"></i>
-                                TB4823-DHCT_Thong bao Vv dang ky hoc cung luc hai chuong trinh nam 2024.pdf
-                            </a>
-                            <button class="btn btn-secondary btn-sm"><i class="fas fa-bookmark"></i></button>
-                        </span>-->
-                    </div>
-                    <!-- Images Container -->
-                    <div id="selected-images-container0" class="m-2 mb-3 position-relative">
-                        <!--<span class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block">
-                            <a target="_blank" href="../assets/file/Banner-VN.jpg">
-                                <img src="../assets/file/Banner-VN.jpg" width="100px" height="100px" alt="Banner Image" class="d-block mx-auto">
-                            </a>
-                            <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);"><i class="fas fa-bookmark"></i></button>
-                        </span>-->
-                    </div>
-                </div>
+            
+            <div class="mb-3 mb-sm-0">
+              <h5 class="card-title fw-semibold">Trả lời bài viết</h5>
             </div>
-          @endif
-
-          <!-- Comment -->
-          @foreach($binh_luan_goc as $key => $blg)
-            <div class="card" id="form-comment1">
-                <div class="card-body p-3">
-                    <div class="list-unstyled mb-0 p-2 reply-comment-card">
-                        <div class="d-flex flex-row pb-3 pt-1" data-comment-id-value="{{$blg->BL_MA}}">
-                            <div>
-                              <a href="javascript:void(0)" class="text-body">
-                                <img src="<?php if($blg->ND_ANHDAIDIEN) echo $blg->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
-                                    width="40" height="40" class="rounded-circle me-2">
+            <hr>
+            @if($userLog)  
+              <div class="card" id="form-comment0">
+                  <div class="card-body p-3">
+                      <form id="reply-form0" class="text-muted d-flex justify-content-start align-items-center pe-3 mt-3">
+                          {{ csrf_field() }}
+                          <textarea name="BL_NOIDUNG0" class="form-control border-secondary ms-3" placeholder="Nhập bình luận" rows="3" style="resize: none;"></textarea>
+                          <label for="file-input0" class="ms-3 text-muted" style="cursor: pointer;">
+                              <i class="fas fa-paperclip"></i>
+                          </label>
+                          <input name="BL_TRALOI_MA0" value="0" type="number" style="display: none"/>
+                          <!-- Input type file ẩn -->
+                          <input name="TN_FDK0[]" type="file" id="file-input0" style="display: none" multiple accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx"/>
+                          <input type="hidden" name="linkFile0" id="linkFileInput0" value="">
+                          
+                          <button type="button" id="reply-btn0" class="btn text-primary"><i class="fas fa-paper-plane"></i></button>
+                      </form>
+                    
+                      <!-- File Container -->
+                      <div id="selected-files-container0" class=" m-2">
+                          <!--<span class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3">
+                              <a class="text-white" href="../assets/file/TB4823-DHCT_Thong bao Vv dang ky hoc cung luc hai chuong trinh nam 2024.pdf">
+                              <i class="far fa-file-pdf"></i>
+                                  TB4823-DHCT_Thong bao Vv dang ky hoc cung luc hai chuong trinh nam 2024.pdf
                               </a>
-                            </div>
-                            <div class="pt-1" style="width:100%">
-                                <a href="javascript:void(0)" class="text-muted"><p class="fw-bold mb-0">{{$blg->ND_HOTEN}}</p></a>
-                                <span class="text-muted">{{$blg->BL_NOIDUNG}}</span>
+                              <button class="btn btn-secondary btn-sm"><i class="fas fa-bookmark"></i></button>
+                          </span>-->
+                      </div>
+                      <!-- Images Container -->
+                      <div id="selected-images-container0" class="m-2 mb-3 position-relative">
+                          <!--<span class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block">
+                              <a target="_blank" href="../assets/file/Banner-VN.jpg">
+                                  <img src="../assets/file/Banner-VN.jpg" width="100px" height="100px" alt="Banner Image" class="d-block mx-auto">
+                              </a>
+                              <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);"><i class="fas fa-bookmark"></i></button>
+                          </span>-->
+                      </div>
+                  </div>
+              </div>
+            @endif
 
-                                <!-- Images Container -->
-                                <div id="images-container-{{$blg->BL_MA}}" class="mt-3 mb-3 position-relative"></div>
-                                <!-- File Container -->
-                                <div id="files-container-{{$blg->BL_MA}}" class="mt-3"></div>
+            <!-- Comment -->
+            @foreach($binh_luan_goc as $key => $blg)
+              <div class="card" id="form-comment1">
+                  <div class="card-body p-3">
+                      <div class="list-unstyled mb-0 p-2 reply-comment-card">
+                          <div class="d-flex flex-row pb-3 pt-1" data-comment-id-value="{{$blg->BL_MA}}">
+                              <div>
+                                <a href="{{URL::to('/tai-khoan/'.$blg->ND_MA)}}" class="text-body">
+                                  <img src="<?php if($blg->ND_ANHDAIDIEN) echo $blg->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
+                                      width="40" height="40" class="rounded-circle me-2">
+                                </a>
+                              </div>
+                              <div class="pt-1" style="width:100%">
+                                  <a href="{{URL::to('/tai-khoan/'.$blg->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0">{{$blg->ND_HOTEN}}</span></a>
+                                  @if($blg->VT_MA != 3)
+                                    <span class="badge-sm bg-warning rounded-pill"><i>{{$blg->VT_TEN}}</i></span>
+                                  @endif
+                                  <br>
+                                  <span class="text-muted">{{$blg->BL_NOIDUNG}}</span>
 
-                                <div class="row">
-                                  <div class="col-sm-6 d-flex mt-2 justify-content-start">
-                                    <span>{{date('H:i', strtotime($blg->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($blg->BL_THOIGIANTAO))}}</span>
-                                  </div>
-                                  <div class="col-sm-6 d-flex mt-2 justify-content-end">
-                                    <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$blg->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
-                                    <a class="ms-3 cursor-pointer <?php 
-                                        if($userLog){
-                                            $check_bl_thich0 = $binh_luan_thich_no_get->clone()
-                                            ->where('binh_luan.BL_MA', $blg->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
-                                            if($check_bl_thich0) echo 'text-danger unlike-comment'; else echo 'text-muted like-comment';
-                                        } else echo "text-muted"?> " data-comment-id-value="{{$blg->BL_MA}}">
-                                      <i class="fas fa-heart"></i> Thích:
-                                      <b>
-                                        <?php 
-                                          $count_bl_thich0 = $binh_luan_thich_no_get->clone()->where('binh_luan.BL_MA', $blg->BL_MA)->count();
-                                          if($count_bl_thich0) echo $count_bl_thich0; else echo 0;
-                                        ?>
-                                      </b>
-                                    </a>
-                                    <a class="ms-3 text-muted reply-comment-btn cursor-pointer" data-comment-id-value="{{$blg->BL_MA}}">
-                                      <i class="fas fa-reply"></i> Trả lời: 
-                                      <b>
-                                        <?php 
-                                          $count_bl_traloi = $binh_luan_no_get->clone()->where('binh_luan.BL_TRALOI_MA', $blg->BL_MA)->count();
-                                          //dd($count_bl_traloi);
-                                          if($count_bl_traloi) echo $count_bl_traloi; else echo 0;
-                                        ?>
-                                      </b>
-                                    </a>
-                                    <a class="ms-3 cursor-pointer text-muted <?php 
-                                      if($userLog){
-                                          $check_bl_luu = $binh_luan_luu_no_get->clone()
-                                          ->where('danh_dau_boi.BL_MA', $blg->BL_MA)->where('danh_dau_boi.ND_MA', $userLog->ND_MA)->exists();
-                                          if($check_bl_luu) echo ' unbookmark-comment'; else echo ' bookmark-comment';
-                                      } ?> " data-comment-id-value="{{$blg->BL_MA}}">
-                                    <?php 
-                                      if($userLog){
-                                        if($check_bl_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
-                                        else echo '<i class="fas fa-bookmark"></i> Lưu';
-                                    } else echo '<i class="fas fa-bookmark"></i> Lưu';
-                                    ?></a>
-                                  </div>
-                                </div>
-                            </div>
-                        </div>
+                                  <!-- Images Container -->
+                                  <div id="images-container-{{$blg->BL_MA}}" class="mt-3 mb-3 position-relative"></div>
+                                  <!-- File Container -->
+                                  <div id="files-container-{{$blg->BL_MA}}" class="mt-3"></div>
 
-                        <!-- Rep Comment -->
-                        @foreach($binh_luan_traloi as $key => $bltl)
-                          @if($bltl->BL_TRALOI_MA == $blg->BL_MA)
-                            <div class="d-flex flex-row ms-5 pb-1 pt-3" data-comment-id-value="{{$bltl->BL_MA}}">
-                                <div>
-                                  <a href="javascript:void(0)" class="text-body">
-                                    <img src="<?php if($bltl->ND_ANHDAIDIEN) echo $bltl->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
-                                        width="40" height="40" class="rounded-circle me-2">
-                                  </a>
-                                </div>
-                                <div class="pt-1" style="width:100%">
-                                    <a href="javascript:void(0)" class="text-muted"><p class="fw-bold mb-0">{{$bltl->ND_HOTEN}}</p></a>
-                                    <span class="text-muted">{{$bltl->BL_NOIDUNG}}</span>
-
-                                    <!-- Images Container -->
-                                    <div id="images-container-{{$bltl->BL_MA}}" class="mt-3 mb-3 position-relative"></div>
-                                    <!-- File Container -->
-                                    <div id="files-container-{{$bltl->BL_MA}}" class="mt-3"></div>
-
-                                    <div class="row">
-                                      <div class="col-sm-6 d-flex mt-2 justify-content-start">
-                                        <span>{{date('H:i', strtotime($bltl->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($bltl->BL_THOIGIANTAO))}}</span>
-                                      </div>
-                                      <div class="col-sm-6 d-flex mt-2 justify-content-end">
-                                        <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$bltl->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
-                                        <a class="ms-3 cursor-pointer <?php 
-                                            if($userLog){
-                                                $check_bl_thich1 = $binh_luan_thich_no_get->clone()
-                                                ->where('binh_luan.BL_MA', $bltl->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
-                                                if($check_bl_thich1) echo 'text-danger unlike-comment'; else echo 'text-muted like-comment';
-                                            } else echo "text-muted"?> "  data-comment-id-value="{{$bltl->BL_MA}}">
-                                          <i class="fas fa-heart"></i> Thích:
-                                          <b>
-                                            <?php 
-                                              $count_bl_thich1 = $binh_luan_thich_no_get->clone()->where('binh_luan.BL_MA', $bltl->BL_MA)->count();
-                                              if($count_bl_thich1) echo $count_bl_thich1; else echo 0;
-                                            ?>
-                                          </b>
-                                          <a class="ms-3 cursor-pointer text-muted <?php 
-                                            if($userLog){
-                                                $check_bl_luu = $binh_luan_luu_no_get->clone()
-                                                ->where('danh_dau_boi.BL_MA', $bltl->BL_MA)->where('danh_dau_boi.ND_MA', $userLog->ND_MA)->exists();
-                                                if($check_bl_luu) echo ' unbookmark-comment'; else echo ' bookmark-comment';
-                                            } ?> " data-comment-id-value="{{$bltl->BL_MA}}">
-                                          <?php 
-                                            if($userLog){
-                                              if($check_bl_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
-                                              else echo '<i class="fas fa-bookmark"></i> Lưu';
-                                          } else echo '<i class="fas fa-bookmark"></i> Lưu';
-                                          ?></a>
-                                      </div>
+                                  <div class="row">
+                                    <div class="col-sm-6 d-flex mt-2 justify-content-start">
+                                      <span>{{date('H:i', strtotime($blg->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($blg->BL_THOIGIANTAO))}}</span>
                                     </div>
-                                </div>
-                            </div>
-                          @endif
-                        @endforeach
+                                    <div class="col-sm-6 d-flex mt-2 justify-content-end">
+                                      <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$blg->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
+                                      <a class="ms-3 cursor-pointer <?php 
+                                          if($userLog){
+                                              $check_bl_thich0 = $binh_luan_thich_no_get->clone()
+                                              ->where('binh_luan.BL_MA', $blg->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
+                                              if($check_bl_thich0) echo 'text-danger unlike-comment'; else echo 'text-muted like-comment';
+                                          } else echo "text-muted"?> " data-comment-id-value="{{$blg->BL_MA}}">
+                                        <i class="fas fa-heart"></i> Thích:
+                                        <b>
+                                          <?php 
+                                            $count_bl_thich0 = $binh_luan_thich_no_get->clone()->where('binh_luan.BL_MA', $blg->BL_MA)->count();
+                                            if($count_bl_thich0) echo $count_bl_thich0; else echo 0;
+                                          ?>
+                                        </b>
+                                      </a>
+                                      <a class="ms-3 text-muted reply-comment-btn cursor-pointer" data-comment-id-value="{{$blg->BL_MA}}">
+                                        <i class="fas fa-reply"></i> Trả lời: 
+                                        <b>
+                                          <?php 
+                                            $count_bl_traloi = $binh_luan_no_get->clone()->where('binh_luan.BL_TRALOI_MA', $blg->BL_MA)->count();
+                                            //dd($count_bl_traloi);
+                                            if($count_bl_traloi) echo $count_bl_traloi; else echo 0;
+                                          ?>
+                                        </b>
+                                      </a>
+                                      <a class="ms-3 cursor-pointer text-muted <?php 
+                                        if($userLog){
+                                            $check_bl_luu = $binh_luan_luu_no_get->clone()
+                                            ->where('danh_dau_boi.BL_MA', $blg->BL_MA)->where('danh_dau_boi.ND_MA', $userLog->ND_MA)->exists();
+                                            if($check_bl_luu) echo ' unbookmark-comment'; else echo ' bookmark-comment';
+                                        } ?> " data-comment-id-value="{{$blg->BL_MA}}">
+                                      <?php 
+                                        if($userLog){
+                                          if($check_bl_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
+                                          else echo '<i class="fas fa-bookmark"></i> Lưu';
+                                      } else echo '<i class="fas fa-bookmark"></i> Lưu';
+                                      ?></a>
+                                    </div>
+                                  </div>
+                              </div>
+                          </div>
 
-                        <!--<div id="divdata-unique" class="ms-5 pb-1 pt-3">
-                        <form id="reply-form1" class="text-muted d-flex justify-content-start align-items-center pe-3 mt-3">
-                            {{ csrf_field() }}
-                            <textarea name="BL_NOIDUNG1" class="form-control border-secondary ms-3" placeholder="Nhập bình luận" rows="2" style="resize: none;"></textarea>
-                            <label for="file-input1" class="ms-3 text-muted" style="cursor: pointer;">
-                                <i class="fas fa-paperclip"></i>
-                            </label>
-                            <input name="BL_TRALOI_MA1" value="{{$blg->BL_MA}}" type="number" style="display: none"/>
-                            <input name="TN_FDK1[]" type="file" id="file-input1" style="display: none" multiple accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx"/>
-                            <input type="hidden" name="linkFile1" id="linkFileInput1" value="">
-                            <button type="button" id="reply-btn1" class="btn text-primary"><i class="fas fa-paper-plane"></i></button>
-                        </form>
-                        <div id="selected-files-container1" class=" m-2"></div>
-                        <div id="selected-images-container1" class="m-2 mb-3 position-relative"></div>
-                        </div>-->
+                          <!-- Rep Comment -->
+                          @foreach($binh_luan_traloi as $key => $bltl)
+                            @if($bltl->BL_TRALOI_MA == $blg->BL_MA)
+                              <div class="d-flex flex-row ms-5 pb-1 pt-3" data-comment-id-value="{{$bltl->BL_MA}}">
+                                  <div>
+                                    <a href="{{URL::to('/tai-khoan/'.$bltl->ND_MA)}}" class="text-body">
+                                      <img src="<?php if($bltl->ND_ANHDAIDIEN) echo $bltl->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
+                                          width="40" height="40" class="rounded-circle me-2">
+                                    </a>
+                                  </div>
+                                  <div class="pt-1" style="width:100%">
+                                      <a href="{{URL::to('/tai-khoan/'.$bltl->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0">{{$bltl->ND_HOTEN}}</span></a>
+                                      @if($bltl->VT_MA != 3)
+                                        <span class="badge-sm bg-warning rounded-pill"><i>{{$bltl->VT_TEN}}</i></span>
+                                      @endif
+                                      <br>
+                                      <span class="text-muted">{{$bltl->BL_NOIDUNG}}</span>
 
-                    </div>
-                </div>
-            </div>
-          @endforeach
+                                      <!-- Images Container -->
+                                      <div id="images-container-{{$bltl->BL_MA}}" class="mt-3 mb-3 position-relative"></div>
+                                      <!-- File Container -->
+                                      <div id="files-container-{{$bltl->BL_MA}}" class="mt-3"></div>
+
+                                      <div class="row">
+                                        <div class="col-sm-6 d-flex mt-2 justify-content-start">
+                                          <span>{{date('H:i', strtotime($bltl->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($bltl->BL_THOIGIANTAO))}}</span>
+                                        </div>
+                                        <div class="col-sm-6 d-flex mt-2 justify-content-end">
+                                          <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$bltl->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
+                                          <a class="ms-3 cursor-pointer <?php 
+                                              if($userLog){
+                                                  $check_bl_thich1 = $binh_luan_thich_no_get->clone()
+                                                  ->where('binh_luan.BL_MA', $bltl->BL_MA)->where('binhluan_thich.ND_MA', $userLog->ND_MA)->exists();
+                                                  if($check_bl_thich1) echo 'text-danger unlike-comment'; else echo 'text-muted like-comment';
+                                              } else echo "text-muted"?> "  data-comment-id-value="{{$bltl->BL_MA}}">
+                                            <i class="fas fa-heart"></i> Thích:
+                                            <b>
+                                              <?php 
+                                                $count_bl_thich1 = $binh_luan_thich_no_get->clone()->where('binh_luan.BL_MA', $bltl->BL_MA)->count();
+                                                if($count_bl_thich1) echo $count_bl_thich1; else echo 0;
+                                              ?>
+                                            </b>
+                                            <a class="ms-3 cursor-pointer text-muted <?php 
+                                              if($userLog){
+                                                  $check_bl_luu = $binh_luan_luu_no_get->clone()
+                                                  ->where('danh_dau_boi.BL_MA', $bltl->BL_MA)->where('danh_dau_boi.ND_MA', $userLog->ND_MA)->exists();
+                                                  if($check_bl_luu) echo ' unbookmark-comment'; else echo ' bookmark-comment';
+                                              } ?> " data-comment-id-value="{{$bltl->BL_MA}}">
+                                            <?php 
+                                              if($userLog){
+                                                if($check_bl_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
+                                                else echo '<i class="fas fa-bookmark"></i> Lưu';
+                                            } else echo '<i class="fas fa-bookmark"></i> Lưu';
+                                            ?></a>
+                                        </div>
+                                      </div>
+                                  </div>
+                              </div>
+                            @endif
+                          @endforeach
+
+                          <!--<div id="divdata-unique" class="ms-5 pb-1 pt-3">
+                          <form id="reply-form1" class="text-muted d-flex justify-content-start align-items-center pe-3 mt-3">
+                              {{ csrf_field() }}
+                              <textarea name="BL_NOIDUNG1" class="form-control border-secondary ms-3" placeholder="Nhập bình luận" rows="2" style="resize: none;"></textarea>
+                              <label for="file-input1" class="ms-3 text-muted" style="cursor: pointer;">
+                                  <i class="fas fa-paperclip"></i>
+                              </label>
+                              <input name="BL_TRALOI_MA1" value="{{$blg->BL_MA}}" type="number" style="display: none"/>
+                              <input name="TN_FDK1[]" type="file" id="file-input1" style="display: none" multiple accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx"/>
+                              <input type="hidden" name="linkFile1" id="linkFileInput1" value="">
+                              <button type="button" id="reply-btn1" class="btn text-primary"><i class="fas fa-paper-plane"></i></button>
+                          </form>
+                          <div id="selected-files-container1" class=" m-2"></div>
+                          <div id="selected-images-container1" class="m-2 mb-3 position-relative"></div>
+                          </div>-->
+
+                      </div>
+                  </div>
+              </div>
+            @endforeach
+          @else
+              <div class="text-center text-muted">
+                <h4>Bài viết này đã bị ẩn đến bạn!</h4>
+              </div>
+          </div>
+          @endif
         </div>
       </div>
     </div>
 
+
+    @if($isBlock != 1)
     <script type="module">
         //|-----------------------------------------------------
         //|KHAI BÁO FIRESTORE
@@ -1371,4 +1391,5 @@
           //|*****************************************************
         });
     </script>
+    @endif
 @endsection
