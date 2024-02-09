@@ -160,7 +160,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="{{URL::to('/danh-sach-theo-doi')}}" aria-expanded="false">
+              <a class="sidebar-link" href="{{URL::to('/danh-sach-theo-doi/'.$userLog->ND_MA)}}" aria-expanded="false">
                 <span>
                   <i class="fa fa-portrait"></i>
                 </span>

@@ -45,13 +45,14 @@ class HomeController extends Controller
      */
     public function index(Request $request){ ///
         //Bài viết Start
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
 
         $userLog = Session::get('userLog');
         if($userLog){
             $bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
             $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
             $nguoi_dung_not_in2 = DB::table('chan')->where('ND_BICHAN_MA', $userLog->ND_MA)->pluck('ND_CHAN_MA')->toArray();
-
+            
             $bai_viet = DB::table('bai_viet')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
@@ -59,14 +60,16 @@ class HomeController extends Controller
             ->orderBy('BV_THOIGIANDANG', 'desc')
             ->whereNotIn('BV_MA', $bai_viet_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)->paginate(5);
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(5);
         }
         else{
             $bai_viet = DB::table('bai_viet')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
-            ->orderBy('BV_THOIGIANDANG', 'desc')->paginate(5);
+            ->orderBy('BV_THOIGIANDANG', 'desc')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(5);
         }
         
         $hashtag_bai_viet = DB::table('hashtag')

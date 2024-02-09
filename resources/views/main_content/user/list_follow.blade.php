@@ -6,12 +6,13 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="mb-3 mb-sm-0">
-                <h5 class="card-title fw-semibold">Những người dùng bạn có thể muốn biết</h5>
+                <h5 class="card-title fw-semibold"><?php echo $name ?></h5>
                 </div>
                 <hr>
                 <div class="row">
                     @foreach($account_info as $key => $info)    
-                        @if($userLog && $userLog->ND_MA !=$info->ND_MA)
+                        @if($userLog && $userLog->ND_MA ==$info->ND_MA)
+                        @else
                         <div class=" col-lg-6">
                             <div class="card">
                                 <div class="card-body p-4">
@@ -37,7 +38,17 @@
                                             <div class="d-flex flex-row">
                                                 <a href="{{URL::to('/tai-khoan/'.$info->ND_MA)}}" class="btn btn-primary w-100" type="button"><i class="fas fa-user-circle"></i>
                                                 Xem trang cá nhân</a>
-                                                <button class="btn btn-danger ms-2 unfollow w-100" data-user-id-value="<?php echo $info->ND_MA;?>" type="button"><i class="fa fa-portrait"></i> Huỷ theo dõi</button>
+                                                @if($userLog)
+                                                <?php 
+                                                    $check_follow = $nguoi_dung_no_get->clone()->where('ND_DUOCTHEODOI_MA', $info->ND_MA)->where('ND_THEODOI_MA', $userLog->ND_MA)->exists(); 
+                                                    if(!$check_follow){ ?>
+                                                    <button class="btn btn-success ms-2 follow w-100" data-user-id-value="<?php echo $info->ND_MA;?>" type="button"><i class="fa fa-portrait"></i> Theo dõi</button>
+                                                <?php
+                                                    } else{ ?>
+                                                    <button class="btn btn-danger ms-2 unfollow w-100" data-user-id-value="<?php echo $info->ND_MA;?>" type="button"><i class="fa fa-portrait"></i> Huỷ theo dõi</button>
+                                                <?php
+                                                    }?>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

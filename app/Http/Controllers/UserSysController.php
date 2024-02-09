@@ -31,7 +31,7 @@ class UserSysController extends Controller
         Cập nhật tài khoản người dùng (****), Vô hiệu hoá tài khoản người dùng (****),
         Đổi mật khẩu (*)
     - Đối với người dùng khác: Chặn người dùng (*), Theo dõi người dùng khác (*),
-      Danh sách người dùng, Danh sách theo dõi (*), Danh sách chặn (*)
+      Danh sách người dùng, Danh sách theo dõi, Danh sách người theo dõi, Danh sách chặn (*)
     |--------------------------------------------------------------------------
     */
 
@@ -191,9 +191,11 @@ class UserSysController extends Controller
         $userLog = Session::get('userLog');
         $checkBlockND = 0;
         $checkBlockND2 = 0;
+        $checkBlockND3 = 0;
         if($userLog){
             $checkBlockND = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->where('ND_BICHAN_MA', '=', $tai_khoan->ND_MA)->exists(); 
             $checkBlockND2 = DB::table('chan')->where('ND_CHAN_MA', $tai_khoan->ND_MA)->where('ND_BICHAN_MA', '=', $userLog->ND_MA)->exists(); 
+            $checkBlockND3 = DB::table('nguoi_dung')->where('ND_MA', $tai_khoan->ND_MA)->where('ND_TRANGTHAI', 0)->exists(); 
         }
         $account_info = DB::table('nguoi_dung')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
@@ -212,12 +214,24 @@ class UserSysController extends Controller
         //Bài viết nổi bật
         $bai_viet_notget = DB::table('bai_viet')->where('ND_MA', $tai_khoan->ND_MA)->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt');
         $bai_viet_count = $bai_viet_notget->clone()->count();
-        $bai_viet = $bai_viet_notget->clone()->take(5)->get();
+        if($userLog){
+            $bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
+            $bai_viet = $bai_viet_notget->clone()->whereNotIn('bai_viet.BV_MA', $bai_viet_not_in)->take(5)->get();
+        }
+        else{
+            $bai_viet = $bai_viet_notget->clone()->take(5)->get();
+        }
 
         //Bình luân nổi bật
         $binh_luan_notget = DB::table('binh_luan')->where('ND_MA', $tai_khoan->ND_MA);
         $binh_luan_count = $binh_luan_notget->clone()->count();
-        $binh_luan = $binh_luan_notget->clone()->take(5)->get();
+        if($userLog){
+            $binh_luan_not_in = DB::table('binhluan_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BL_MA')->toArray();
+            $binh_luan = $binh_luan_notget->clone()->whereNotIn('BL_MA', $binh_luan_not_in)->take(5)->get();
+        }
+        else{
+            $binh_luan = $binh_luan_notget->clone()->take(5)->get();
+        }
 
         $binh_luan_no_get= DB::table('binh_luan');
         $binh_luan_thich_no_get = DB::table('binh_luan')
@@ -226,7 +240,7 @@ class UserSysController extends Controller
         
         return view('main_content.user.show_user')
         ->with('account_info', $account_info)->with('college', $college)
-        ->with('checkBlockND', $checkBlockND)->with('checkBlockND2', $checkBlockND2)
+        ->with('checkBlockND', $checkBlockND)->with('checkBlockND2', $checkBlockND2)->with('checkBlockND3', $checkBlockND3)
         ->with('nguoi_theo_doi', $nguoi_theo_doi)->with('dang_theo_doi', $dang_theo_doi)
         ->with('nguoi_theo_doi_no_get', $nguoi_theo_doi_no_get)->with('nguoi_bi_chan_no_get', $nguoi_bi_chan_no_get)
         ->with('bai_viet_count', $bai_viet_count)->with('bai_viet', $bai_viet)
@@ -446,18 +460,26 @@ class UserSysController extends Controller
 
     public function list_user(){ ///
         $userLog= Session::get('userLog');
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+
         if($userLog){
             $account_info_not_in = DB::table('theo_doi')
             ->where('ND_THEODOI_MA', $userLog->ND_MA)
             ->pluck('ND_DUOCTHEODOI_MA')->toArray();
-
+            $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
+            $nguoi_dung_not_in2 = DB::table('chan')->where('ND_BICHAN_MA', $userLog->ND_MA)->pluck('ND_CHAN_MA')->toArray();
+            
             $account_info = DB::table('nguoi_dung')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-            ->whereNotIn('ND_MA', $account_info_not_in)->get();
+            ->whereNotIn('ND_MA', $account_info_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
         }
         else{
             $account_info = DB::table('nguoi_dung')
-            ->get();
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
         }
 
         $college = DB::table('khoa_truong')->get();
@@ -467,22 +489,75 @@ class UserSysController extends Controller
     }
 
     /**
-     * Danh sách theo dõi (*)
+     * Danh sách theo dõi
      */
 
-    public function list_follow(){ ///
-        $this->AuthLogin_ND();
+    public function list_follow($ND_MA){ ///
         $userLog= Session::get('userLog');
-
-        $account_info = DB::table('nguoi_dung')
-        ->join('theo_doi', 'nguoi_dung.ND_MA', '=', 'theo_doi.ND_DUOCTHEODOI_MA')
-        ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-        ->where('ND_THEODOI_MA', $userLog->ND_MA)->get();
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+        
+        if($userLog){
+            $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
+            $nguoi_dung_not_in2 = DB::table('chan')->where('ND_BICHAN_MA', $userLog->ND_MA)->pluck('ND_CHAN_MA')->toArray();
+            $account_info = DB::table('nguoi_dung')
+            ->join('theo_doi', 'nguoi_dung.ND_MA', '=', 'theo_doi.ND_DUOCTHEODOI_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->where('ND_THEODOI_MA', $ND_MA)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
+        }
+        else{
+            $account_info = DB::table('nguoi_dung')
+            ->join('theo_doi', 'nguoi_dung.ND_MA', '=', 'theo_doi.ND_DUOCTHEODOI_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->where('ND_THEODOI_MA', $ND_MA)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
+        }
+        $nguoi_dung_no_get = DB::table('theo_doi');
 
         $college = DB::table('khoa_truong')->get();
 
+        $name= 'Danh sách theo dõi';
         return view('main_content.user.list_follow')
-        ->with('account_info', $account_info)->with('college', $college);
+        ->with('account_info', $account_info)->with('nguoi_dung_no_get', $nguoi_dung_no_get)
+        ->with('college', $college)->with('name', $name);
+    }
+
+    /**
+     * Danh sách người theo dõi
+     */
+
+     public function list_followme($ND_MA){ ///
+        $userLog= Session::get('userLog');
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+        
+        if($userLog){
+            $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
+            $nguoi_dung_not_in2 = DB::table('chan')->where('ND_BICHAN_MA', $userLog->ND_MA)->pluck('ND_CHAN_MA')->toArray();
+            $account_info = DB::table('nguoi_dung')
+            ->join('theo_doi', 'nguoi_dung.ND_MA', '=', 'theo_doi.ND_THEODOI_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->where('ND_DUOCTHEODOI_MA', $ND_MA)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
+        }
+        else{
+            $account_info = DB::table('nguoi_dung')
+            ->join('theo_doi', 'nguoi_dung.ND_MA', '=', 'theo_doi.ND_THEODOI_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->where('ND_DUOCTHEODOI_MA', $ND_MA)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
+        }
+        $nguoi_dung_no_get = DB::table('theo_doi');
+
+        $college = DB::table('khoa_truong')->get();
+
+        $name= 'Danh sách người theo dõi';
+        return view('main_content.user.list_follow')
+        ->with('account_info', $account_info)->with('nguoi_dung_no_get', $nguoi_dung_no_get)
+        ->with('college', $college)->with('name', $name);
     }
 
     /**
@@ -492,11 +567,13 @@ class UserSysController extends Controller
     public function list_block(){ ///
         $this->AuthLogin_ND();
         $userLog= Session::get('userLog');
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
 
         $account_info = DB::table('nguoi_dung')
         ->join('chan', 'nguoi_dung.ND_MA', '=', 'chan.ND_BICHAN_MA')
         ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-        ->where('ND_CHAN_MA', $userLog->ND_MA)->get();
+        ->where('ND_CHAN_MA', $userLog->ND_MA)
+        ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
 
         $college = DB::table('khoa_truong')->get();
 

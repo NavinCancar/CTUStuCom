@@ -41,7 +41,8 @@ Route::post('/kiem-tra-mat-khau', 'App\Http\Controllers\UserSysController@passwo
 
 //--Tài khoản
 Route::get('/danh-sach-nguoi-dung', 'App\Http\Controllers\UserSysController@list_user'); ///ok
-Route::get('/danh-sach-theo-doi', 'App\Http\Controllers\UserSysController@list_follow'); ///ok
+Route::get('/danh-sach-theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysController@list_follow'); ///ok
+Route::get('/danh-sach-nguoi-theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysController@list_followme'); ///ok
 Route::get('/danh-sach-chan', 'App\Http\Controllers\UserSysController@list_block'); ///ok
 Route::resource('/tai-khoan', 'App\Http\Controllers\UserSysController')->except(['create', 'store']); ///ok: CUD_ND
 

@@ -2,7 +2,7 @@
 @section('content')
 <?php $userLog= Session::get('userLog'); ?>
     <!-- Content Start -->
-    @if(!$checkBlockND && !$checkBlockND2)
+    @if(!$checkBlockND && !$checkBlockND2 && !$checkBlockND3)
         @foreach($account_info as $key => $info)
         <div class="container-fluid">
             <div class="row">
@@ -37,10 +37,10 @@
                                     @endif
                                     <div class="text-center">
                                         <div class="row p-3 mb-3 mt-3">
-                                            <a href="javascript:void(0)" class="col-lg-3 col-md-3 col-sm-6 text-muted ml-3">
+                                            <a href="{{URL::to('/danh-sach-nguoi-theo-doi/'.$info->ND_MA)}}" class="col-lg-3 col-md-3 col-sm-6 text-muted ml-3">
                                                 <b class="fs-6"><?php if($nguoi_theo_doi) echo $nguoi_theo_doi; else echo '0'; ?></b><br> Người theo dõi
                                             </a>
-                                            <a href="{{URL::to('/danh-sach-theo-doi')}}" class="col-lg-3 col-md-3 col-sm-6 text-muted">
+                                            <a href="{{URL::to('/danh-sach-theo-doi/'.$info->ND_MA)}}" class="col-lg-3 col-md-3 col-sm-6 text-muted">
                                                 <b class="fs-6"><?php if($dang_theo_doi) echo $dang_theo_doi; else echo '0'; ?></b><br> Đang theo dõi
                                             </a>
                                             <a href="javascript:void(0)" class="col-lg-3 col-md-3 col-sm-6 text-muted">
@@ -202,7 +202,7 @@
     </div>
     @endif
 
-    @if(!$checkBlockND && !$checkBlockND2)
+    @if(!$checkBlockND && !$checkBlockND2 && !$checkBlockND3)
   <script>
     $(document).ready(function() {
 
