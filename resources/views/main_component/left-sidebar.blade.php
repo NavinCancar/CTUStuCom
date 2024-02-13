@@ -152,11 +152,11 @@
             <?php if($userLog->VT_MA==3) echo "show";?>
           ">
             <li class="sidebar-item">
-              <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+              <a class="sidebar-link" href="{{URL::to('/kho-luu-tru')}}" aria-expanded="false">
                 <span>
                   <i class="fas fa-layer-group"></i>
                 </span>
-                <span class="hide-menu">Kho tài liệu</span>
+                <span class="hide-menu">Kho lưu trữ</span>
               </a>
             </li>
             <li class="sidebar-item">

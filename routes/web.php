@@ -24,6 +24,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/','App\Http\Controllers\HomeController@index'); ///ok
 Route::get('/trang-chu', 'App\Http\Controllers\HomeController@index'); ///ok
 
+//--Kho lưu trữ
+Route::get('/kho-luu-tru','App\Http\Controllers\HomeController@archive'); ///
+Route::get('/kho-bai-viet','App\Http\Controllers\HomeController@post_archive');
+Route::get('/kho-binh-luan','App\Http\Controllers\HomeController@comment_archive');
+Route::get('/kho-file','App\Http\Controllers\HomeController@file_archive');
 
 //UserSys: Người dùng hệ thống
 //--Đăng nhập

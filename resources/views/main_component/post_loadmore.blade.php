@@ -31,6 +31,18 @@
               } else echo "text-muted" ?> " data-post-id-value="{{$bv->BV_MA}}">
             <i class="fas fa-heart"></i> Thích: <b><?php if($count_thich_tim) echo $count_thich_tim->count; else echo 0;?></b></a>
             <a class="ms-3 text-muted"><i class="fas fa-reply"></i> Trả lời: <b><?php if($count_binh_luan_tim) echo $count_binh_luan_tim->count; else echo 0;?></b></a>
+            <a class="ms-3 cursor-pointer text-muted<?php 
+                if($userLog){
+                    $check_bv_luu = $bai_viet_luu->clone()
+                    ->where('danh_dau.BV_MA', $bv->BV_MA)->where('danh_dau.ND_MA', $userLog->ND_MA)->exists();
+                    if($check_bv_luu) echo ' unbookmark-post'; else echo ' bookmark-post';
+                } ?> " data-post-id-value="{{$bv->BV_MA}}">
+              <?php 
+                if($userLog){
+                  if($check_bv_luu) echo '<i class="fas fa-vote-yea"></i> Đã lưu'; 
+                  else echo '<i class="fas fa-bookmark"></i> Lưu';
+              } else echo '<i class="fas fa-bookmark"></i> Lưu';
+              ?></a>
         </div>
         <div class=" m-1 mt-2">
           @if($bv->HP_MA)

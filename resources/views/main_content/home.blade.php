@@ -831,6 +831,60 @@
       //|*****************************************************
       //|LIKE BÀI VIẾT END
       //|*****************************************************
+      //|*****************************************************
+      //|LƯU BÀI VIẾT START
+      //|*****************************************************
+      <?php if($userLog) { ?>
+        $(document).on('click', '.bookmark-post', function() {
+            // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+            var $element = $(this);
+            var BV_MA = $(this).data('post-id-value');
+            //var _token = $('meta[name="csrf-token"]').attr('content');
+
+            $.ajax({
+              url: '{{URL::to('/luu-bai-dang/')}}' +'/'+ BV_MA,
+              type: 'GET',
+              success: function(response) {
+                $element.removeClass('bookmark-post');
+                $element.addClass('unbookmark-post');
+
+                $element.empty();
+                $element.html(`<i class="fas fa-vote-yea"></i> Đã lưu`);
+                //console.log(number);
+              },
+              error: function(error) {
+                console.log(error);
+              }
+            });
+                
+        });
+        $(document).on('click', '.unbookmark-post', function() {
+            // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+            var $element = $(this);
+            var BV_MA = $(this).data('post-id-value');
+            //var _token = $('meta[name="csrf-token"]').attr('content');
+
+            $.ajax({
+              url: '{{URL::to('/huy-luu-bai-dang/')}}' +'/'+ BV_MA,
+              type: 'GET',
+              success: function(response) {
+                $element.removeClass('unbookmark-post');
+                $element.addClass('bookmark-post');
+
+                $element.empty();
+                $element.html(`<i class="fas fa-bookmark"></i> Lưu`);
+                //console.log(number);
+              },
+              error: function(error) {
+                console.log(error);
+              }
+            });
+                
+        });
+      <?php } ?>
+      //|*****************************************************
+      //|LƯU BÀI VIẾT END
+      //|*****************************************************
     });
   </script>
   <!--MAIN END-->
