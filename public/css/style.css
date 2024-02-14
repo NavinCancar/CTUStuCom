@@ -68,6 +68,10 @@
   --bs-dark-border-subtle:#5A6A85;
 }
 
+.start-85 {
+  left: 85%!important;
+}
+
 .nav-search{
     width: 50rem;
     height: 40px; 
@@ -298,4 +302,8 @@
   cursor: pointer;
   padding: 0;
   outline: none;
+}
+
+.d-none {
+  display: none !important; 
 }

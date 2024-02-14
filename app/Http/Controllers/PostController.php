@@ -255,6 +255,13 @@ class PostController extends Controller
         ->with('bai_viet_luu', $bai_viet_luu)->with('binh_luan_luu_no_get', $binh_luan_luu_no_get);
     }
 
+    public function find_baidang_binhluan($BL_MA){ ///
+        $binh_luan_bv= DB::table('binh_luan')
+        ->where('binh_luan.BL_MA', '=', $BL_MA)->first();
+        $ma_bv = $binh_luan_bv->BV_MA;
+        return Redirect::to('/bai-dang/'.$ma_bv.'?binh-luan='.$BL_MA);
+    }
+
     /**
      * Sửa bài đăng
      */
