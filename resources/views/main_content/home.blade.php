@@ -28,12 +28,12 @@
                   class="fa fa-filter"></i> Lọc bài viết</button>
             </div>
 
-            <div class="text-notice text-notice-success alert alert-success" id="them-success" style="display: none">
-              Thêm bài viết thành công
+            <div class="text-notice text-notice-success alert alert-success" id="alert-success" style="display: none">
+              <span></span> 
               <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
             </div>
-            <div class="text-notice text-notice-danger alert alert-danger" id="them-danger" style="display: none">
-              Thêm bài viết thất bại
+            <div class="text-notice text-notice-danger alert alert-danger" id="alert-danger" style="display: none">
+              <span></span> 
               <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
             </div>
 
@@ -677,12 +677,21 @@
                     form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
                     form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
                     document.getElementById('thembaiviet').classList.remove("show");
-                    document.getElementById('them-success').style.display = 'block';
+
+                    $('#alert-success span').html('Thêm bài viết thành công');
+                    $('html, body').animate({
+                        scrollTop: $('#alert-success').offset().top
+                    });
+                    document.getElementById('alert-success').style.display = 'block';
                     //console.log('Thành công');
                 },
                 error: function(error) {
                     // Handle errors here
-                    document.getElementById('them-danger').style.display = 'block';
+                    $('#alert-danger span').html('Thêm bài viết thất bại');
+                    $('html, body').animate({
+                        scrollTop: $('#alert-danger').offset().top
+                    });
+                    document.getElementById('alert-danger').style.display = 'block';
                     console.log(error);
                 }
               });

@@ -18,8 +18,12 @@
             }
             Session::put('alert',null);
           ?>
-          <div class="text-notice text-notice-danger alert alert-danger" id="deletepost-alert-danger" style="display: none">
-            Xoá bài viết thất bại!
+          <div class="text-notice text-notice-success alert alert-success" id="alert-success" style="display: none">
+            <span></span> 
+            <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
+          </div>
+          <div class="text-notice text-notice-danger alert alert-danger" id="alert-danger" style="display: none">
+            <span></span> 
             <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
           </div>
           <hr>
@@ -342,7 +346,7 @@
 
           <!-- Modal body -->
           <div class="modal-body">
-          <div class="text-notice text-notice-danger alert alert-danger" id="sua-danger" style="display: none">
+          <div class="text-notice text-notice-danger alert alert-danger" id="modal-alert-danger" style="display: none">
               Cập nhật bài viết thất bại
               <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
             </div>
@@ -659,7 +663,7 @@
                         })().catch((error) => {
                             document.getElementById('dangbai-btn').style.display = 'block';
                             document.getElementById('spinner').style.display = 'none';
-                            document.getElementById('sua-danger').style.display = 'block';
+                            document.getElementById('modal-alert-danger').style.display = 'block';
                             console.error("Error in delete script: ", error);
                             return 0;
                         });
@@ -726,7 +730,7 @@
                       error: function(error) {
                           document.getElementById('dangbai-btn').style.display = 'block';
                           document.getElementById('spinner').style.display = 'none';
-                          document.getElementById('sua-danger').style.display = 'block';
+                          document.getElementById('modal-alert-danger').style.display = 'block';
                           console.log(error);
                       }
                     });
@@ -1925,7 +1929,11 @@
                         window.location.href = '{{URL::to('/')}}';
                       },
                       error: function(error) {
-                          document.getElementById('deletepost-alert-danger').style.display = 'block';
+                        $('#alert-danger span').html('Xoá bài viết thất bại');
+                        $('html, body').animate({
+                            scrollTop: $('#alert-danger').offset().top
+                        });
+                        document.getElementById('alert-danger').style.display = 'block';
                           console.log(error);
                       }
                     });
