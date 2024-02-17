@@ -256,7 +256,7 @@
                 });
                 //alert('Tài khoản đã được vô hiệu hoá!');
             } else {
-                alert('Hủy bỏ vô hiệu hoá tài khoản.');
+                alert('Hủy bỏ vô hiệu hoá tài khoản');
             }
         });
 

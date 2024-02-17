@@ -50,6 +50,38 @@ class PostController extends Controller
     }
 
 
+    /**
+     * Kiểm tra đăng nhập: Bản thân => (*****)
+     */
+    public function AuthLogin_BT($bai_dang){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->ND_MA == $bai_dang->ND_MA){
+            }
+            else{
+                return Redirect::to('bai-dang/'.$bai_dang->BV_MA)->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
+
+
+    /**
+     * Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+     */
+    public function AuthLogin_BTwQTV($bai_dang){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->VT_MA == 1 || $userLog->ND_MA == $bai_dang->ND_MA){
+            }
+            else{
+                return Redirect::to('bai-dang/'.$bai_dang->BV_MA)->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
     /*
     |--------------------------------------------------------------------------
     | NGƯỜI DÙNG
@@ -174,6 +206,8 @@ class PostController extends Controller
         ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA')
         ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA);
 
+        $hashtag = DB::table('hashtag')->get();
+
         //Bình luận
         $count_binh_luan = DB::table('bai_viet')
         ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
@@ -183,6 +217,9 @@ class PostController extends Controller
         $isBlock=0;
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
 
+        $checkBlockBVTT = DB::table('bai_viet')->where('BV_MA', '=', $bai_dang->BV_MA)->where('BV_TRANGTHAI', '!=', 'Đã duyệt')->exists();
+        if($checkBlockBVTT) $isBlock=1;
+        
         if($userLog){
             $checkBlockBV = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->where('BV_MA', '=', $bai_dang->BV_MA)->exists();
             $checkBlockND = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->where('ND_BICHAN_MA', '=', $bai_dang->ND_MA)->exists(); 
@@ -252,7 +289,8 @@ class PostController extends Controller
         ->with('count_binh_luan', $count_binh_luan)->with('binh_luan_goc', $binh_luan_goc)
         ->with('binh_luan_traloi', $binh_luan_traloi)->with('binh_luan_bv', $binh_luan_bv)
         ->with('binh_luan_no_get', $binh_luan_no_get)->with('binh_luan_thich_no_get', $binh_luan_thich_no_get)
-        ->with('bai_viet_luu', $bai_viet_luu)->with('binh_luan_luu_no_get', $binh_luan_luu_no_get);
+        ->with('bai_viet_luu', $bai_viet_luu)->with('binh_luan_luu_no_get', $binh_luan_luu_no_get)
+        ->with('hashtag', $hashtag);
     }
 
     public function find_baidang_binhluan($BL_MA){ ///
@@ -263,24 +301,94 @@ class PostController extends Controller
     }
 
     /**
-     * Sửa bài đăng
+     * Sửa bài đăng (*****)
      */
-    public function edit(Post $bai_dang)
-    {
-        //
+    public function edit(Post $bai_dang){ //Không dùng
     }
 
-    public function update(Request $request, Post $bai_dang)
-    {
-        //
+    public function update(Request $request, Post $bai_dang){ ///
+        $this->AuthLogin_BT($bai_dang);
+
+        $userLog = Session::get('userLog');
+        //Bài viết
+        DB::table('bai_viet')
+        ->where('BV_MA', $bai_dang->BV_MA)
+        ->update([ 
+            'BV_TIEUDE' => $request->BV_TIEUDE,
+            'BV_NOIDUNG' => $request->BV_NOIDUNG,
+            'BV_TRANGTHAI' => 'Chưa duyệt',
+            'HP_MA' => $request->HP_MA ? $request->HP_MA : null
+        ]);
+
+        //Của bài viết
+        $hashtag_bai_viet = DB::table('cua_bai_viet')->where('BV_MA', $bai_dang->BV_MA)
+        ->delete();
+
+        $hashtags = json_decode($request->input('hashtags'), true);
+        $hashtagsNew = json_decode($request->input('hashtagsNew'), true);
+
+        if ($hashtags && is_array($hashtags)) {
+            foreach ($hashtags as $item) {
+                DB::table('cua_bai_viet')->insert([
+                    'BV_MA' => $bai_dang->BV_MA,
+                    'H_HASHTAG' => $item['name']
+                ]);
+            }
+        } 
+        if ($hashtagsNew && is_array($hashtagsNew)) {
+            foreach ($hashtagsNew as $items_new) {
+                DB::table('hashtag')->insert([
+                    'H_HASHTAG' => $items_new['name']
+                ]);
+
+                DB::table('cua_bai_viet')->insert([
+                    'BV_MA' => $bai_dang->BV_MA,
+                    'H_HASHTAG' => $items_new['name']
+                ]);
+            }
+        } 
+
+        //File đính kèm
+        $linkFile = json_decode($request->input('linkFile'), true);
+        $collection = 'FILE_DINH_KEM';
+        
+        if($linkFile && is_array($linkFile)){   
+            foreach ($linkFile as $file) {
+                $this->firestoreClient->addDocument($collection, [
+                    'BV_MA' =>  $bai_dang->BV_MA,  
+                    'BL_MA' =>  0,
+                    'FDK_DUONGDAN'=> $file['link'],
+                    'FDK_TEN' => $file['name'],
+                    'ND_GUI_MA' => 0,
+                    'ND_NHAN_MA' =>  0,
+                    'TN_REALTIME'=> null,
+                    'TN_THOIGIANGUI' => null,
+                ]);
+                //if($fileSend) ; else báo lỗi
+            }
+        }
+        
+        //return Redirect::to('trang-chu');
+        Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật bài viết thành công!']);
+        return;
     }
 
     /**
      * Xoá bài đăng
      */
-    public function destroy(Post $bai_dang)
-    {
-        //
+    public function destroy(Post $bai_dang){ ///
+        $this->AuthLogin_BTwQTV($bai_dang);
+
+        $userLog = Session::get('userLog');
+        //Bài viết
+        DB::table('bai_viet')
+        ->where('BV_MA', $bai_dang->BV_MA)
+        ->update([ 
+            'BV_TRANGTHAI' => 'Đã xoá'
+        ]);
+
+        Session::put('alert', ['type' => 'success', 'content' => 'Xoá bài viết thành công!']);
+        return;
     }
 
     /**

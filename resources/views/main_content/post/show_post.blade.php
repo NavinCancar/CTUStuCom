@@ -18,6 +18,10 @@
             }
             Session::put('alert',null);
           ?>
+          <div class="text-notice text-notice-danger alert alert-danger" id="deletepost-alert-danger" style="display: none">
+            Xoá bài viết thất bại!
+            <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
+          </div>
           <hr>
           @if($isBlock != 1)
             @foreach($bai_viet as $key => $bv)
@@ -25,18 +29,29 @@
               <div class="card">
                 <div class="card-body p-4">
                   <div class="mb-3 mb-sm-0">
-                    <p>
-                      <a href="{{URL::to('/tai-khoan/'.$bv->ND_MA)}}" class="text-body">
-                        <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="40" height="40" class="rounded-circle">
-                        <b>{{$bv->ND_HOTEN}}</b> 
-                      </a>
-                      @if($bv->VT_MA != 3)
-                        <span class="badge-sm bg-warning rounded-pill"><i>{{$bv->VT_TEN}}</i></span>
+                    <div class="dropdown">
+                      <span>
+                        <a href="{{URL::to('/tai-khoan/'.$bv->ND_MA)}}" class="text-body">
+                          <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="40" height="40" class="rounded-circle">
+                          <b>{{$bv->ND_HOTEN}}</b> 
+                        </a>
+                        @if($bv->VT_MA != 3)
+                          <span class="badge-sm bg-warning rounded-pill"><i>{{$bv->VT_TEN}}</i></span>
+                        @endif
+                        đã đăng vào {{date('H:i', strtotime($bv->BV_THOIGIANDANG))}} ngày {{date('d/m/Y', strtotime($bv->BV_THOIGIANDANG))}}
+                      </span>
+                    
+                      @if($userLog && $userLog->ND_MA == $bv->ND_MA)
+                      <i class="fas fa-ellipsis-v cursor-pointer float-end" data-bs-toggle="dropdown"></i>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#suabaiviet">Sửa bài viết</a>
+                      </li>
+                        <li><a class="dropdown-item" id="xoabai-btn">Xoá bài viết</a></li>
+                      </ul>
                       @endif
-                      đã đăng vào {{date('H:i', strtotime($bv->BV_THOIGIANDANG))}} ngày {{date('d/m/Y', strtotime($bv->BV_THOIGIANDANG))}}
-                    </p>
+                    </div>
                     <h5 class="card-title fw-semibold post-title">{{$bv->BV_TIEUDE}}</h5>
-                    <span class="limited-lines">{!! nl2br(e($bv->BV_NOIDUNG)) !!}</span>
+                    <span class="">{!! nl2br(e($bv->BV_NOIDUNG)) !!}</span>
 
                     <!-- Images Container -->
                     <div id="images-container" class="m-2 mt-3 mb-3 position-relative">
@@ -314,6 +329,202 @@
 
 
     @if($isBlock != 1)
+    <!-- The Modal -->
+    <div class="modal" id="suabaiviet">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Sửa bài viết</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+          <div class="text-notice text-notice-danger alert alert-danger" id="sua-danger" style="display: none">
+              Cập nhật bài viết thất bại
+              <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
+            </div>
+          <form id="them" method="post" enctype="multipart/form-data">
+            {{ csrf_field() }}
+            <div class="mb-3">
+              <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
+              <input type="text" class="form-control mb-3" placeholder="Nhập tiêu đề" id="title" value="{{$bv->BV_TIEUDE}}" name="BV_TIEUDE">
+
+              <label class="form-label">Nội dung <span class="text-danger">(*)</span>:</label>
+              <textarea class="form-control mb-3" rows="5" id="comment" name="BV_NOIDUNG"
+                placeholder="Nhập nội dung" id="desc">{{$bv->BV_NOIDUNG}}</textarea>
+
+              <div class="mb-3">
+                <label for="hashtag_input" class="form-label">Hashtag đính kèm <span class="text-danger">(tối đa 5 hashtag *)</span>:</label>
+                <div class="output"></div>
+                <input class="basic" name="BV_HASHTAG" placeholder="Hashtag đính kèm"/>
+
+                <input type="hidden" name="hashtags" id="hashtagsInput" value="">
+                <input type="hidden" name="hashtagsNew" id="hashtagsNewInput" value="">
+              </div>
+
+              <div class="mb-3">
+                <div id="old-FDK" style="display: none;">
+                  <label for="formFileMultiple" class="form-label">Các file đính kèm đang có:</label>
+                  <div id="u-images-container" class="m-2 mt-3 mb-3 position-relative"></div>
+                  <div id="u-files-container" class=" m-2 mt-3"></div>
+                </div>
+
+                <label for="formFileMultiple" class="form-label">Các file bổ sung (nếu có):</label>
+                <label for="file-input" class="ms-3 text-muted" style="cursor: pointer;">
+                  <span class="btn btn-link" style="text-decoration: none;"><i class="fas fa-paperclip"></i> Thêm file</span>
+                </label>
+                <!-- Input type file ẩn -->
+                <input name="TN_FDK[]" type="file" id="file-input" style="display: none" multiple accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx"/>
+                <input type="hidden" name="linkFile" id="linkFileInput" value="">
+                <!-- Files Container -->
+                <div id="selected-files-container" class=" m-2"></div>
+                <!-- Images Container -->
+                <div  id="selected-images-container" class="m-2 mb-3 position-relative"></div>
+              </div>
+
+              <label for="exampleDataList" class="form-label">Học phần liên quan (nếu có):</label>
+              <input class="form-control" list="datalistOptions" id="exampleDataList"
+                placeholder="Tìm kiếm học phần" name="HP_MA" <?php if($bv->HP_MA) echo 'value="'.$bv->HP_MA.'"'; ?>>
+              <datalist id="datalistOptions">
+              @foreach($hoc_phan as $key => $hp)
+                <option value="{{$hp->HP_MA}}">{{ $hp->HP_TEN }}</option>
+              @endforeach
+              </datalist>
+              
+            </div>
+            <button type="button" class="btn btn-primary float-sm-end" id="dangbai-btn">Sửa bài</button>
+            <button type="button" class="btn btn-outline-primary float-sm-end me-2" onclick="location.reload();">Hoàn tác</button>
+            <div class="text-center" style="display: none;" id="spinner">
+                <div class="spinner-border text-primary"></div>
+            </div>
+          </form>
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer"></div>
+
+        </div>
+      </div>
+    </div>
+    @endif
+
+    @if($isBlock != 1)
+
+    <!--XỬ LÝ HASHTAG START-->
+    <script src="{{asset('public/js/tokenfield.web.js')}}"></script>
+    
+    <script>
+      //Thêm bài
+      const myItems = [
+        <?php 
+          foreach($hashtag as $key => $h){
+            echo "{ name: '".$h->H_HASHTAG."' }, ";
+          }
+        ?>
+      ];
+      const instance = new Tokenfield({
+        el: document.querySelector('.basic'),
+        items: myItems,
+
+        form: true, // Listens to reset event
+        mode: 'tokenfield', // tokenfield or list.
+        addItemOnBlur: false,
+        addItemsOnPaste: false,
+        keepItemsOrder: true,
+        setItems: [
+          <?php
+          foreach($hashtag_bai_viet as $key => $hbvt){
+            echo "{ name: '".$hbvt->H_HASHTAG."' }, ";
+          }
+          ?>
+        ], // array of pre-selected items
+        newItems: true,
+        multiple: true,
+        maxItems: 5,
+        minLength: 1,
+        keys: {
+          17: 'ctrl',
+          16: 'shift',
+          91: 'meta',
+          8: 'delete', // Backspace
+          27: 'esc',
+          37: 'left',
+          38: 'up',
+          39: 'right',
+          40: 'down',
+          46: 'delete',
+          65: 'select', // A
+          67: 'copy', // C
+          88: 'cut', // X
+          9: 'delimiter', // Tab
+          13: 'delimiter', // Enter
+          108: 'delimiter' // Numpad Enter
+        },
+        matchRegex: '{value}',
+        matchFlags: 'i',
+        matchStart: false,
+        matchEnd: false,
+        delimiters: [], // array of strings
+        copyProperty: 'name',
+        copyDelimiter: ', ',
+        placeholder: null,
+        inputType: 'text',
+        minChars: 0,
+        maxSuggest: 10,
+        maxSuggestWindow: 10,
+        filterSetItems: true,
+        filterMatchCase: false,
+        singleInput: false, // true, 'selector', or an element.
+        singleInputValue: 'name',
+        singleInputDelimiter: ', ',
+        itemLabel: 'name',
+        itemName: 'items',
+        newItemName: 'items_new',
+        itemValue: 'name',
+        newItemValue: 'name',
+        itemData: 'name',
+        validateNewItem: null
+      });
+
+      /*
+      const instance = new Tokenfield({
+            el: document.querySelector('.basic'),
+            remote: {
+              type: 'GET', // GET or POST
+              url: null, // Full url.
+              queryParam: 'q', // query parameter
+              delay: 300, // delay in ms
+              timestampParam: 't',
+              params: {},
+              headers: {}
+            },
+      });*/
+
+      //******** UPDATE FUTURE: Gợi ý hashtag chọn: Sự kiện thay đổi trạng thái của tokenfield, hiển thị cả item lẫn
+      /*instance.on('change', () => {
+        const selectedItems = instance.getItems();
+        const inputElement = document.querySelector('.basic');
+        const outputDiv = document.querySelector('.output');
+        //outputDiv.innerHTML = `Mục đã chọn: ${selectedItems.map(item => item.name).join(', ')}`;
+        outputDiv.innerHTML = '';
+        selectedItems.forEach(function(item) {
+          if (item.isNew) {
+              outputDiv.innerHTML += `New: ${item.name}<br>`;
+          } else {
+              outputDiv.innerHTML += `Select: ${item.name}<br>`;
+          }
+        });
+
+        //if(selectedItems!=null){
+        //  inputElement.removeAttribute('required');
+        //}
+      });*/
+    </script>
+    <!--XỬ LÝ HASHTAG END-->
+
     <script type="module">
         //|-----------------------------------------------------
         //|KHAI BÁO FIRESTORE
@@ -348,7 +559,256 @@
         const imagesContainer = document.getElementById('images-container');
         var fileSaved = [];
 
+        const ufilesContainer = document.getElementById('u-files-container');
+        const uimagesContainer = document.getElementById('u-images-container');
+        var fileDelete = [];
         $(document).ready(function() {
+          //|*****************************************************
+          //|SỬA BÀI VIẾT START
+          //|*****************************************************
+          //BIẾN CHO UPLOAD ẢNH
+          const fileInput = document.getElementById('file-input');
+          const selectedFilesContainer = document.getElementById('selected-files-container');
+          const selectedImagesContainer = document.getElementById('selected-images-container');
+          var dontUse = [];
+          $('#dangbai-btn').click(function(e) {
+              e.preventDefault();
+
+              const selectedItems = instance.getItems();
+              var form = $(this).closest('form');
+              var BV_TIEUDE = form.find('input[name="BV_TIEUDE"]').val();
+              var BV_NOIDUNG = form.find('textarea[name="BV_NOIDUNG"]').val();
+
+              form.find('input[name="BV_TIEUDE"]').css('border-color', '');
+              form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
+              form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+
+              if(BV_TIEUDE == ""){
+                form.find('input[name="BV_TIEUDE"]').css('border-color', '#FA896B');
+              }
+              else if(BV_NOIDUNG == ""){
+                form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '#FA896B');
+              }
+              else if(selectedItems.length==0){
+                form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '#FA896B');
+              }
+              else{
+                // Hiển thị thông báo xác nhận
+                var confirmation = confirm("Bài viết của bạn sẽ bị xét duyệt lại khi cập nhật. Xác nhận cập nhật?");
+                
+                if (confirmation) {
+                  //|-----------------------------------------------------
+                  //|XỬ LÝ LINK FILE
+                  //|-----------------------------------------------------
+                  //Cho nút gửi xoay
+                  document.getElementById('dangbai-btn').style.display = 'none';
+                  document.getElementById('spinner').style.display = 'block';
+
+                  var urlFile = [];
+                  var TN_FDK = fileInput.files;
+
+                  if(TN_FDK.length > 0 && TN_FDK.length > dontUse.length){//Gửi có file
+                      (async () => {
+
+                          for (var i = 0; i < TN_FDK.length; i++) {
+                              //console.log("Selected File " + (i) + ": " + TN_FDK[i].name);
+                              if (dontUse.indexOf(i) !== -1) {
+                                  // console.log(i + " đã tồn tại trong mảng dontUse.");
+                                  //Không xử lý
+                              } else {
+                                  //console.log(i + " không tồn tại trong mảng dontUse.");
+                                  const file = TN_FDK[i];
+                                  
+                                  //STORAGE---------------------------------------
+                                  const name = `${Date.now()}_${file.name}`;
+                                  const folder = 'files';
+                                  const fullPath = `${folder}/${name}`;
+
+                                  //const storageRef = ref(storage, name); //Đường dẫn trực tiếp
+                                  const storageRef = ref(storage, fullPath);
+                                  //console.log('file: ',file);
+
+                                  await uploadBytes(storageRef, file);
+                                  const downloadURL = await getDownloadURL(storageRef); //Link file để add vào csdl
+                                  //console.log('Uploaded file:', downloadURL);
+                                  urlFile.push({name: name, link: downloadURL});
+                              }
+                          }
+                          document.getElementById('linkFileInput').value = JSON.stringify(urlFile);
+                          
+                          selectedFilesContainer.innerHTML = '';
+                          selectedImagesContainer.innerHTML = '';
+                          $("input[name^='TN_FDK']").val("");
+                          
+                          const checkDelete = DeleteFile();
+                          if(checkDelete) TagAndForm ();
+                      })().catch((error) => {
+                          console.error('Error uploading file:', error);
+                      });
+                      //console.log("Xoá: ", dontUse);
+                  }
+                  else{ //Gửi không có file
+                    const checkDelete = DeleteFile();
+                    if(checkDelete) TagAndForm ();
+                  }
+
+                  function DeleteFile (){
+                      for (var i = 0; i < fileDelete.length; i++) {
+                        (async () => {
+                            await deleteDoc(doc(db, "FILE_DINH_KEM", fileDelete[i]));
+                        })().catch((error) => {
+                            document.getElementById('dangbai-btn').style.display = 'block';
+                            document.getElementById('spinner').style.display = 'none';
+                            document.getElementById('sua-danger').style.display = 'block';
+                            console.error("Error in delete script: ", error);
+                            return 0;
+                        });
+                      }
+                      // Trả về 1 nếu không có lỗi
+                      return 1;
+                  }
+        
+                  function TagAndForm (){
+                    //|-----------------------------------------------------
+                    //|XỬ LÝ HASHTAG
+                    //|-----------------------------------------------------
+                    var hashtagItems = [];
+                    var hashtagItemsNew = [];
+
+                    selectedItems.forEach(function(hashtag) {
+                      if (hashtag.isNew) {
+                        hashtagItemsNew.push(hashtag);
+                      } else {
+                        hashtagItems.push(hashtag);
+                      }
+                    });
+                    document.getElementById('hashtagsInput').value = JSON.stringify(hashtagItems);
+                    document.getElementById('hashtagsNewInput').value = JSON.stringify(hashtagItemsNew);
+
+                    //|-----------------------------------------------------
+                    //|GỬI FORM
+                    //|-----------------------------------------------------
+                    var HP_MA = form.find('input[name="HP_MA"]').val();
+                    var linkFile = form.find('input[name="linkFile"]').val();
+                    var hashtags = form.find('input[name="hashtags"]').val();
+                    var hashtagsNew = form.find('input[name="hashtagsNew"]').val();
+                    var _token = $('input[name="_token"]').val(); 
+                    /*console.log("BV_TIEUDE:", BV_TIEUDE);
+                    console.log("BV_NOIDUNG:", BV_NOIDUNG);
+                    console.log("HP_MA:", HP_MA);
+                    console.log("linkFile:", linkFile);
+                    console.log("hashtags:", hashtags);
+                    console.log("hashtagsNew:", hashtagsNew);*/
+                    
+                    $.ajax({
+                      url: '{{URL::to('/bai-dang/'.$BV_MA)}}',
+                      type: 'PUT',
+                      data: {
+                        BV_TIEUDE: BV_TIEUDE,
+                        BV_NOIDUNG: BV_NOIDUNG,
+                        HP_MA: HP_MA,
+                        linkFile: linkFile,
+                        hashtags: hashtags,
+                        hashtagsNew: hashtagsNew,
+                        _token: _token // Include the CSRF token in the data
+                      },
+                      success: function(response) {
+                          $('#them')[0].reset();
+                          document.getElementById('dangbai-btn').style.display = 'block';
+                          document.getElementById('spinner').style.display = 'none';
+                          form.find('input[name="BV_TIEUDE"]').css('border-color', '');
+                          form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
+                          form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+                          //console.log('Thành công');
+
+                          window.location.href = '{{URL::to('/')}}';
+                      },
+                      error: function(error) {
+                          document.getElementById('dangbai-btn').style.display = 'block';
+                          document.getElementById('spinner').style.display = 'none';
+                          document.getElementById('sua-danger').style.display = 'block';
+                          console.log(error);
+                      }
+                    });
+
+                  }
+                }
+              }
+          });
+          
+          //|*****************************************************
+          //|UPLOAD FILE START
+          //|*****************************************************
+          $('#file-input').on('click', function() {
+              $("input[name='TN_FDK']").val("");
+              dontUse = [];
+          });
+          $('#file-input').on('change', function() {
+
+              selectedFilesContainer.innerHTML = '';
+              selectedImagesContainer.innerHTML = '';
+
+              if (fileInput.files.length > 0) {
+                  for (let i = 0; i < fileInput.files.length; i++) {
+                      const file = fileInput.files[i];
+                      const fileType = file.type;
+                      console.log(file);
+                      // Kiểm tra loại file
+                      if (fileType.startsWith('image/')) {
+                          // Image
+                          const imageUrl = URL.createObjectURL(file);
+                          var divData = 
+                              '<span data-value="'+i+'" class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
+                              '    <img src="'+imageUrl+'" width="100px" height="100px" alt="Banner Image" class="d-block mx-auto">' +
+                              '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn" style="transform: translateX(-50%);"><i class="fas fa-times"></i></button>' +
+                              '</span>';
+                          selectedImagesContainer.insertAdjacentHTML('beforeend', divData);
+                      } else{
+                          var divData = 
+                              '<span data-value="'+i+'" class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">';
+                          if (fileType.startsWith('application/pdf')) {// PDF
+                              divData += '    <i class="fas fa-file-pdf fs-5 me-2"></i> ';
+                          }
+                          else if (fileType.startsWith('application/msword') || fileType.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) { //Word
+                              divData += '    <i class="fas fa-file-word fs-5 me-2"></i> ';
+                          }
+                          else if (fileType.startsWith('application/vnd.ms-excel') || fileType.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {// Excel
+                              divData += '    <i class="fas fa-file-excel fs-5 me-2"></i> ';
+                          }
+                          else if (fileType.startsWith('application/vnd.ms-powerpoint') || fileType.startsWith('application/vnd.openxmlformats-officedocument.presentationml.presentation')) {// Powerpoint
+                              divData += '    <i class="fas fa-file-powerpoint fs-5 me-2"></i> ';
+                          }
+                          else{
+                              divData += '    <i class="fas fa-file fs-5 me-2"></i> ';
+                          }
+                              divData += file.name + 
+                              '    <button class="btn btn-secondary btn-sm file-item-btn"><i class="fas fa-times"></i></button>' +
+                              '</span>';
+                          selectedFilesContainer.insertAdjacentHTML('beforeend', divData);
+                      }
+                  }
+              }
+
+              $('.file-item-btn').on('click', function() {
+                  const fileItem = $(this).closest('.file-item');
+                  const dataValue = fileItem.data('value');
+
+                  fileItem.remove();
+                  dontUse.push(dataValue);
+
+                  // Gán giá trị của mảng vào một input ẩn trong form $dontUseArray = json_decode($request->input('dontUse'));
+                  // document.getElementById('dontUseInput').value = JSON.stringify(dontUse);
+                  console.log("Xoá " + dataValue + ": " + dontUse);
+              });
+          });
+          //|*****************************************************
+          //|UPLOAD FILE END
+          //|*****************************************************  
+          
+          //|*****************************************************
+          //|SỬA BÀI VIẾT END
+          //|*****************************************************
+
           //|-----------------------------------------------------
           //|DANH SÁCH FILE NGƯỜI DÙNG ĐÃ LƯU
           //|-----------------------------------------------------
@@ -385,6 +845,10 @@
 
             const querySnapshotfile = await getDocs(qfile);
         
+            if (!querySnapshotfile.empty) {
+              var oldFDK = document.getElementById('old-FDK');
+              oldFDK.style.display = 'block';
+            }
             querySnapshotfile.forEach((doc) => {
                 const fileName = doc.data().FDK_TEN;
                 const fileLink = doc.data().FDK_DUONGDAN;
@@ -396,14 +860,25 @@
                       '<span class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
                       '  <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
                       '    <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
-                      '  </a>' +
+                      '  </a>' ;
+                    
+                    var divDataShow = divData +
                       '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
-                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
-                    else  divData += '    <i class="fas fa-bookmark"></i>';
-                    divData += 
+                    if (fileSaved.includes(doc.id)) divDataShow += '    <i class="fas fa-vote-yea"></i>';
+                    else  divDataShow += '    <i class="fas fa-bookmark"></i>';
+                    divDataShow += 
                       '  </button>' +
                       '</span>';
-                    imagesContainer.insertAdjacentHTML('afterbegin', divData);
+                    imagesContainer.insertAdjacentHTML('afterbegin', divDataShow);
+
+
+                    var divDataUpdate = divData +
+                      '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn delete-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
+                    divDataUpdate += 
+                      '    <i class="fas fa-times"></i>'
+                      '  </button>' +
+                      '</span>';
+                    uimagesContainer.insertAdjacentHTML('afterbegin', divDataUpdate);
                 }
                 else{
                     var divData =
@@ -427,14 +902,24 @@
                     }
 
                     divData += fileName +
-                        ' </a>' +
+                        ' </a>';
+                    var divDataShow = divData +
                         '  <button class="btn btn-secondary btn-sm file-item-btn bookmark-file" data-fdk-id-value="'+doc.id+'">' ;
-                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea background-indigo"></i>';
-                    else  divData += '    <i class="fas fa-bookmark"></i>';
-                    divData += 
+                    if (fileSaved.includes(doc.id)) divDataShow += '    <i class="fas fa-vote-yea background-indigo"></i>';
+                    else  divDataShow += '    <i class="fas fa-bookmark"></i>';
+                    divDataShow += 
                         '  </button>' +
                         '</span>';
-                    filesContainer.insertAdjacentHTML('afterbegin', divData);
+                    filesContainer.insertAdjacentHTML('afterbegin', divDataShow);
+
+
+                    var divDataUpdate = divData +
+                        '  <button class="btn btn-secondary btn-sm file-item-btn delete-file" data-fdk-id-value="'+doc.id+'">' ;
+                    divDataUpdate += 
+                      '    <i class="fas fa-times"></i>'
+                      '  </button>' +
+                      '</span>';
+                    uimagesContainer.insertAdjacentHTML('afterbegin', divDataUpdate);
                 } 
             });
           })().catch((error) => {
@@ -712,7 +1197,7 @@
           //|GỌI FORM REPLY COMMENT
           //|-----------------------------------------------------
           <?php if($userLog){ ?> 
-           $('.reply-comment-btn').click(function(e) {
+            $('.reply-comment-btn').click(function(e) {
               e.preventDefault();
 
               //Chỉ 1 form rep comment tồn tại
@@ -1388,6 +1873,67 @@
           <?php } ?>
           //|*****************************************************
           //|REPORT BÌNH LUẬN END
+          //|*****************************************************
+
+
+          //|*****************************************************
+          //|XOÁ FILE TRONG BÀI VIẾT START 
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.delete-file', function(e) {
+                e.preventDefault();
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var FDK_MA = $(this).data('fdk-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                const fileItem = $(this).closest('.file-item');
+
+                fileItem.remove();
+                fileDelete.push(FDK_MA);
+
+                var oldFDK = document.getElementById('old-FDK');
+                var oldFDKfile = oldFDK.querySelectorAll('[data-fdk-id-value]');
+
+                if (oldFDKfile.length == 0) {
+                  oldFDK.style.display = 'none';
+                }
+                    
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|XOÁ FILE TRONG BÀI VIẾT END
+          //|*****************************************************
+          //|*****************************************************
+          //|XOÁ BÀI VIẾT START 
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $('#xoabai-btn').click(function(e) {
+                e.preventDefault();
+                // Hiển thị hộp thoại xác nhận
+                var isConfirmed = window.confirm('Bạn có chắc chắn muốn xoá bài viết này không?');
+
+                if (isConfirmed) {
+                    var _token = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                      url: '{{URL::to('/bai-dang/'.$BV_MA)}}',
+                      type: 'DELETE',
+                      data: {
+                        _token: _token // Include the CSRF token in the data
+                      },
+                      success: function(response) {
+                        window.location.href = '{{URL::to('/')}}';
+                      },
+                      error: function(error) {
+                          document.getElementById('deletepost-alert-danger').style.display = 'block';
+                          console.log(error);
+                      }
+                    });
+                } 
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|XOÁ BÀI VIẾT END
           //|*****************************************************
         });
     </script>

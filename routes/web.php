@@ -61,7 +61,7 @@ Route::get('/bo-chan/{ND_MA}', 'App\Http\Controllers\UserSysController@destroy_c
 
 
 //Post: Bài đăng
-Route::resource('/bai-dang', 'App\Http\Controllers\PostController')->except(['create']); ///ok: C_ND
+Route::resource('/bai-dang', 'App\Http\Controllers\PostController')->except(['create','edit']); ///ok: C_ND
 Route::get('/bai-dang-binh-luan={BL_MA}', 'App\Http\Controllers\PostController@find_baidang_binhluan');
 
 //-- Bài viết và thích
