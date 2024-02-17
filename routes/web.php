@@ -77,7 +77,7 @@ Route::post('/bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@ba
 
 
 //Comment: Bình luận
-Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(['create']); ///ok: C_ND
+Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(['create','edit']); ///ok: C_ND
 
 //-- Bình luận và thích
 Route::get('/thich-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_thich'); ///ok

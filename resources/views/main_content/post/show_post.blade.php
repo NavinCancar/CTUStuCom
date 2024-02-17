@@ -181,12 +181,22 @@
                                 </a>
                               </div>
                               <div class="pt-1" style="width:100%">
-                                  <a href="{{URL::to('/tai-khoan/'.$blg->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0">{{$blg->ND_HOTEN}}</span></a>
-                                  @if($blg->VT_MA != 3)
-                                    <span class="badge-sm bg-warning rounded-pill"><i>{{$blg->VT_TEN}}</i></span>
-                                  @endif
-                                  <br>
-                                  <span class="text-muted">{{$blg->BL_NOIDUNG}}</span>
+                                  <div class="dropdown">
+                                      <a href="{{URL::to('/tai-khoan/'.$blg->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0">{{$blg->ND_HOTEN}}</span></a>
+                                      @if($blg->VT_MA != 3)
+                                        <span class="badge-sm bg-warning rounded-pill"><i>{{$blg->VT_TEN}}</i></span>
+                                      @endif
+
+                                      @if($userLog && $userLog->ND_MA == $blg->ND_MA)
+                                      <i class="fas fa-ellipsis-v cursor-pointer float-end" data-bs-toggle="dropdown"></i>
+                                      <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item update-comment"  data-bs-toggle="modal" data-bs-target="#suabinhluan" data-comment-id-value="{{$blg->BL_MA}}" data-comment-content-value ="{{$blg->BL_NOIDUNG}}">Sửa bình luận</a>
+                                      </li>
+                                        <li><a class="dropdown-item xoabinhluan-btn" data-comment-id-value="{{$blg->BL_MA}}">Xoá bình luận</a></li>
+                                      </ul>
+                                      @endif
+                                  </div>
+                                  <span class="text-muted">{!! nl2br(e($blg->BL_NOIDUNG)) !!}</span>
 
                                   <!-- Images Container -->
                                   <div id="images-container-{{$blg->BL_MA}}" class="mt-3 mb-3 position-relative"></div>
@@ -251,12 +261,22 @@
                                     </a>
                                   </div>
                                   <div class="pt-1" style="width:100%">
-                                      <a href="{{URL::to('/tai-khoan/'.$bltl->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0">{{$bltl->ND_HOTEN}}</span></a>
-                                      @if($bltl->VT_MA != 3)
-                                        <span class="badge-sm bg-warning rounded-pill"><i>{{$bltl->VT_TEN}}</i></span>
-                                      @endif
-                                      <br>
-                                      <span class="text-muted">{{$bltl->BL_NOIDUNG}}</span>
+                                      <div class="dropdown">
+                                          <a href="{{URL::to('/tai-khoan/'.$bltl->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0">{{$bltl->ND_HOTEN}}</span></a>
+                                          @if($bltl->VT_MA != 3)
+                                            <span class="badge-sm bg-warning rounded-pill"><i>{{$bltl->VT_TEN}}</i></span>
+                                          @endif
+
+                                          @if($userLog && $userLog->ND_MA == $bltl->ND_MA)
+                                          <i class="fas fa-ellipsis-v cursor-pointer float-end" data-bs-toggle="dropdown"></i>
+                                          <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item update-comment"  data-bs-toggle="modal" data-bs-target="#suabinhluan" data-comment-id-value="{{$bltl->BL_MA}}" data-comment-content-value ="{{$bltl->BL_NOIDUNG}}">Sửa bình luận</a>
+                                          </li>
+                                            <li><a class="dropdown-item xoabinhluan-btn" data-comment-id-value="{{$bltl->BL_MA}}">Xoá bình luận</a></li>
+                                          </ul>
+                                          @endif
+                                      </div>
+                                      <span class="text-muted">{!! nl2br(e($bltl->BL_NOIDUNG)) !!}</span>
 
                                       <!-- Images Container -->
                                       <div id="images-container-{{$bltl->BL_MA}}" class="mt-3 mb-3 position-relative"></div>
@@ -333,7 +353,7 @@
 
 
     @if($isBlock != 1)
-    <!-- The Modal -->
+    <!-- MODAL BÀI VIẾT START -->
     <div class="modal" id="suabaiviet">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -400,7 +420,7 @@
               
             </div>
             <button type="button" class="btn btn-primary float-sm-end" id="dangbai-btn">Sửa bài</button>
-            <button type="button" class="btn btn-outline-primary float-sm-end me-2" onclick="location.reload();">Hoàn tác</button>
+            <button type="button" class="btn btn-outline-primary float-sm-end me-2" id="hoantac-btn" onclick="location.reload();">Hoàn tác</button>
             <div class="text-center" style="display: none;" id="spinner">
                 <div class="spinner-border text-primary"></div>
             </div>
@@ -413,6 +433,67 @@
         </div>
       </div>
     </div>
+    <!-- MODAL BÀI VIẾT END -->
+
+    <!-- MODAL BÌNH LUẬN START -->
+    <div class="modal" id="suabinhluan">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Sửa bình luận</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+          <div class="text-notice text-notice-danger alert alert-danger" id="modal-alert-danger-c" style="display: none">
+              Cập nhật bình luận thất bại
+              <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
+            </div>
+          <form id="them-c" method="post" enctype="multipart/form-data">
+            {{ csrf_field() }}
+            <div class="mb-3">
+              <textarea class="form-control mb-3" rows="5" name="BL_NOIDUNG-c"
+                placeholder="Nhập nội dung"></textarea>
+
+              <div class="mb-3">
+                <div id="old-FDK-c" style="display: none;">
+                  <label for="formFileMultiple" class="form-label">Các file đính kèm đang có:</label>
+                  <div id="u-images-container-c" class="m-2 mt-3 mb-3 position-relative"></div>
+                  <div id="u-files-container-c" class=" m-2 mt-3"></div>
+                </div>
+
+                <label for="formFileMultiple" class="form-label">Các file bổ sung (nếu có):</label>
+                <label for="file-input-c" class="ms-3 text-muted" style="cursor: pointer;">
+                  <span class="btn btn-link" style="text-decoration: none;"><i class="fas fa-paperclip"></i> Thêm file</span>
+                </label>
+                <!-- Input type file ẩn -->
+                <input name="TN_FDK-c[]" type="file" id="file-input-c" style="display: none" multiple accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx"/>
+                <input type="hidden" name="linkFile-c" id="linkFileInput-c" value="">
+                <!-- Files Container -->
+                <div id="selected-files-container-c" class=" m-2"></div>
+                <!-- Images Container -->
+                <div  id="selected-images-container-c" class="m-2 mb-3 position-relative"></div>
+              </div>
+              
+            </div>
+            <button type="button" class="btn btn-primary float-sm-end" id="dangbai-btn-c">Sửa bình luận</button>
+            <button type="button" class="btn btn-outline-primary float-sm-end me-2" id="hoantac-btn-c" onclick="location.reload();">Hoàn tác</button>
+            <div class="text-center" style="display: none;" id="spinner-c">
+                <div class="spinner-border text-primary"></div>
+            </div>
+          </form>
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer"></div>
+
+        </div>
+      </div>
+    </div>
+    <!-- MODAL BÌNH LUẬN END -->
     @endif
 
     @if($isBlock != 1)
@@ -566,6 +647,10 @@
         const ufilesContainer = document.getElementById('u-files-container');
         const uimagesContainer = document.getElementById('u-images-container');
         var fileDelete = [];
+
+        const ufilesContainerC = document.getElementById('u-files-container-c');
+        const uimagesContainerC = document.getElementById('u-images-container-c');
+        var fileDeleteC = [];
         $(document).ready(function() {
           //|*****************************************************
           //|SỬA BÀI VIẾT START
@@ -606,6 +691,7 @@
                   //|-----------------------------------------------------
                   //Cho nút gửi xoay
                   document.getElementById('dangbai-btn').style.display = 'none';
+                  document.getElementById('hoantac-btn').style.display = 'none';
                   document.getElementById('spinner').style.display = 'block';
 
                   var urlFile = [];
@@ -662,6 +748,7 @@
                             await deleteDoc(doc(db, "FILE_DINH_KEM", fileDelete[i]));
                         })().catch((error) => {
                             document.getElementById('dangbai-btn').style.display = 'block';
+                            document.getElementById('hoantac-btn').style.display = 'block';
                             document.getElementById('spinner').style.display = 'none';
                             document.getElementById('modal-alert-danger').style.display = 'block';
                             console.error("Error in delete script: ", error);
@@ -719,6 +806,7 @@
                       success: function(response) {
                           $('#them')[0].reset();
                           document.getElementById('dangbai-btn').style.display = 'block';
+                          document.getElementById('hoantac-btn').style.display = 'block';
                           document.getElementById('spinner').style.display = 'none';
                           form.find('input[name="BV_TIEUDE"]').css('border-color', '');
                           form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
@@ -729,6 +817,7 @@
                       },
                       error: function(error) {
                           document.getElementById('dangbai-btn').style.display = 'block';
+                          document.getElementById('hoantac-btn').style.display = 'block';
                           document.getElementById('spinner').style.display = 'none';
                           document.getElementById('modal-alert-danger').style.display = 'block';
                           console.log(error);
@@ -812,6 +901,307 @@
           //|*****************************************************
           //|SỬA BÀI VIẾT END
           //|*****************************************************
+
+
+          //|*****************************************************
+          //|CẬP NHẬT BÌNH LUẬN START 
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.update-comment', function(e) {
+                e.preventDefault();
+                const selectedFilesContainerC = document.getElementById('selected-files-container-c');
+                const selectedImagesContainerC = document.getElementById('selected-images-container-c');
+                selectedFilesContainerC.innerHTML = '';
+                selectedImagesContainerC.innerHTML = '';
+
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var element = $(this);
+                var BL_MA = $(this).data('comment-id-value');
+                var BL_NOIDUNG_content = $(this).data('comment-content-value');
+                
+                var form = $('#them-c');
+                form[0].reset();
+                form.find('textarea[name="BL_NOIDUNG-c"]').css('border-color', '');
+                form.find('textarea[name="BL_NOIDUNG-c"]').val(BL_NOIDUNG_content);
+
+                //|-----------------------------------------------------
+                //|HIỆN FILE BÌNH LUẬN
+                //|-----------------------------------------------------
+                (async () => {
+                  const qfileC = query(
+                      collection(db, "FILE_DINH_KEM"), 
+                      where('ND_NHAN_MA', '==', 0),
+                      where('ND_GUI_MA', '==', 0),
+                      where('BV_MA', '==', 0),
+                      where('BL_MA', '==', BL_MA),
+                      where('TN_THOIGIANGUI', '==', null)
+                  );
+
+                  const querySnapshotfileC = await getDocs(qfileC);
+              
+                  if (!querySnapshotfileC.empty) {
+                    var oldFDKC = document.getElementById('old-FDK-c');
+                    oldFDKC.style.display = 'block';
+                  }
+                  querySnapshotfileC.forEach((doc) => {
+                      const fileName = doc.data().FDK_TEN;
+                      const fileLink = doc.data().FDK_DUONGDAN;
+                      const fileExtension = fileName.split('.').pop().toLowerCase();
+
+                      if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                          // Image
+                          var divData =
+                            '<span class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
+                            '  <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
+                            '    <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
+                            '  </a>' +
+                            '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn delete-file-c" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' +
+                            '    <i class="fas fa-times"></i>'
+                            '  </button>' +
+                            '</span>';
+                          uimagesContainerC.insertAdjacentHTML('afterbegin', divData);
+                      }
+                      else{
+                          var divData =
+                              '<span class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">' +    
+                              ' <a target="_blank" class="text-white" href="'+fileLink+'">';
+
+                          if (['pdf'].includes(fileExtension)){
+                              divData += '    <i class="fas fa-file-pdf fs-5 me-2"></i> ';
+                          }
+                          else if (['docx', 'doc'].includes(fileExtension)) {
+                              divData += '    <i class="fas fa-file-word fs-5 me-2"></i> ';
+                          }
+                          else if (['xlsx', 'xls'].includes(fileExtension)) {
+                              divData += '    <i class="fas fa-file-excel fs-5 me-2"></i> ';
+                          }
+                          else if (['ppt', 'pptx'].includes(fileExtension)) {
+                              divData += '    <i class="fas fa-file-powerpoint fs-5 me-2"></i> ';
+                          }
+                          else {
+                              divData += '    <i class="fas fa-file fs-5 me-2"></i> ';
+                          }
+
+                          divData += fileName +
+                              ' </a>' +
+                              '  <button class="btn btn-secondary btn-sm file-item-btn delete-file-c" data-fdk-id-value="'+doc.id+'">' +
+                            '    <i class="fas fa-times"></i>'
+                            '  </button>' +
+                            '</span>';
+                          uimagesContainerC.insertAdjacentHTML('afterbegin', divData);
+                      } 
+                  });
+                })().catch((error) => {
+                    console.error("Error in script: ", error);
+                });
+
+
+                //|*****************************************************
+                //|SỬA BÌNH LUẬN START
+                //|*****************************************************
+                //BIẾN CHO UPLOAD ẢNH
+                const fileInputC = document.getElementById('file-input-c');
+                var dontUseC = [];
+                $('#dangbai-btn-c').click(function(e) {
+                    e.preventDefault();
+
+                    var BL_NOIDUNG = form.find('textarea[name="BL_NOIDUNG-c"]').val();
+                    form.find('textarea[name="BL_NOIDUNG-c"]').css('border-color', '');
+
+                    if(BL_NOIDUNG == ""){
+                      form.find('textarea[name="BL_NOIDUNG-c"]').css('border-color', '#FA896B');
+                    }
+                    else{
+                        //|-----------------------------------------------------
+                        //|XỬ LÝ LINK FILE
+                        //|-----------------------------------------------------
+                        //Cho nút gửi xoay
+                        document.getElementById('dangbai-btn-c').style.display = 'none';
+                        document.getElementById('hoantac-btn-c').style.display = 'none';
+                        document.getElementById('spinner-c').style.display = 'block';
+
+                        var urlFile = [];
+                        var TN_FDK = fileInputC.files;
+
+                        if(TN_FDK.length > 0 && TN_FDK.length > dontUseC.length){//Gửi có file
+                            (async () => {
+
+                                for (var i = 0; i < TN_FDK.length; i++) {
+                                    //console.log("Selected File " + (i) + ": " + TN_FDK[i].name);
+                                    if (dontUseC.indexOf(i) !== -1) {
+                                        // console.log(i + " đã tồn tại trong mảng dontUse.");
+                                        //Không xử lý
+                                    } else {
+                                        //console.log(i + " không tồn tại trong mảng dontUse.");
+                                        const file = TN_FDK[i];
+                                        
+                                        //STORAGE---------------------------------------
+                                        const name = `${Date.now()}_${file.name}`;
+                                        const folder = 'files';
+                                        const fullPath = `${folder}/${name}`;
+
+                                        //const storageRef = ref(storage, name); //Đường dẫn trực tiếp
+                                        const storageRef = ref(storage, fullPath);
+                                        //console.log('file: ',file);
+
+                                        await uploadBytes(storageRef, file);
+                                        const downloadURL = await getDownloadURL(storageRef); //Link file để add vào csdl
+                                        //console.log('Uploaded file:', downloadURL);
+                                        urlFile.push({name: name, link: downloadURL});
+                                    }
+                                }
+                                document.getElementById('linkFileInput-c').value = JSON.stringify(urlFile);
+                                
+                                selectedFilesContainer.innerHTML = '';
+                                selectedImagesContainer.innerHTML = '';
+                                $("input[name='TN_FDK-c']").val("");
+                                
+                                const checkDeleteC = DeleteFileC();
+                                if(checkDeleteC) TagAndFormC ();
+                            })().catch((error) => {
+                                console.error('Error uploading file:', error);
+                            });
+                            //console.log("Xoá: ", dontUse);
+                        }
+                        else{ //Gửi không có file
+                          const checkDeleteC = DeleteFileC();
+                          if(checkDeleteC) TagAndFormC ();
+                        }
+
+                        function DeleteFileC (){
+                            for (var i = 0; i < fileDeleteC.length; i++) {
+                              (async () => {
+                                  await deleteDoc(doc(db, "FILE_DINH_KEM", fileDeleteC[i]));
+                              })().catch((error) => {
+                                  document.getElementById('dangbai-btn-c').style.display = 'block';
+                                  document.getElementById('hoantac-btn-c').style.display = 'block';
+                                  document.getElementById('spinner-c').style.display = 'none';
+                                  document.getElementById('modal-alert-danger-c').style.display = 'block';
+                                  console.error("Error in delete script: ", error);
+                                  return 0;
+                              });
+                            }
+                            // Trả về 1 nếu không có lỗi
+                            return 1;
+                        }
+              
+                        function TagAndFormC (){
+                          
+                          //|-----------------------------------------------------
+                          //|GỬI FORM
+                          //|-----------------------------------------------------
+                          var linkFileC = form.find('input[name="linkFile-c"]').val();
+                          var _token = $('input[name="_token"]').val(); 
+
+                          $.ajax({
+                            url: '{{URL::to('/binh-luan/')}}'+'/'+BL_MA,
+                            type: 'PUT',
+                            data: {
+                              BL_NOIDUNG: BL_NOIDUNG,
+                              linkFile: linkFileC,
+                              _token: _token // Include the CSRF token in the data
+                            },
+                            success: function(response) {
+                                $('#them-c')[0].reset();
+                                document.getElementById('dangbai-btn-c').style.display = 'block';
+                                document.getElementById('hoantac-btn-c').style.display = 'block';
+                                document.getElementById('spinner-c').style.display = 'none';
+                                form.find('textarea[name="BL_NOIDUNG-c"]').css('border-color', '');
+                                //console.log('Thành công');
+                                window.location.href = '{{URL::to('/bai-dang/'.$BV_MA.'?binh-luan=')}}'+BL_MA;
+                            },
+                            error: function(error) {
+                                document.getElementById('dangbai-btn-c').style.display = 'block';
+                                document.getElementById('hoantac-btn-c').style.display = 'block';
+                                document.getElementById('spinner-c').style.display = 'none';
+                                document.getElementById('modal-alert-danger-c').style.display = 'block';
+                                console.log(error);
+                            }
+                          });
+
+                        }
+                    }
+                });
+                
+                //|*****************************************************
+                //|UPLOAD FILE START
+                //|*****************************************************
+                $('#file-input-c').on('click', function() {
+                    $("input[name='TN_FDK-c']").val("");
+                    dontUseC = [];
+                });
+                $('#file-input-c').on('change', function() {
+
+                    selectedFilesContainerC.innerHTML = '';
+                    selectedImagesContainerC.innerHTML = '';
+
+                    if (fileInputC.files.length > 0) {
+                        for (let i = 0; i < fileInputC.files.length; i++) {
+                            const file = fileInputC.files[i];
+                            const fileType = file.type;
+                            console.log(file);
+                            // Kiểm tra loại file
+                            if (fileType.startsWith('image/')) {
+                                // Image
+                                const imageUrl = URL.createObjectURL(file);
+                                var divData = 
+                                    '<span data-value="'+i+'" class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
+                                    '    <img src="'+imageUrl+'" width="100px" height="100px" alt="Banner Image" class="d-block mx-auto">' +
+                                    '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn" style="transform: translateX(-50%);"><i class="fas fa-times"></i></button>' +
+                                    '</span>';
+                                selectedImagesContainerC.insertAdjacentHTML('beforeend', divData);
+                            } else{
+                                var divData = 
+                                    '<span data-value="'+i+'" class="badge bg-secondary rounded-3 fw-semiboldms-0 p-1 px-3 me-2 mb-2 text-white file-item">';
+                                if (fileType.startsWith('application/pdf')) {// PDF
+                                    divData += '    <i class="fas fa-file-pdf fs-5 me-2"></i> ';
+                                }
+                                else if (fileType.startsWith('application/msword') || fileType.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) { //Word
+                                    divData += '    <i class="fas fa-file-word fs-5 me-2"></i> ';
+                                }
+                                else if (fileType.startsWith('application/vnd.ms-excel') || fileType.startsWith('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {// Excel
+                                    divData += '    <i class="fas fa-file-excel fs-5 me-2"></i> ';
+                                }
+                                else if (fileType.startsWith('application/vnd.ms-powerpoint') || fileType.startsWith('application/vnd.openxmlformats-officedocument.presentationml.presentation')) {// Powerpoint
+                                    divData += '    <i class="fas fa-file-powerpoint fs-5 me-2"></i> ';
+                                }
+                                else{
+                                    divData += '    <i class="fas fa-file fs-5 me-2"></i> ';
+                                }
+                                    divData += file.name + 
+                                    '    <button class="btn btn-secondary btn-sm file-item-btn"><i class="fas fa-times"></i></button>' +
+                                    '</span>';
+                                selectedFilesContainerC.insertAdjacentHTML('beforeend', divData);
+                            }
+                        }
+                    }
+
+                    $('.file-item-btn').on('click', function() {
+                        const fileItem = $(this).closest('.file-item');
+                        const dataValue = fileItem.data('value');
+
+                        fileItem.remove();
+                        dontUseC.push(dataValue);
+
+                        // Gán giá trị của mảng vào một input ẩn trong form $dontUseArray = json_decode($request->input('dontUse'));
+                        // document.getElementById('dontUseInput').value = JSON.stringify(dontUse);
+                        console.log("Xoá " + dataValue + ": " + dontUseC);
+                    });
+                });
+                //|*****************************************************
+                //|UPLOAD FILE END
+                //|*****************************************************  
+                
+                //|*****************************************************
+                //|SỬA BÌNH LUẬN END
+                //|*****************************************************
+              });
+          <?php } ?>
+          //|*****************************************************
+          //|CẬP NHẬT BÌNH LUẬN END
+          //|*****************************************************
+
+
 
           //|-----------------------------------------------------
           //|DANH SÁCH FILE NGƯỜI DÙNG ĐÃ LƯU
@@ -1942,6 +2332,74 @@
           <?php } ?>
           //|*****************************************************
           //|XOÁ BÀI VIẾT END
+          //|*****************************************************
+
+
+          //|*****************************************************
+          //|XOÁ FILE TRONG BÌNH LUẬN START 
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $(document).on('click', '.delete-file-c', function(e) {
+                e.preventDefault();
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var FDK_MA = $(this).data('fdk-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                const fileItem = $(this).closest('.file-item');
+
+                fileItem.remove();
+                fileDeleteC.push(FDK_MA);
+
+                var oldFDKC = document.getElementById('old-FDK-c');
+                var oldFDKfileC = oldFDKC.querySelectorAll('[data-fdk-id-value]');
+
+                if (oldFDKfileC.length == 0) {
+                  oldFDKC.style.display = 'none';
+                }
+                    
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|XOÁ FILE TRONG BÌNH LUẬN END
+          //|*****************************************************
+          //|*****************************************************
+          //|XOÁ BÌNH LUẬN START 
+          //|*****************************************************
+          <?php if($userLog) { ?>
+            $('.xoabinhluan-btn').click(function(e) {
+                e.preventDefault();
+                // Hiển thị hộp thoại xác nhận
+                var isConfirmed = window.confirm('Bạn có chắc chắn muốn xoá bình luận này không?');
+
+                if (isConfirmed) {
+                    var element = $(this);
+                    var BL_MA = $(this).data('comment-id-value');
+                
+                    var _token = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                      url: '{{URL::to('/binh-luan/')}}'+'/'+BL_MA,
+                      type: 'DELETE',
+                      data: {
+                        _token: _token // Include the CSRF token in the data
+                      },
+                      success: function(response) {
+                        window.location.href = '{{URL::to('/bai-dang/'.$BV_MA)}}';
+                      },
+                      error: function(error) {
+                        $('#alert-danger span').html('Xoá bình luận thất bại');
+                        $('html, body').animate({
+                            scrollTop: $('#alert-danger').offset().top
+                        });
+                        document.getElementById('alert-danger').style.display = 'block';
+                          console.log(error);
+                      }
+                    });
+                } 
+            });
+          <?php } ?>
+          //|*****************************************************
+          //|XOÁ BÌNH LUẬN END
           //|*****************************************************
         });
     </script>

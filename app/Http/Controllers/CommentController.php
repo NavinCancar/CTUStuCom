@@ -22,9 +22,11 @@ class CommentController extends Controller
     HÀM HỖ TRỢ
     - Hàm xây dựng FireStore
     - Kiểm tra đăng nhập: Người dùng => (*)
-    
+    - Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+    - Kiểm tra đăng nhập: Bản thân => (*****)
+
     NGƯỜI DÙNG
-    - Tạo bình luận mới(*), 
+    - Tạo bình luận mới(*), Sửa bình luận (*****), Xoá bình luận (****)
     - Bình luận - thích (*), Bình luận - lưu (*), Bình luận - báo cáo (*)
     |--------------------------------------------------------------------------
     */
@@ -50,6 +52,38 @@ class CommentController extends Controller
     }
 
 
+    /**
+     * Kiểm tra đăng nhập: Bản thân => (*****)
+     */
+    public function AuthLogin_BT($binh_luan){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->ND_MA == $binh_luan->ND_MA){
+            }
+            else{
+                return Redirect::to('bai-dang/'.$binh_luan->BV_MA)->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
+
+
+    /**
+     * Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+     */
+    public function AuthLogin_BTwQTV($binh_luan){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->VT_MA == 1 || $userLog->ND_MA == $binh_luan->ND_MA){
+            }
+            else{
+                return Redirect::to('bai-dang/'.$binh_luan->BV_MA)->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
     /*
     |--------------------------------------------------------------------------
     | NGƯỜI DÙNG
@@ -116,24 +150,60 @@ class CommentController extends Controller
     }
 
     /**
-     * Sửa comment
+     * Sửa comment (*****)
      */
-    public function edit(Comment $binh_luan)
-    {
-        //
+    public function edit(Comment $binh_luan){ //Không dùng
     }
 
-    public function update(Request $request, Comment $binh_luan)
-    {
-        //
+    public function update(Request $request, Comment $binh_luan){ ///
+        $this->AuthLogin_BT($binh_luan);
+
+        $userLog = Session::get('userLog');
+
+        //Bình luận
+        DB::table('binh_luan')
+        ->where('BL_MA', $binh_luan->BL_MA)
+        ->update([ 
+            'BL_NOIDUNG' => $request->BL_NOIDUNG
+        ]);
+
+        //File đính kèm
+        $linkFile = json_decode($request->input('linkFile'), true);
+        $collection = 'FILE_DINH_KEM';
+        
+        if($linkFile && is_array($linkFile)){   
+            foreach ($linkFile as $file) {
+                $this->firestoreClient->addDocument($collection, [
+                    'BV_MA' =>  0,  
+                    'BL_MA' =>  $binh_luan->BL_MA,
+                    'FDK_DUONGDAN'=> $file['link'],
+                    'FDK_TEN' => $file['name'],
+                    'ND_GUI_MA' => 0,
+                    'ND_NHAN_MA' =>  0,
+                    'TN_REALTIME'=> null,
+                    'TN_THOIGIANGUI' => null,
+                ]);
+                //if($fileSend) ; else báo lỗi
+            }
+        }
+
+        Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật bình luận thành công!']);
+        return;
     }
 
     /**
-     * Xoá comment
+     * Xoá comment (****)
      */
-    public function destroy(Comment $binh_luan)
-    {
-        //
+    public function destroy(Comment $binh_luan){ ///
+        $this->AuthLogin_BTwQTV($binh_luan);
+
+        $userLog = Session::get('userLog');
+        //Bài viết
+        DB::table('binh_luan')
+        ->where('BL_MA', $binh_luan->BL_MA)->delete();
+
+        Session::put('alert', ['type' => 'success', 'content' => 'Xoá bình luận thành công!']);
+        return;
     }
 
     /**
