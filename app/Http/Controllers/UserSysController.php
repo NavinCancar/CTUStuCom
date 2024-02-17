@@ -339,7 +339,7 @@ class UserSysController extends Controller
                 ]);
         }
 
-        Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật thành công!']);
+        Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật tài khoản thành công!']);
         //return response()->json(['ND_MA' => $tai_khoan->ND_MA], 200);
         //return response()->json($responseData);
         return;

@@ -18,8 +18,12 @@
             }
             Session::put('alert',null);
           ?>
+          <div class="text-notice text-notice-success alert alert-success" id="alert-success" style="display: none">
+            <span></span> 
+            <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
+          </div>
           <div class="text-notice text-notice-danger alert alert-danger" id="alert-danger" style="display: none">
-            Cập nhật thất bại!
+            <span></span> 
             <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
           </div>
           <hr>
@@ -244,6 +248,10 @@
                             $('#submit-form').hide();
                             $('#spinner').hide();
 
+                            $('#alert-danger span').html('Vô hiệu hoá tài khoản thất bại');
+                            $('html, body').animate({
+                                scrollTop: $('#alert-danger').offset().top
+                            });
                             document.getElementById('alert-danger').style.display = 'block';
                             console.log(error);
                         }
@@ -251,6 +259,10 @@
 
                     });
                 })().catch((error) => {
+                    $('#alert-danger span').html('Vô hiệu hoá tài khoản thất bại');
+                    $('html, body').animate({
+                        scrollTop: $('#alert-danger').offset().top
+                    });
                     document.getElementById('alert-danger').style.display = 'block';
                     console.error("Error in script: ", error);
                 });
@@ -409,6 +421,10 @@
                           form.find('input[name="ND_HOTEN"]').css('border-color', '');
                           form.find('input[name="ND_EMAIL"]').css('border-color', '');
 
+                          $('#alert-danger span').html('Cập nhật tài khoản thất bại');
+                          $('html, body').animate({
+                              scrollTop: $('#alert-danger').offset().top
+                          });
                           document.getElementById('alert-danger').style.display = 'block';
                           console.log(error);
                       }
@@ -416,6 +432,10 @@
 
                   });
               })().catch((error) => {
+                  $('#alert-danger span').html('Cập nhật tài khoản thất bại');
+                  $('html, body').animate({
+                      scrollTop: $('#alert-danger').offset().top
+                  });
                   document.getElementById('alert-danger').style.display = 'block';
                   console.error("Error in script: ", error);
               });

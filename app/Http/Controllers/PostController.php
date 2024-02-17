@@ -22,9 +22,11 @@ class PostController extends Controller
     HÀM HỖ TRỢ
     - Hàm xây dựng FireStore
     - Kiểm tra đăng nhập: Người dùng => (*)
+    - Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+    - Kiểm tra đăng nhập: Bản thân => (*****)
     
     NGƯỜI DÙNG
-    - Tạo bài đăng mới(*), Xem chi tiết bài đăng
+    - Tạo bài đăng mới(*), Xem chi tiết bài đăng, Sửa bài đăng (*****), Xoá bài đăng (****)
     - Bài viết - thích (*), Bài viết - lưu (*), Bài viết - báo cáo (*)
     |--------------------------------------------------------------------------
     */
@@ -374,7 +376,7 @@ class PostController extends Controller
     }
 
     /**
-     * Xoá bài đăng
+     * Xoá bài đăng (****)
      */
     public function destroy(Post $bai_dang){ ///
         $this->AuthLogin_BTwQTV($bai_dang);
