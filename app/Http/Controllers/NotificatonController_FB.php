@@ -221,18 +221,20 @@ class NotificatonController_FB extends Controller
                 $bvgoc = DB::table('binh_luan')
                 ->where('BL_MA', $bv->BL_TRALOI_MA)->select('ND_MA')->first();
 
-                $documentRoot = 'THONG_BAO/'.$bvgoc->ND_MA.'binhluan'.$BV_MA;
-                $stringchu = $nguoidung_top_binhluan->ND_HOTEN.' đã trả lời bình luận của bạn trong bài viết "'.$bai_viet->BV_TIEUDE.'"';
-                if ($baiviet_binhluan_count-1 > 0) $stringchu .= ' và cùng thảo luận với '.($baiviet_binhluan_count-1).' người khác';
-                $this->firestoreClient->updateDocument($documentRoot, [
-                    'ND_NHAN_MA' =>  $bvgoc->ND_MA,  
-                    'TB_ANHDINHKEM' => $nguoidung_top_binhluan->ND_ANHDAIDIEN,
-                    'TB_NOIDUNG' =>  $stringchu,
-                    'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA),
-                    'TB_LOAI' => 'bình luận bài viết',
-                    'TB_TRANGTHAI' => 0,
-                    'TB_REALTIME' => new FirestoreTimestamp,
-                ]);
+                if($bvgoc->ND_MA != $userLog->ND_MA){
+                    $documentRoot = 'THONG_BAO/'.$bvgoc->ND_MA.'binhluan'.$BV_MA;
+                    $stringchu = $nguoidung_top_binhluan->ND_HOTEN.' đã trả lời bình luận của bạn trong bài viết "'.$bai_viet->BV_TIEUDE.'"';
+                    if ($baiviet_binhluan_count-1 > 0) $stringchu .= ' và cùng thảo luận với '.($baiviet_binhluan_count-1).' người khác';
+                    $this->firestoreClient->updateDocument($documentRoot, [
+                        'ND_NHAN_MA' =>  $bvgoc->ND_MA,  
+                        'TB_ANHDINHKEM' => $nguoidung_top_binhluan->ND_ANHDAIDIEN,
+                        'TB_NOIDUNG' =>  $stringchu,
+                        'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA),
+                        'TB_LOAI' => 'bình luận bài viết',
+                        'TB_TRANGTHAI' => 0,
+                        'TB_REALTIME' => new FirestoreTimestamp,
+                    ]);
+                }
             }
         }
     }

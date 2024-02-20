@@ -32,7 +32,7 @@ class PostController extends Controller
     - Bài viết - thích (*), Bài viết - lưu (*), Bài viết - báo cáo (*)
 
     KIỂM DUYỆT VIÊN
-    - Xem danh sách bài đăng (**), Duyệt báo cáo bài đăng (**)
+    - Xem danh sách bài đăng (**), Duyệt báo cáo bài đăng (**), Cập nhật trạng thái bài viết (**)
     |--------------------------------------------------------------------------
     */
 
@@ -599,31 +599,32 @@ class PostController extends Controller
                         <form class="modal-title row" style="width: 95%">
                             <span class="d-flex justify-content-between align-items-center col-sm-9 mb-2">
                                 <b>Trạng thái bài viết:</b>
-                                <select name="BV_TRANGTHAI"  class="form-select w-75">
-                                    <option'; 
-                                        if($bv->BV_TRANGTHAI == 'Chưa duyệt') $output .=' selected '; 
-                                        $output .= ' value="Chưa duyệt">Chưa duyệt</option>
-                                    <option';
+                                <select name="BV_TRANGTHAI" ';
+                                if($bv->BV_TRANGTHAI == 'Đã xoá') $output .=' disabled '; 
+                                $output .= 'class="form-select w-75">';
+                                    if($bv->BV_TRANGTHAI == 'Chưa duyệt') $output .='<option selected value="Chưa duyệt">Chưa duyệt</option>';
+                        $output .= '<option';
                                         if($bv->BV_TRANGTHAI == 'Đã duyệt') $output .=' selected '; 
                                         $output .= ' value="Đã duyệt">Đã duyệt</option>
                                     <option';
                                         if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') $output .=' selected '; 
                                         $output .= ' value="Yêu cầu chỉnh sửa">Yêu cầu chỉnh sửa</option>
                                     <option'; 
-                                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Không qua xét duyệt') $output .=' selected '; 
-                                        $output .= ' value="Không qua xét duyệt">Không qua xét duyệt</option>
-                                    <option';
-                                        if($bv->BV_TRANGTHAI == 'Đã xoá') $output .=' selected '; 
-                                        $output .= ' value="Đã xoá">Đã xoá</option>
-                                </select>
+                                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Không duyệt và ẩn đi') $output .=' selected '; 
+                                        $output .= ' value="Không duyệt và ẩn đi">Không duyệt và ẩn đi</option>';
+                                    if($bv->BV_TRANGTHAI == 'Đã xoá') $output .='<option selected value="Đã xoá">Đã xoá</option>';    
+                        $output .= '</select>
                             </span>
-                            <span'; if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Không qua xét duyệt') $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
+                            <span id="detail_BV_TRANGTHAI"'; 
+                            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Không duyệt và ẩn đi') 
+                            $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
+
                                 <span class="d-flex justify-content-between align-items-center">
                                     <b>Chi tiết trạng thái:</b>
                                     <input type="text" name="BV_NOIDUNG_TRANGTHAI" value="'. trim(strstr($bv->BV_TRANGTHAI, ':'), ': ') .'" class="form-control w-75">
                                 </span>
                             </span>
-                            <button type="button" class="btn btn-primary col-sm-3 mb-2">Cập nhật</button>
+                            <button type="button" id="update_BV_TRANGTHAI" class="btn btn-primary col-sm-3 mb-2">Cập nhật</button>
                         </form>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
@@ -645,8 +646,9 @@ class PostController extends Controller
                                 <b>'. $bv->ND_HOTEN .'</b> 
                             </a>';
                             if($bv->VT_MA != 3) $output .='<span class="badge-sm bg-warning rounded-pill"><i>'. $bv->VT_TEN .'</i></span>';
-                            $output .= ' đã gửi vào '. date('H:i', strtotime($bv->BV_THOIGIANTAO)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANTAO)) .'
-                            </div>
+                            if($bv->BV_THOIGIANDANG == null ) $output .= '<span class="thoigian"> đã gửi vào '. date('H:i', strtotime($bv->BV_THOIGIANTAO)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANTAO)).'</span>';
+                            else $output .= '<span class="thoigian"> đã đăng vào '. date('H:i', strtotime($bv->BV_THOIGIANDANG)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANDANG)).'</span>';
+                $output .= '</div>
 
                             <div class="mx-2">
                             <h5 class="card-title fw-semibold post-title">'. $bv->BV_TIEUDE .'</h5>
@@ -727,6 +729,68 @@ class PostController extends Controller
 
             return Response($output);
         }
+    }
+
+    /**
+     * Cập nhật trạng thái bài viết (**)
+     */
+    public function updateState(Request $request, $BV_MA){ ///
+        $this->AuthLogin_KDV();
+
+        $userLog = Session::get('userLog');
+        //Bài viết
+        DB::table('bai_viet')
+        ->where('BV_MA', $BV_MA)
+        ->update([ 
+            'BV_TRANGTHAI' => $request->BV_TRANGTHAI,
+        ]);
+
+        if($request->BV_TRANGTHAI == 'Đã duyệt'){
+            DB::table('bai_viet')
+            ->where('BV_MA', $BV_MA)
+            ->update([ 
+                'BV_THOIGIANDANG' => Carbon::now('Asia/Ho_Chi_Minh'),
+            ]);
+        }
+
+        $bv = DB::table('bai_viet')->where('bai_viet.BV_MA', '=', $BV_MA)->first();
+
+        $output = '';
+        $output .= 
+        '<span class="d-flex justify-content-between align-items-center col-sm-9 mb-2">
+                <b>Trạng thái bài viết:</b>
+                <select name="BV_TRANGTHAI" ';
+                if($bv->BV_TRANGTHAI == 'Đã xoá') $output .=' disabled '; 
+                $output .= 'class="form-select w-75">';
+                    if($bv->BV_TRANGTHAI == 'Chưa duyệt') $output .='<option selected value="Chưa duyệt">Chưa duyệt</option>';
+        $output .= '<option';
+                        if($bv->BV_TRANGTHAI == 'Đã duyệt') $output .=' selected '; 
+                        $output .= ' value="Đã duyệt">Đã duyệt</option>
+                    <option';
+                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') $output .=' selected '; 
+                        $output .= ' value="Yêu cầu chỉnh sửa">Yêu cầu chỉnh sửa</option>
+                    <option'; 
+                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Không duyệt và ẩn đi') $output .=' selected '; 
+                        $output .= ' value="Không duyệt và ẩn đi">Không duyệt và ẩn đi</option>';
+                    if($bv->BV_TRANGTHAI == 'Đã xoá') $output .='<option selected value="Đã xoá">Đã xoá</option>';    
+        $output .= '</select>
+            </span>
+            <span id="detail_BV_TRANGTHAI"'; 
+            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Không duyệt và ẩn đi') 
+            $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
+
+                <span class="d-flex justify-content-between align-items-center">
+                    <b>Chi tiết trạng thái:</b>
+                    <input type="text" name="BV_NOIDUNG_TRANGTHAI" value="'. trim(strstr($bv->BV_TRANGTHAI, ':'), ': ') .'" class="form-control w-75">
+                </span>
+            </span>
+            <button type="button" id="update_BV_TRANGTHAI" class="btn btn-primary col-sm-3 mb-2">Cập nhật</button>';
+        
+        $thoiGianGui = '';
+        if($request->BV_TRANGTHAI == 'Đã duyệt'){
+            $thoiGianGui = ' đã đăng vào '. date('H:i', strtotime($bv->BV_THOIGIANDANG)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANDANG));
+        }
+        return Response()->json(['output' => $output, 'thoiGianGui' => $thoiGianGui]);
     }
 
     /**

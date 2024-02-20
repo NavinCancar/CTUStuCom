@@ -164,7 +164,7 @@
                                         <tr data-post-id-value="{{$bv->BV_MA}}">
                                             <td>{{$bv->BV_MA}}</td>
                                             <td><span class="limited-lines">{{$bv->BV_NOIDUNG}}</span></td>
-                                            <td>
+                                            <td class="trangthai">
                                                 <?php 
                                                     if($bv->BV_TRANGTHAI == 'Chưa duyệt') echo '<span class="badge-sm bg-danger rounded-pill fs-2"><i>Chưa duyệt</i></span>'; 
                                                     else if($bv->BV_TRANGTHAI == 'Đã duyệt') echo '<span class="badge-sm bg-success rounded-pill fs-2"><i>Đã duyệt</i></span>';
@@ -323,6 +323,8 @@
 
             $(document).on('click', '.show-detail', function(e) {
                 e.preventDefault();
+                $('#modal-content').html('');
+
                 // Truy cập giá trị của tham số từ thuộc tính dữ liệu
                 var element = $(this);
                 var BV_MA = $(this).data('post-id-value');
@@ -330,9 +332,9 @@
                 $.ajax({
                     url: '{{URL::to('/chi-tiet-bai-dang/')}}' +'/'+ BV_MA,
                     type: 'GET',
-                    success: function(response) {
+                    success: function(response) { 
                         $('#modal-content').html(response);
-
+                        var defaultValue = $('select[name="BV_TRANGTHAI"]').val();
                         //|-----------------------------------------------------
                         //|HIỆN FILE BÀI VIẾT
                         //|-----------------------------------------------------
@@ -477,7 +479,92 @@
                             }
                             
                         });
-                        
+
+                        //|-----------------------------------------------------
+                        //|SELECT
+                        //|-----------------------------------------------------
+                        $('select[name="BV_TRANGTHAI"]').change(function() {
+                            $('input[name="BV_NOIDUNG_TRANGTHAI"]').css('border-color', '');
+
+                            var selectedValue = $(this).val();
+                            if(selectedValue == 'Yêu cầu chỉnh sửa' || selectedValue == 'Không duyệt và ẩn đi') $('#detail_BV_TRANGTHAI').show();
+                            else $('#detail_BV_TRANGTHAI').hide();
+                        });
+
+                        //|-----------------------------------------------------
+                        //|NGĂN GÕ : TRONG CHI TIẾT TRẠNG THÁI
+                        //|-----------------------------------------------------
+                        $('input[name="BV_NOIDUNG_TRANGTHAI"]').on('keydown', function(e) {
+                            if (e.key === ":") {
+                                e.preventDefault();
+                            }
+                        });
+
+                        //|*****************************************************
+                        //|CẬP NHẬT TRẠNG THÁI START 
+                        //|*****************************************************
+                        $('#update_BV_TRANGTHAI').click(function() {
+                            var form = $(this).closest('form');
+                            var BV_TRANGTHAI = form.find('select[name="BV_TRANGTHAI"]').val();
+                            var BV_NOIDUNG_TRANGTHAI = form.find('input[name="BV_NOIDUNG_TRANGTHAI"]').val();
+                            var _token = $('meta[name="csrf-token"]').attr('content');
+
+                            if(BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' && BV_NOIDUNG_TRANGTHAI == ''){
+                                form.find('input[name="BV_NOIDUNG_TRANGTHAI"]').css('border-color', '#FA896B');
+                            }
+                            else{
+                                if((BV_TRANGTHAI != defaultValue && BV_TRANGTHAI != 'Đã xoá') || BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' || BV_TRANGTHAI == 'Không duyệt và ẩn đi'){
+                                    $('.modal-header form').hide();
+                                    $('.modal-body').hide();
+                                    $('.modal-auto-load').show();
+
+                                    const BV_TRANGTHAI_get = BV_TRANGTHAI;
+
+                                    if(BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' || BV_TRANGTHAI == 'Không duyệt và ẩn đi'){
+                                        BV_TRANGTHAI = BV_TRANGTHAI + ': ' + BV_NOIDUNG_TRANGTHAI;
+                                    }
+                                    
+                                    $.ajax({
+                                    url: '{{URL::to('/cap-nhat-trang-thai-bai-dang/')}}' +'/'+ BV_MA,
+                                    type: 'POST',
+                                    data: {
+                                        BV_TRANGTHAI: BV_TRANGTHAI,
+                                        _token: _token 
+                                    },
+                                    success: function(response) {
+                                        form[0].reset();
+                                        $('.modal-header form').html(response.output);
+                                        if(response.thoiGianGui != '') $('span.thoigian').html(response.thoiGianGui);
+
+                                        var trangThaiNew = '';
+                                        if(BV_TRANGTHAI_get == 'Chưa duyệt') trangThaiNew = '<span class="badge-sm bg-danger rounded-pill fs-2"><i>Chưa duyệt</i></span>'; 
+                                        else if(BV_TRANGTHAI_get == 'Đã duyệt') trangThaiNew = '<span class="badge-sm bg-success rounded-pill fs-2"><i>Đã duyệt</i></span>';
+                                        else if(BV_TRANGTHAI_get == 'Đã xoá') trangThaiNew = '<span class="badge-sm bg-light rounded-pill fs-2"><i>Đã xoá</i></span>'; 
+                                        else trangThaiNew = '<span class="badge-sm bg-warning rounded-pill fs-2"><i>'+BV_TRANGTHAI_get+'</i></span>'; 
+                                        $('tr[data-post-id-value="' + BV_MA + '"]').find('td.trangthai').html(trangThaiNew);
+
+                                        $('.modal-auto-load').hide();
+                                        $('.modal-header form').show();
+                                        $('.modal-body').show();
+                                        $('#modal-alert-success').show();
+                                        $('#modal-alert-success span').html('Cập nhật trạng thái bài viết thành công');
+                                    },
+                                    error: function(error) {
+                                        $('.modal-auto-load').hide();
+                                        $('.modal-header form').show();
+                                        $('.modal-body').show();
+                                        $('#modal-alert-danger').show();
+                                        $('#modal-alert-danger span').html('Cập nhật trạng thái bài viết thất bại');
+                                        console.log(error);
+                                    }
+                                    });
+                                }
+                            }
+                            
+                        });
+                        //|*****************************************************
+                        //|CẬP NHẬT TRẠNG THÁI END 
+                        //|*****************************************************
                     },
                     error: function(error) {
                         console.log(error);

@@ -64,6 +64,7 @@ Route::get('/bo-chan/{ND_MA}', 'App\Http\Controllers\UserSysController@destroy_c
 Route::resource('/bai-dang', 'App\Http\Controllers\PostController')->except(['create','edit']); ///ok: C_ND
 Route::get('/bai-dang-binh-luan={BL_MA}', 'App\Http\Controllers\PostController@find_baidang_binhluan'); ///ok
 Route::get('/chi-tiet-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@index_detail'); ///
+Route::post('/cap-nhat-trang-thai-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@updateState'); ///
 
 //-- Bài viết và thích
 Route::get('/thich-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@baidang_thich'); ///ok

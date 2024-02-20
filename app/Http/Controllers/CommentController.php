@@ -194,7 +194,7 @@ class CommentController extends Controller
     }
 
     /**
-     * Sửa comment (****)
+     * Sửa bình luận (****)
      */
     public function edit(Comment $binh_luan){ //Không dùng
     }
@@ -236,7 +236,7 @@ class CommentController extends Controller
     }
 
     /**
-     * Xoá comment (*****)
+     * Xoá bình luận (*****)
      */
     public function destroy(Comment $binh_luan){ ///
         $this->AuthLogin_BTwKDV($binh_luan);

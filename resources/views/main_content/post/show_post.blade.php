@@ -42,7 +42,12 @@
                         @if($bv->VT_MA != 3)
                           <span class="badge-sm bg-warning rounded-pill"><i>{{$bv->VT_TEN}}</i></span>
                         @endif
+
+                        @if($bv->BV_THOIGIANDANG == null)
+                        đã gửi vào {{date('H:i', strtotime($bv->BV_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($bv->BV_THOIGIANTAO))}}
+                        @else
                         đã đăng vào {{date('H:i', strtotime($bv->BV_THOIGIANDANG))}} ngày {{date('d/m/Y', strtotime($bv->BV_THOIGIANDANG))}}
+                        @endif
                       </span>
                     
                       @if($userLog && $userLog->ND_MA == $bv->ND_MA)
