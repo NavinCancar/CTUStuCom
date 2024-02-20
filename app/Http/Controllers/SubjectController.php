@@ -150,7 +150,7 @@ class SubjectController extends Controller
     |--------------------------------------------------------------------------
     */
 
-/**
+    /**
      * Tất cả học phần (***)
      */
     public function index(){ ///

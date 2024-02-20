@@ -22,7 +22,7 @@ class MessageController_FB extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - Nhắn tin(*)
+    - Nhắn tin (*)
     |--------------------------------------------------------------------------
     */
     
@@ -45,7 +45,7 @@ class MessageController_FB extends Controller
     */
 
     /**
-     * Nhắn tin(*)
+     * Nhắn tin (*)
      */
 
     public function index(){ ///

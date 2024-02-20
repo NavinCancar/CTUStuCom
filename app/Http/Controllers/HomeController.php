@@ -18,7 +18,7 @@ class HomeController extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - Hiển thị trang chủ
+    - Hiển thị trang chủ, Kho lưu trữ (*)
     |--------------------------------------------------------------------------
     */
 
@@ -111,7 +111,7 @@ class HomeController extends Controller
 
 
     /**
-     * Kho lưu trữ
+     * Kho lưu trữ (*)
      */
     public function archive(){ ///
         $this->AuthLogin_ND();

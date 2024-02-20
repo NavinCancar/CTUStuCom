@@ -161,7 +161,7 @@
                                     </thead>
                                     <tbody>
                                         @foreach($bai_viet as $key => $bv)
-                                        <tr>
+                                        <tr data-post-id-value="{{$bv->BV_MA}}">
                                             <td>{{$bv->BV_MA}}</td>
                                             <td><span class="limited-lines">{{$bv->BV_NOIDUNG}}</span></td>
                                             <td>
@@ -173,9 +173,9 @@
                                                 ?>
                                             </td>
                                             <td>{{date('d/m/Y', strtotime($bv->BV_THOIGIANTAO))}}</td>
-                                            <td class="text-center"><?php 
+                                            <td class="text-center td_sl_baocao"><?php 
                                                 $count = $baiviet_baocao_noget->clone()->groupby('BV_MA')->where('BV_MA', $bv->BV_MA)->count(); 
-                                                if($count != 0) echo '<b class="cursor-pointer">'.$count.'&ensp;<i class="fas fa-flag"></i></b>'; 
+                                                if($count != 0) echo '<b class="cursor-pointer"><span class="sl_baocao">'.$count.'</span>&ensp;<i class="fas fa-flag"></i></b>'; 
                                             ?></td>
                                             <td>
                                                 <div class="d-flex justify-content-between">
@@ -272,6 +272,30 @@
         //-----------------------------------------------------------------------------------
         //***********************************************************************************
         //***********************************************************************************
+        
+        //|-----------------------------------------------------
+        //|FOCUS BÌNH LUẬN NẾU CÓ
+        //|-----------------------------------------------------
+        <?php 
+        $BV_MA_Focus = Session::get('BV_MA_Focus');
+        if($BV_MA_Focus) { 
+        ?>
+            var postIdValue = <?php echo $BV_MA_Focus ?>;
+
+            var trToFocus = document.querySelector(`tr[data-post-id-value="${postIdValue}"]`);
+            //console.log("focus:", trToFocus)
+            if (trToFocus) {
+                trToFocus.style.background = 'linear-gradient(to right, #ffffff00, #ffff0038, #ffff0038, #ffff0038, #ffffff00)';
+                trToFocus.tabIndex = 0;
+                trToFocus.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center', // Hoặc 'center', 'end', 'nearest'
+                });
+            }
+        <?php 
+            Session::put('BV_MA_Focus',null);
+        } 
+        ?>
 
         //|*****************************************************
         //|MỞ RỘNG CHI TIẾT BÀI VIẾT START 
@@ -421,6 +445,10 @@
                                     success: function(response) {
                                         bcDuyetValues.forEach(function(value) {
                                             $('div[data-report-nd-value="' + value + '"]').addClass('d-none');
+                                            
+                                            var slbaocao = parseInt($('tr[data-post-id-value="' + BV_MA + '"]').find('span.sl_baocao').text());
+                                            if(slbaocao-1==0) $('tr[data-post-id-value="' + BV_MA + '"]').find('td.td_sl_baocao').text('');
+                                            else $('tr[data-post-id-value="' + BV_MA + '"]').find('span.sl_baocao').text(slbaocao - 1);
                                         });
 
                                         var divsWithoutDnone = $('div[data-report-nd-value]').filter(function() {
@@ -429,7 +457,6 @@
 
                                         // Kiểm tra số lượng div tìm được
                                         if (divsWithoutDnone.length == 0) {
-                                            console.log('hide');
                                             $('#modal-baocao').hide();
                                         }
                                         else{

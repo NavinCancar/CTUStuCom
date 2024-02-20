@@ -75,15 +75,6 @@ class FileofUserController_FB extends Controller
         //return response()->json(['fileSend' => $fileSend]);
         return;
     }
-    
-    /**
-     * Danh sách file đính kèm của người dùng
-     */
-    public function index()
-    {
-        //
-    }
-
 
     /*
     |--------------------------------------------------------------------------

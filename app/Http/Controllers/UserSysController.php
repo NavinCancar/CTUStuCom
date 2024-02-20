@@ -24,15 +24,18 @@ class UserSysController extends Controller
     - Hàm xây dựng FireStore
     - Kiểm tra đăng nhập: Người dùng => (*)
     - Kiểm tra đăng nhập: Quản trị viên => (***)
-    - Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+    - Kiểm tra đăng nhập: Bản thân & quản trị viên => (******)
     
     NGƯỜI DÙNG
-    - Đối với cá nhân: Đăng nhập tài khoản, Đăng xuất tài khoản(*), Đăng ký tài khoản, 
-        Tài khoản cá nhân người dùng,
-        Cập nhật tài khoản người dùng (****), Vô hiệu hoá tài khoản người dùng (****),
-        Đổi mật khẩu (*)
+    - Đối với cá nhân: Đăng nhập tài khoản, Đăng xuất tài khoản (*), Đăng ký tài khoản, 
+      Tài khoản cá nhân người dùng, Cập nhật tài khoản người dùng (******), 
+      Vô hiệu hoá tài khoản người dùng (******), Đổi mật khẩu (*)
+
     - Đối với người dùng khác: Chặn người dùng (*), Theo dõi người dùng khác (*),
       Danh sách người dùng, Danh sách theo dõi, Danh sách người theo dõi, Danh sách chặn (*)
+
+    QUẢN TRỊ VIÊN
+    - Danh sách người dùng hệ thống (***)
     |--------------------------------------------------------------------------
     */
 
@@ -73,7 +76,7 @@ class UserSysController extends Controller
     }
 
     /**
-     * Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+     * Kiểm tra đăng nhập: Bản thân & quản trị viên => (******)
      */
     public function AuthLogin_BTwQTV($ma){ ///
         $userLog = Session::get('userLog');
@@ -133,7 +136,7 @@ class UserSysController extends Controller
     }
 
     /**
-     * Đăng xuất tài khoản(*)
+     * Đăng xuất tài khoản (*)
      */
     public function logout(){ ///
         $this->AuthLogin_ND();
@@ -266,7 +269,7 @@ class UserSysController extends Controller
     }
 
     /**
-     * Cập nhật tài khoản người dùng (****)
+     * Cập nhật tài khoản người dùng (******)
      */
     public function edit(UserSys $tai_khoan){///
         $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
@@ -346,7 +349,7 @@ class UserSysController extends Controller
     }
 
     /**
-     * Vô hiệu hoá tài khoản người dùng (****)
+     * Vô hiệu hoá tài khoản người dùng (******)
      */
     public function destroy(UserSys $tai_khoan){ ///
         $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
@@ -616,7 +619,7 @@ class UserSysController extends Controller
     */
 
     /**
-     * Danh sách người dùng hệ thống
+     * Danh sách người dùng hệ thống (***)
      */
     public function index(){ ///
         $this->AuthLogin_QTV();

@@ -24,12 +24,18 @@ class CommentController extends Controller
     - Hàm xây dựng FireStore
     - Kiểm tra đăng nhập: Người dùng => (*)
     - Kiểm tra đăng nhập: Kiểm duyệt viên => (**)
-    - Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
-    - Kiểm tra đăng nhập: Bản thân => (*****)
+    - Kiểm tra đăng nhập: Bản thân => (****)
+    - Kiểm tra đăng nhập: Bản thân & kiểm duyệt viên => (*****)
+    - Kiểm tra đăng nhập: Bản thân & quản trị viên => (******)
+    
 
     NGƯỜI DÙNG
-    - Tạo bình luận mới(*), Sửa bình luận (*****), Xoá bình luận (****)
+    - Tạo bình luận mới (*), Sửa bình luận (****), Xoá bình luận (*****)
     - Bình luận - thích (*), Bình luận - lưu (*), Bình luận - báo cáo (*)
+
+
+    KIỂM DUYỆT VIÊN
+    - Xem danh sách bình luận (**), Duyệt báo cáo bình luận (**)
     |--------------------------------------------------------------------------
     */
 
@@ -72,7 +78,7 @@ class CommentController extends Controller
 
 
     /**
-     * Kiểm tra đăng nhập: Bản thân => (*****)
+     * Kiểm tra đăng nhập: Bản thân => (****)
      */
     public function AuthLogin_BT($binh_luan){ ///
         $userLog = Session::get('userLog');
@@ -89,7 +95,24 @@ class CommentController extends Controller
 
 
     /**
-     * Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+     * Kiểm tra đăng nhập: Bản thân & kiểm duyệt viên => (*****)
+     */
+    public function AuthLogin_BTwKDV($binh_luan){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->VT_MA == 1 || $userLog->VT_MA == 2 || $userLog->ND_MA == $binh_luan->ND_MA){
+            }
+            else{
+                return Redirect::to('bai-dang/'.$binh_luan->BV_MA)->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
+
+    
+    /**
+     * Kiểm tra đăng nhập: Bản thân & quản trị viên => (******)
      */
     public function AuthLogin_BTwQTV($binh_luan){ ///
         $userLog = Session::get('userLog');
@@ -103,6 +126,8 @@ class CommentController extends Controller
             return Redirect::to('dang-nhap')->send();
         }
     }
+    
+    
     /*
     |--------------------------------------------------------------------------
     | NGƯỜI DÙNG
@@ -110,7 +135,7 @@ class CommentController extends Controller
     */
 
     /**
-     * Tạo bình luận mới(*)
+     * Tạo bình luận mới (*)
      */
     public function create(){ //Không dùng
     }
@@ -169,7 +194,7 @@ class CommentController extends Controller
     }
 
     /**
-     * Sửa comment (*****)
+     * Sửa comment (****)
      */
     public function edit(Comment $binh_luan){ //Không dùng
     }
@@ -211,10 +236,10 @@ class CommentController extends Controller
     }
 
     /**
-     * Xoá comment (****)
+     * Xoá comment (*****)
      */
     public function destroy(Comment $binh_luan){ ///
-        $this->AuthLogin_BTwQTV($binh_luan);
+        $this->AuthLogin_BTwKDV($binh_luan);
 
         $userLog = Session::get('userLog');
         //Bài viết
@@ -340,6 +365,11 @@ class CommentController extends Controller
         $this->AuthLogin_KDV();
 
         $userLog = Session::get('userLog');
+        
+        //Xử lý đường dẫn: http://localhost/ctustucom/binh-luan?binh-luan={binh_luan}
+        $binhLuanMa = request()->query('binh-luan');
+        if($binhLuanMa) Session::put('BL_MA_Focus', $binhLuanMa);
+        $binhLuanMa = null;
 
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
         $binh_luan = DB::table('binh_luan')
@@ -407,6 +437,7 @@ class CommentController extends Controller
                             </a>';
                             if($bl->VT_MA != 3) $output .='<span class="badge-sm bg-warning rounded-pill"><i>'. $bl->VT_TEN .'</i></span>';
                             $output .= ' đã gửi vào '. date('H:i', strtotime($bl->BL_THOIGIANTAO)) .' ngày '. date('d/m/Y', strtotime($bl->BL_THOIGIANTAO)) .'
+                            <button type="button" class="btn btn-danger xoabinhluan-btn btn-sm float-end"><i class="fa fa-times text-white text"></i> Xoá bình luận</button>
                             </div>
 
                             <div class="mx-2">

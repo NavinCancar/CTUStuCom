@@ -24,12 +24,15 @@ class PostController extends Controller
     - Hàm xây dựng FireStore
     - Kiểm tra đăng nhập: Người dùng => (*)
     - Kiểm tra đăng nhập: Kiểm duyệt viên => (**)
-    - Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
-    - Kiểm tra đăng nhập: Bản thân => (*****)
+    - Kiểm tra đăng nhập: Bản thân => (****)
+    - Kiểm tra đăng nhập: Bản thân & quản trị viên => (******)
     
     NGƯỜI DÙNG
-    - Tạo bài đăng mới(*), Xem chi tiết bài đăng, Sửa bài đăng (*****), Xoá bài đăng (****)
+    - Tạo bài đăng mới (*), Xem chi tiết bài đăng, Sửa bài đăng (****), Xoá bài đăng (******)
     - Bài viết - thích (*), Bài viết - lưu (*), Bài viết - báo cáo (*)
+
+    KIỂM DUYỆT VIÊN
+    - Xem danh sách bài đăng (**), Duyệt báo cáo bài đăng (**)
     |--------------------------------------------------------------------------
     */
 
@@ -72,7 +75,7 @@ class PostController extends Controller
 
 
     /**
-     * Kiểm tra đăng nhập: Bản thân => (*****)
+     * Kiểm tra đăng nhập: Bản thân => (****)
      */
     public function AuthLogin_BT($bai_dang){ ///
         $userLog = Session::get('userLog');
@@ -89,7 +92,7 @@ class PostController extends Controller
 
 
     /**
-     * Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
+     * Kiểm tra đăng nhập: Bản thân & quản trị viên => (******)
      */
     public function AuthLogin_BTwQTV($bai_dang){ ///
         $userLog = Session::get('userLog');
@@ -110,7 +113,7 @@ class PostController extends Controller
     */
 
     /**
-     * Tạo bài đăng mới(*)
+     * Tạo bài đăng mới (*)
      */
     public function create(){ //Không dùng
     }
@@ -167,7 +170,7 @@ class PostController extends Controller
             foreach ($linkFile as $file) {
                 $this->firestoreClient->addDocument($collection, [
                     'BV_MA' =>  $bai_viet->BV_MA,  
-                    'BL_MA' =>  0,
+                    'VMA' =>  0,
                     'FDK_DUONGDAN'=> $file['link'],
                     'FDK_TEN' => $file['name'],
                     'ND_GUI_MA' => 0,
@@ -193,7 +196,7 @@ class PostController extends Controller
      * Xem chi tiết bài đăng
      */
     public function show(Post $bai_dang){ ///
-        //Xử lý đường dẫn: http://localhost/ctustucom/bai-dang/{bai_dang}?binh-luan={binh_luan}\
+        //Xử lý đường dẫn: http://localhost/ctustucom/bai-dang/{bai_dang}?binh-luan={binh_luan}
         $binhLuanMa = request()->query('binh-luan');
         if($binhLuanMa) Session::put('BL_MA_Focus', $binhLuanMa);
         $binhLuanMa = null;
@@ -323,7 +326,7 @@ class PostController extends Controller
     }
 
     /**
-     * Sửa bài đăng (*****)
+     * Sửa bài đăng (****)
      */
     public function edit(Post $bai_dang){ //Không dùng
     }
@@ -396,7 +399,7 @@ class PostController extends Controller
     }
 
     /**
-     * Xoá bài đăng (****)
+     * Xoá bài đăng (******)
      */
     public function destroy(Post $bai_dang){ ///
         $this->AuthLogin_BTwQTV($bai_dang);
@@ -532,6 +535,12 @@ class PostController extends Controller
         $this->AuthLogin_KDV();
 
         $userLog = Session::get('userLog');
+
+        //Xử lý đường dẫn: http://localhost/ctustucom/bai-dang?bai-dang={bai_viet}
+        $baivietMa = request()->query('bai-dang');
+        if($baivietMa) Session::put('BV_MA_Focus', $baivietMa);
+        $baivietMa = null;
+
 
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
         $bai_viet = DB::table('bai_viet')

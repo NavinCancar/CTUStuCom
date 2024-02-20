@@ -73,7 +73,7 @@ class CollegeController extends Controller
     /**
      * Chi tiết khoa trường
      */
-    public function show(Request $request, College $khoa_truong){
+    public function show(Request $request, College $khoa_truong){ ///
         $userLog = Session::get('userLog');
         $college = DB::table('khoa_truong')->where('KT_MA', $khoa_truong->KT_MA)->first();
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();

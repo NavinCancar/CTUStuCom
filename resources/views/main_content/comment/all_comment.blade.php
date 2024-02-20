@@ -20,7 +20,14 @@
               }
               Session::put('alert',null);
             ?>
-
+          <div class="text-notice text-notice-success alert alert-success" id="alert-success" style="display: none">
+            <span></span> 
+            <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
+          </div>
+          <div class="text-notice text-notice-danger alert alert-danger" id="alert-danger" style="display: none">
+            <span></span> 
+            <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
+          </div>
             <div class="modal" id="detail">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content" id="modal-content">
@@ -61,13 +68,13 @@
                                     </thead>
                                     <tbody>
                                         @foreach($binh_luan as $key => $bl)
-                                        <tr>
+                                        <tr data-comment-id-value="{{$bl->BL_MA}}">
                                             <td>{{$bl->BL_MA}}</td>
                                             <td><span class="limited-lines">{{$bl->BL_NOIDUNG}}</span></td>
                                             <td>{{date('d/m/Y', strtotime($bl->BL_THOIGIANTAO))}}</td>
-                                            <td class="text-center"><?php 
+                                            <td class="text-center td_sl_baocao"><?php 
                                                 $count = $binhluan_baocao_noget->clone()->groupby('BL_MA')->where('BL_MA', $bl->BL_MA)->count(); 
-                                                if($count != 0) echo '<b class="cursor-pointer">'.$count.'&ensp;<i class="fas fa-flag"></i></b>'; 
+                                                if($count != 0) echo '<b class="cursor-pointer"><span class="sl_baocao">'.$count.'</span>&ensp;<i class="fas fa-flag"></i></b>'; 
                                             ?></td>
                                             <td>
                                                 <div class="d-flex justify-content-between">
@@ -164,6 +171,30 @@
         //-----------------------------------------------------------------------------------
         //***********************************************************************************
         //***********************************************************************************
+
+        //|-----------------------------------------------------
+        //|FOCUS BÌNH LUẬN NẾU CÓ
+        //|-----------------------------------------------------
+        <?php 
+        $BL_MA_Focus = Session::get('BL_MA_Focus');
+        if($BL_MA_Focus) { 
+        ?>
+            var commentIdValue = <?php echo $BL_MA_Focus ?>;
+
+            var trToFocus = document.querySelector(`tr[data-comment-id-value="${commentIdValue}"]`);
+            //console.log("focus:", trToFocus)
+            if (trToFocus) {
+                trToFocus.style.background = 'linear-gradient(to right, #ffffff00, #ffff0038, #ffff0038, #ffff0038, #ffffff00)';
+                trToFocus.tabIndex = 0;
+                trToFocus.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center', // Hoặc 'center', 'end', 'nearest'
+                });
+            }
+        <?php 
+            Session::put('BL_MA_Focus',null);
+        } 
+        ?>
 
         //|*****************************************************
         //|MỞ RỘNG CHI TIẾT BÌNH LUẬN START 
@@ -313,6 +344,10 @@
                                     success: function(response) {
                                         bcDuyetValues.forEach(function(value) {
                                             $('div[data-report-nd-value="' + value + '"]').addClass('d-none');
+
+                                            var slbaocao = parseInt($('tr[data-comment-id-value="' + BL_MA + '"]').find('span.sl_baocao').text());
+                                            if(slbaocao-1==0) $('tr[data-comment-id-value="' + BL_MA + '"]').find('td.td_sl_baocao').text('');
+                                            else $('tr[data-comment-id-value="' + BL_MA + '"]').find('span.sl_baocao').text(slbaocao - 1);
                                         });
 
                                         var divsWithoutDnone = $('div[data-report-nd-value]').filter(function() {
@@ -321,7 +356,6 @@
 
                                         // Kiểm tra số lượng div tìm được
                                         if (divsWithoutDnone.length == 0) {
-                                            console.log('hide');
                                             $('#modal-baocao').hide();
                                         }
                                         else{
@@ -343,6 +377,39 @@
                             
                         });
                         
+                        //|*****************************************************
+                        //|XOÁ BÌNH LUẬN START 
+                        //|*****************************************************
+                        $('.xoabinhluan-btn').click(function(e) {
+                            e.preventDefault();
+                            // Hiển thị hộp thoại xác nhận
+                            var isConfirmed = window.confirm('Bạn có chắc chắn muốn xoá bình luận này không?');
+
+                            if (isConfirmed) {
+                                var _token = $('meta[name="csrf-token"]').attr('content');
+                                $.ajax({
+                                url: '{{URL::to('/binh-luan/')}}'+'/'+BL_MA,
+                                type: 'DELETE',
+                                data: {
+                                    _token: _token // Include the CSRF token in the data
+                                },
+                                success: function(response) {
+                                    window.location.href = '{{URL::to('/binh-luan')}}';
+                                },
+                                error: function(error) {
+                                    $('#alert-danger span').html('Xoá bình luận thất bại');
+                                    $('html, body').animate({
+                                        scrollTop: $('#alert-danger').offset().top
+                                    });
+                                    document.getElementById('alert-danger').style.display = 'block';
+                                    console.log(error);
+                                }
+                                });
+                            } 
+                        });
+                        //|*****************************************************
+                        //|XOÁ BÌNH LUẬN END
+                        //|*****************************************************
                     },
                     error: function(error) {
                         console.log(error);

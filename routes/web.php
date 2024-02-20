@@ -78,7 +78,7 @@ Route::post('/bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@ba
 Route::post('/duyet-bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@duyet_baidang_baocao'); ///
 
 //Comment: Bình luận
-Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(['create','edit']); ///ok: C_ND
+Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(['create','show','edit']); ///ok: C_ND
 Route::get('/chi-tiet-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@index_detail'); ///
 
 //-- Bình luận và thích

@@ -23,8 +23,8 @@ class NotificatonController_FB extends Controller
     - Kiểm tra đăng nhập: Người dùng => (*)
     
     NGƯỜI DÙNG
-    - Thông báo(*)
-    - Cập nhật thông báo thích(*), Cập nhật thông báo bình luận(*), Cập nhật thông báo báo cáo(*)
+    - Thông báo (*)
+    - Cập nhật thông báo thích (*), Cập nhật thông báo bình luận (*), Cập nhật thông báo báo cáo (*),
       Cập nhật thông báo theo dõi (*)
     |--------------------------------------------------------------------------
     */
@@ -57,7 +57,7 @@ class NotificatonController_FB extends Controller
     */
 
     /**
-     * Thông báo(*)
+     * Thông báo (*)
      */
 
     public function index(){ ///
@@ -66,7 +66,7 @@ class NotificatonController_FB extends Controller
     }
 
     /**
-     * Cập nhật thông báo thích(*)
+     * Cập nhật thông báo thích (*)
      */
     public function UpdateNotification_LikePost($BV_MA){ ///
         $this->AuthLogin_ND();
@@ -150,7 +150,7 @@ class NotificatonController_FB extends Controller
 
 
     /**
-     * Cập nhật thông báo bình luận(*)
+     * Cập nhật thông báo bình luận (*)
      */
      public function UpdateNotification_CommentPost($BL_MA){ ///
         $this->AuthLogin_ND();
@@ -239,7 +239,7 @@ class NotificatonController_FB extends Controller
 
 
     /**
-     * Cập nhật thông báo báo cáo(*)
+     * Cập nhật thông báo báo cáo (*)
      */
     public function UpdateNotification_ReportPost($BV_MA){ ///
         $this->AuthLogin_ND();
@@ -282,7 +282,7 @@ class NotificatonController_FB extends Controller
                     'ND_NHAN_MA' =>  $nguoidung->ND_MA,  
                     'TB_ANHDINHKEM' => $nguoidung_baocao->ND_ANHDAIDIEN,
                     'TB_NOIDUNG' =>  $string,
-                    'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA),
+                    'TB_DUONGDAN'=> URL::to('/bai-dang?bai-dang='.$BV_MA),
                     'TB_LOAI' => 'báo cáo bài viết',
                     'TB_TRANGTHAI' => 0,
                     'TB_REALTIME' => new FirestoreTimestamp,
@@ -338,7 +338,7 @@ class NotificatonController_FB extends Controller
                     'ND_NHAN_MA' =>  $nguoidung->ND_MA,  
                     'TB_ANHDINHKEM' => $nguoidung_baocao->ND_ANHDAIDIEN,
                     'TB_NOIDUNG' =>  $string,
-                    'TB_DUONGDAN'=> URL::to('/bai-dang/'.$binh_luan->BV_MA.'?binh-luan='.$BL_MA),
+                    'TB_DUONGDAN'=> URL::to('/binh-luan?binh-luan='.$BL_MA),
                     'TB_LOAI' => 'báo cáo bình luận',
                     'TB_TRANGTHAI' => 0,
                     'TB_REALTIME' => new FirestoreTimestamp,
