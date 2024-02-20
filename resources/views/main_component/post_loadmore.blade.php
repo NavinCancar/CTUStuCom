@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-body p-4">
       <div class="mb-3 mb-sm-0">
-        <p>
+        <div class="pb-2">
           <a href="{{URL::to('/tai-khoan/'.$bv->ND_MA)}}" class="text-body">
             <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="20" height="20" class="rounded-circle">
             <b>{{$bv->ND_HOTEN}}</b> 
@@ -11,7 +11,7 @@
             <span class="badge-sm bg-warning rounded-pill"><i>{{$bv->VT_TEN}}</i></span>
           @endif
           đã đăng vào {{date('H:i', strtotime($bv->BV_THOIGIANDANG))}} ngày {{date('d/m/Y', strtotime($bv->BV_THOIGIANDANG))}}
-        </p>
+        </div>
         <a href="{{URL::to('/bai-dang/'.$bv->BV_MA)}}" class="text-dark mb-2">
           <h5 class="card-title fw-semibold post-title">{{$bv->BV_TIEUDE}}</h5>
 

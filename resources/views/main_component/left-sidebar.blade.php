@@ -33,7 +33,7 @@
           </li>
           <div id="kiemduyet" class="collapse show">
             <li class="sidebar-item">
-              <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+              <a class="sidebar-link" href="{{URL::to('/bai-dang')}}" aria-expanded="false">
                 <span>
                   <i class="fa fa-comment-alt"></i>
                 </span>
@@ -41,7 +41,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+              <a class="sidebar-link" href="{{URL::to('/binh-luan')}}" aria-expanded="false">
                 <span>
                   <i class="fas fa-comments"></i>
                 </span>

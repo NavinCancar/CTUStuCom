@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="form-group mb-3">
                                     <label class="form-label">Khoa/trường giảng dạy</label>
-                                    <select name="KT_MA" class="form-control" required="">
+                                    <select name="KT_MA" class="form-select" required="">
                                         @foreach($college as $key => $c)
                                             @if($item->KT_MA == $c->KT_MA)
                                             <option selected value="{{$c->KT_MA}}">{{ $c->KT_TEN }}</option>

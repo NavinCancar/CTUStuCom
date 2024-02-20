@@ -9,6 +9,7 @@ use DB;
 use Session;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\URL;
 
 use MrShan0\PHPFirestore\FirestoreClient;
 
@@ -22,6 +23,7 @@ class PostController extends Controller
     HÀM HỖ TRỢ
     - Hàm xây dựng FireStore
     - Kiểm tra đăng nhập: Người dùng => (*)
+    - Kiểm tra đăng nhập: Kiểm duyệt viên => (**)
     - Kiểm tra đăng nhập: Bản thân & quản trị viên => (****)
     - Kiểm tra đăng nhập: Bản thân => (*****)
     
@@ -46,6 +48,23 @@ class PostController extends Controller
     public function AuthLogin_ND(){ ///
         $userLog = Session::get('userLog');
         if($userLog){
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
+
+    
+    /**
+     * Kiểm tra đăng nhập: Kiểm duyệt viên => (**)
+     */
+    public function AuthLogin_KDV(){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->VT_MA == 1 || $userLog->VT_MA == 2){
+            }
+            else{
+                return Redirect::to('/')->send();
+            }
         }else{
             return Redirect::to('dang-nhap')->send();
         }
@@ -228,6 +247,7 @@ class PostController extends Controller
             $checkBlockND2 = DB::table('chan')->where('ND_CHAN_MA', $bai_dang->ND_MA)->where('ND_BICHAN_MA', '=', $userLog->ND_MA)->exists(); 
             $checkBlockND3 = DB::table('nguoi_dung')->where('ND_MA', $bai_dang->ND_MA)->where('ND_TRANGTHAI', 0)->exists(); 
             if($checkBlockBV || $checkBlockND || $checkBlockND2 || $checkBlockND3) $isBlock=1;
+            if($userLog->VT_MA == 1 || $userLog->VT_MA == 2) $isBlock=0;
 
             $binh_luan_not_in = DB::table('binhluan_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BL_MA')->toArray();
             $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
@@ -476,9 +496,20 @@ class PostController extends Controller
             ->exists();
 
         if(!$isExist){
-             DB::table('baiviet_baocao')->insert([
+            DB::table('baiviet_baocao')->insert([
                 'ND_MA' => $userLog->ND_MA,
                 'BV_MA' => $BV_MA,
+                'BVBC_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh'),
+                'BVBC_TRANGTHAI' => 0,
+                'BVBC_NOIDUNG' => $request->BVBC_NOIDUNG,
+            ]);
+            Session::put('alert', ['type' => 'success', 'content' => 'Gửi báo cáo thành công!']);
+        }
+        else{
+            DB::table('baiviet_baocao')
+            ->where('ND_MA', $userLog->ND_MA)
+            ->where('BV_MA', $BV_MA)
+            ->update([
                 'BVBC_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh'),
                 'BVBC_TRANGTHAI' => 0,
                 'BVBC_NOIDUNG' => $request->BVBC_NOIDUNG,
@@ -495,13 +526,220 @@ class PostController extends Controller
     */
 
     /**
-     * Xem danh sách bài đăng
+     * Xem danh sách bài đăng (**)
      */
-    public function index()
-    {
-        //
+    public function index(){ ///
+        $this->AuthLogin_KDV();
+
+        $userLog = Session::get('userLog');
+
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+        $bai_viet = DB::table('bai_viet')
+            ->orderBy('BV_THOIGIANTAO', 'desc')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(10);
+
+        $baiviet_baocao_noget = DB::table('baiviet_baocao')->where('BVBC_TRANGTHAI', 0);
+
+        return view('main_content.post.all_post')
+        ->with('bai_viet', $bai_viet)->with('baiviet_baocao_noget', $baiviet_baocao_noget);
     }
 
+    public function index_detail(Request $request, $BV_MA){ ///
+        $this->AuthLogin_KDV();
+
+        $userLog = Session::get('userLog');
+
+        if ($request->ajax()) {
+            $bv = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->where('bai_viet.BV_MA', '=', $BV_MA)->first();
+
+            $hashtag_bai_viet = DB::table('hashtag')
+            ->join('cua_bai_viet', 'cua_bai_viet.H_HASHTAG', '=', 'hashtag.H_HASHTAG')
+            ->where('cua_bai_viet.BV_MA', '=', $BV_MA)->get();
+
+            $hoc_phan = DB::table('hoc_phan')->get();
+
+            $count_thich = DB::table('bai_viet')
+            ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA')
+            ->where('bai_viet.BV_MA', '=', $BV_MA)->count();
+
+            $thich_no_get = DB::table('bai_viet')
+            ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA')
+            ->where('bai_viet.BV_MA', '=', $BV_MA);
+
+            $hashtag = DB::table('hashtag')->get();
+
+            //Bình luận
+            $count_binh_luan = DB::table('bai_viet')
+            ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
+            ->where('bai_viet.BV_MA', '=', $BV_MA)->count();
+
+            //Báo cáo
+            $bao_cao_noget = DB::table('baiviet_baocao')->where('BVBC_TRANGTHAI', 0)->where('BV_MA', $bv->BV_MA); 
+            $bao_cao = $bao_cao_noget->clone()
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'baiviet_baocao.ND_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')->orderby('BVBC_THOIDIEM', 'desc')->get(); 
+            $count_bao_cao = $bao_cao_noget->clone()->count(); 
+
+            $output = '';
+            $output .= 
+                '<!-- Modal Header -->
+                    <div class="modal-header">
+                        <form class="modal-title row" style="width: 95%">
+                            <span class="d-flex justify-content-between align-items-center col-sm-9 mb-2">
+                                <b>Trạng thái bài viết:</b>
+                                <select name="BV_TRANGTHAI"  class="form-select w-75">
+                                    <option'; 
+                                        if($bv->BV_TRANGTHAI == 'Chưa duyệt') $output .=' selected '; 
+                                        $output .= ' value="Chưa duyệt">Chưa duyệt</option>
+                                    <option';
+                                        if($bv->BV_TRANGTHAI == 'Đã duyệt') $output .=' selected '; 
+                                        $output .= ' value="Đã duyệt">Đã duyệt</option>
+                                    <option';
+                                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') $output .=' selected '; 
+                                        $output .= ' value="Yêu cầu chỉnh sửa">Yêu cầu chỉnh sửa</option>
+                                    <option'; 
+                                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Không qua xét duyệt') $output .=' selected '; 
+                                        $output .= ' value="Không qua xét duyệt">Không qua xét duyệt</option>
+                                    <option';
+                                        if($bv->BV_TRANGTHAI == 'Đã xoá') $output .=' selected '; 
+                                        $output .= ' value="Đã xoá">Đã xoá</option>
+                                </select>
+                            </span>
+                            <span'; if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Không qua xét duyệt') $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
+                                <span class="d-flex justify-content-between align-items-center">
+                                    <b>Chi tiết trạng thái:</b>
+                                    <input type="text" name="BV_NOIDUNG_TRANGTHAI" value="'. trim(strstr($bv->BV_TRANGTHAI, ':'), ': ') .'" class="form-control w-75">
+                                </span>
+                            </span>
+                            <button type="button" class="btn btn-primary col-sm-3 mb-2">Cập nhật</button>
+                        </form>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="text-notice text-notice-success alert alert-success mx-4" id="modal-alert-success" style="display: none">
+                        <span></span>
+                        <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = \'none\'"></i>
+                    </div>
+                    <div class="text-notice text-notice-danger alert alert-danger mx-4" id="modal-alert-danger" style="display: none">
+                        <span></span>
+                        <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = \'none\'"></i>
+                    </div>';
+            $output .='
+                    <!-- Modal body -->
+                    <div class="modal-body px-4 scroll-chat" style="height: auto; max-height: 320px;">
+                        <div class="mb-3 mb-sm-0">
+                            <div class="pb-2">
+                            <a href="'. URL::to('/tai-khoan/'.$bv->ND_MA) .'" class="text-body">
+                                <img src="'; if($bv->ND_ANHDAIDIEN) $output .= $bv->ND_ANHDAIDIEN; else $output .= 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'; $output .= '" alt="" width="36" height="36" class="rounded-circle">
+                                <b>'. $bv->ND_HOTEN .'</b> 
+                            </a>';
+                            if($bv->VT_MA != 3) $output .='<span class="badge-sm bg-warning rounded-pill"><i>'. $bv->VT_TEN .'</i></span>';
+                            $output .= ' đã gửi vào '. date('H:i', strtotime($bv->BV_THOIGIANTAO)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANTAO)) .'
+                            </div>
+
+                            <div class="mx-2">
+                            <h5 class="card-title fw-semibold post-title">'. $bv->BV_TIEUDE .'</h5>
+                            <span style="font-size: 0.92rem;">'. nl2br(e($bv->BV_NOIDUNG)) .'</span>
+                            </div>
+
+                            <!-- Images Container -->
+                            <div id="images-container" class="m-2 mt-3 mb-3 position-relative"></div>
+
+                            <!-- File Container -->
+                            <div id="files-container" class=" m-2 mt-3"></div>
+                            
+                            <div class="m-2">';
+                                if($bv->HP_MA){
+                                    $hoc_phan_tim= $hoc_phan->where('HP_MA',$bv->HP_MA)->first();
+                                    $output .= '<a href="'. URL::to('/hoc-phan/'.$bv->HP_MA) .'" previewlistener="true"><span class="badge bg-indigo rounded-3"><i class="fa fa-folder"></i> '. $hoc_phan_tim->HP_MA .' '. $hoc_phan_tim->HP_TEN .'</span></a> ';
+                                } 
+                                foreach($hashtag_bai_viet as $key => $hbv){
+                                    $output .= '<a href="'. URL::to('/hashtag/'.$hbv->H_HASHTAG) .'" previewlistener="true"><span class="badge bg-primary rounded-3 fw-semibold">#'. $hbv->H_HASHTAG .'</span></a> ';
+                                }
+                            $output .= '</div>
+                            <div class="d-flex mt-2 pt-2 justify-content-end">
+                                <a class="ms-3 text-muted"><i class="fas fa-eye"></i> Lượt xem: <b>'. $bv->BV_LUOTXEM .'</b></a></a>
+                                <a class="ms-3 text-muted"><i class="fas fa-heart"></i> Thích: <b>'; if($count_thich) $output .= $count_thich; else $output .= '0'; $output .='</b></a>
+                                <a class="ms-3 text-muted"><i class="fas fa-reply"></i> Trả lời: <b>'; if($count_binh_luan) $output .= $count_binh_luan; else $output .= '0'; $output .='</b></a>
+                                <a class="ms-3 text-muted"><i class="fas fa-flag"></i> Báo cáo: <b>'; if($count_bao_cao) $output .= $count_bao_cao; else $output .= '0'; $output .='</b></a>
+                            </div>
+                        </div>';
+                    if ($count_bao_cao != 0 && $bao_cao) {
+                        $output .= 
+                        '<!-- Báo cáo -->
+                        <div id="modal-baocao">
+                            <div class="mt-3 mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
+                                <h5 class="card-title fw-semibold">Danh sách báo cáo</h5>
+
+                                <span class="align-items-center">
+                                    <input class="form-check-input mt-1" id="check-all-BC_DUYET" type="checkbox">&ensp; Tất cả
+                                    
+                                    <a class="btn btn-danger btn-sm ms-4" previewlistener="true" id="check-BC_DUYET" >
+                                        <i class="fas fa-check-square"></i> Duyệt báo cáo
+                                    </a>
+                                </span>
+                            </div>
+                            <hr>
+                            <div class="form-check">';
+                                foreach ($bao_cao as $key => $bc) {
+                                    $output .= 
+                                    '<div class="d-flex flex-row pb-3 pt-1" data-report-nd-value="'. $bc->ND_MA .'">
+                                        <div>
+                                        <a href="'. URL::to('/tai-khoan/'.$bc->ND_MA) .'" class="text-body" previewlistener="true">
+                                            <img src="'; if($bc->ND_ANHDAIDIEN) $output .= $bc->ND_ANHDAIDIEN; else $output .= 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'; $output .= '" alt="" width="36" height="36" class="rounded-circle me-2">
+                                        </a>
+                                        </div>
+                                        <div class="pt-1" style="width:100%">
+                                            <div>
+                                                <a href="'. URL::to('/tai-khoan/'.$bc->ND_MA) .'" class="text-muted" previewlistener="true"><span class="fw-bold mb-0">'. $bc->ND_HOTEN .'</span></a>';
+                                                if($bc->VT_MA != 3) $output .='<span class="badge-sm bg-warning rounded-pill"><i>'. $bc->VT_TEN .'</i></span>';
+                                                $output .= ' đã gửi vào '. date('H:i', strtotime($bc->BVBC_THOIDIEM)) .' ngày '. date('d/m/Y', strtotime($bc->BVBC_THOIDIEM)) .'
+
+                                                <input class="form-check-input float-end" type="checkbox" name="BC_DUYET" value="'. $bc->ND_MA .'">
+                                            </div>
+                                            <span class="text-muted">'. $bc->BVBC_NOIDUNG .'</span>
+                                        </div>
+                                    </div>';
+                                }
+                            $output .='
+                            </div>
+                        </div>';
+                    }    
+                    $output .= 
+                    '</div>
+                    <!-- Data Loader -->
+                    <div class="auto-load modal-auto-load text-center" style="display: none;">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                    <!-- Modal footer -->
+                    <div class="modal-footer"></div>';
+
+            return Response($output);
+        }
+    }
+
+    /**
+     * Duyệt báo cáo bài đăng (**)
+     */
+    public function duyet_baidang_baocao(Request $request, $BV_MA){ ///
+        $this->AuthLogin_KDV();
+        $userLog = Session::get('userLog');
+
+        $bcDuyetValues = json_decode($request->input('bcDuyetValues'), true);
+
+        if ($bcDuyetValues && is_array($bcDuyetValues)) {
+            foreach ($bcDuyetValues as $ND) {
+                DB::table('baiviet_baocao')
+                ->where('ND_MA', $ND)
+                ->where('BV_MA', $BV_MA)
+                ->update([
+                    'BVBC_TRANGTHAI' => 1,
+                ]);
+            }
+        } 
+    }
 
     /*
     |--------------------------------------------------------------------------

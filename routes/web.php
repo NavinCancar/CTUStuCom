@@ -62,7 +62,8 @@ Route::get('/bo-chan/{ND_MA}', 'App\Http\Controllers\UserSysController@destroy_c
 
 //Post: Bài đăng
 Route::resource('/bai-dang', 'App\Http\Controllers\PostController')->except(['create','edit']); ///ok: C_ND
-Route::get('/bai-dang-binh-luan={BL_MA}', 'App\Http\Controllers\PostController@find_baidang_binhluan');
+Route::get('/bai-dang-binh-luan={BL_MA}', 'App\Http\Controllers\PostController@find_baidang_binhluan'); ///ok
+Route::get('/chi-tiet-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@index_detail'); ///
 
 //-- Bài viết và thích
 Route::get('/thich-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@baidang_thich'); ///ok
@@ -74,10 +75,11 @@ Route::get('/huy-luu-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@des
 
 //-- Bài viết và báo cáo
 Route::post('/bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@baidang_baocao'); ///ok
-
+Route::post('/duyet-bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@duyet_baidang_baocao'); ///
 
 //Comment: Bình luận
 Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(['create','edit']); ///ok: C_ND
+Route::get('/chi-tiet-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@index_detail'); ///
 
 //-- Bình luận và thích
 Route::get('/thich-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_thich'); ///ok
@@ -87,8 +89,9 @@ Route::get('/huy-thich-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentControll
 Route::get('/luu-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_luu'); ///ok
 Route::get('/huy-luu-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@destroy_binhluan_luu'); ///ok
 
-//-- Bình luận và lưu: Đánh dấu bởi
+//-- Bình luận và báo cáo
 Route::post('/bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_baocao'); ///ok
+Route::post('/duyet-bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@duyet_binhluan_baocao'); ///
 
 
 //Hashtag

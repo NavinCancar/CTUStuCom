@@ -48,7 +48,7 @@
                                 <table class="table bg-white rounded shadow-sm  table-hover">
                                     <thead>
                                         <tr>
-                                            <th scope="col">Mã người dùng</th>
+                                            <th scope="col">Mã</th>
                                             <th scope="col">Tên người dùng</th>
                                             <th scope="col">Trạng thái</th>
                                             <th scope="col">Ngày tham gia</th>
@@ -69,9 +69,11 @@
                                             </td>
                                             <td>{{date('d/m/Y', strtotime($item->ND_NGAYTHAMGIA))}}</td>
                                             <td>{{$item->VT_TEN}}</td>
-                                            <td class="d-flex justify-content-between">
-                                                <a href="{{URL::to('/tai-khoan/'.$item -> ND_MA)}}"><i class="fas fa-user text-primary"></i></a>
-                                                <a href="{{URL::to('/tai-khoan/'.$item -> ND_MA.'/edit')}}"><i class="far fa-edit text-success"></i></a>
+                                            <td>
+                                                <div class="d-flex justify-content-between">
+                                                    <a href="{{URL::to('/tai-khoan/'.$item -> ND_MA)}}"><i class="fas fa-user text-primary"></i></a>
+                                                    <a href="{{URL::to('/tai-khoan/'.$item -> ND_MA.'/edit')}}"><i class="far fa-edit text-success"></i></a>
+                                                </div>
                                             </td>
                                         </tr>
                                         @endforeach

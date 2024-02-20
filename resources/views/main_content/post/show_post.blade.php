@@ -33,10 +33,10 @@
               <div class="card">
                 <div class="card-body p-4">
                   <div class="mb-3 mb-sm-0">
-                    <div class="dropdown">
+                    <div class="dropdown pb-2">
                       <span>
                         <a href="{{URL::to('/tai-khoan/'.$bv->ND_MA)}}" class="text-body">
-                          <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="40" height="40" class="rounded-circle">
+                          <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="36" height="36" class="rounded-circle">
                           <b>{{$bv->ND_HOTEN}}</b> 
                         </a>
                         @if($bv->VT_MA != 3)
@@ -54,8 +54,11 @@
                       </ul>
                       @endif
                     </div>
-                    <h5 class="card-title fw-semibold post-title">{{$bv->BV_TIEUDE}}</h5>
-                    <span class="">{!! nl2br(e($bv->BV_NOIDUNG)) !!}</span>
+
+                    <div class="mx-2">
+                      <h5 class="card-title fw-semibold post-title">{{$bv->BV_TIEUDE}}</h5>
+                      <span style="font-size: 0.92rem;">{!! nl2br(e($bv->BV_NOIDUNG)) !!}</span>
+                    </div>
 
                     <!-- Images Container -->
                     <div id="images-container" class="m-2 mt-3 mb-3 position-relative">
@@ -177,7 +180,7 @@
                               <div>
                                 <a href="{{URL::to('/tai-khoan/'.$blg->ND_MA)}}" class="text-body">
                                   <img src="<?php if($blg->ND_ANHDAIDIEN) echo $blg->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
-                                      width="40" height="40" class="rounded-circle me-2">
+                                      width="36" height="36" class="rounded-circle me-2">
                                 </a>
                               </div>
                               <div class="pt-1" style="width:100%">
@@ -257,7 +260,7 @@
                                   <div>
                                     <a href="{{URL::to('/tai-khoan/'.$bltl->ND_MA)}}" class="text-body">
                                       <img src="<?php if($bltl->ND_ANHDAIDIEN) echo $bltl->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
-                                          width="40" height="40" class="rounded-circle me-2">
+                                          width="36" height="36" class="rounded-circle me-2">
                                     </a>
                                   </div>
                                   <div class="pt-1" style="width:100%">
@@ -364,12 +367,13 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
 
+          <div class="text-notice text-notice-danger alert alert-danger mx-4" id="modal-alert-danger" style="display: none">
+            Cập nhật bài viết thất bại
+            <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
+          </div>
+
           <!-- Modal body -->
           <div class="modal-body">
-          <div class="text-notice text-notice-danger alert alert-danger" id="modal-alert-danger" style="display: none">
-              Cập nhật bài viết thất bại
-              <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
-            </div>
           <form id="them" method="post" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="mb-3">
@@ -446,12 +450,13 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
 
+          <div class="text-notice text-notice-danger alert alert-danger mx-4" id="modal-alert-danger-c" style="display: none">
+            Cập nhật bình luận thất bại
+            <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
+          </div>
+
           <!-- Modal body -->
           <div class="modal-body">
-          <div class="text-notice text-notice-danger alert alert-danger" id="modal-alert-danger-c" style="display: none">
-              Cập nhật bình luận thất bại
-              <i class="fas fa-times-circle p-0 float-end" onclick="this.parentNode.style.display = 'none'"></i>
-            </div>
           <form id="them-c" method="post" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="mb-3">

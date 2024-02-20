@@ -80,7 +80,7 @@
                         @if($account_info->ND_MA != $userLog->ND_MA)
                         <div class="form-group mb-3">
                             <label class="form-label">Vai trò:</label>
-                            <select name="VT_MA" class="form-control">
+                            <select name="VT_MA" class="form-select">
                                 @foreach($role as $key => $r)
                                     @if($account_info->VT_MA == $r->VT_MA)
                                     <option selected value="{{$r->VT_MA}}">{{ $r->VT_TEN }}</option>
@@ -93,7 +93,7 @@
                         @endif
                         <div class="form-group mb-3">
                             <label class="form-label">Khoa trường theo học:</label>
-                            <select name="KT_MA" class="form-control">
+                            <select name="KT_MA" class="form-select">
                                 @if($account_info->KT_MA == NULL)
                                       <option selected value="">Chọn khoa trường của bạn...</option>
                                   @foreach($college as $key => $c)

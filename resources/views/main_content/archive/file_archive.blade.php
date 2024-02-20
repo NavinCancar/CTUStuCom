@@ -214,7 +214,7 @@
                                 '        <img src="'+fileLink+'"  width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                                 '    </a>' +
                                 '    <a href="' + url + '" class="btn btn-indigo btn-sm position-absolute start-85 translate-middle" style="transform: translateX(-50%);">' +
-                                '    <i class="fas fa-link"></i>' +
+                                '    <i class="fas fa-info-circle"></i>' +
                                 '    </a>' +
                                 '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' +
                                 '    <i class="fas fa-vote-yea"></i>' +
@@ -268,7 +268,7 @@
                                 '        </div>' +
                                 '    </a>' +
                                 '    <a href="' + url + '" class="btn btn-indigo btn-sm" style="height: 28px !important;">' +
-                                '    <i class="fas fa-link"></i>' +
+                                '    <i class="fas fa-info-circle"></i>' +
                                 '    </a>' +
                                 '    <button class="btn btn-secondary btn-sm bookmark-file" data-fdk-id-value="'+doc.id+'" style="height: 28px !important;">'+
                                 '    <i class="fas fa-vote-yea"></i>' +

@@ -8,7 +8,7 @@
               </a>
             </li>
             <form class="d-flex nav-search">
-              <input class="form-control me-2" type="text" placeholder="Search">
+              <input class="form-control me-2" type="text" placeholder="Tìm kiếm...">
               <button class="btn btn-outline-primary" type="button"><i class="fa fa-search"></i></button>
             </form>
           </ul>

@@ -124,11 +124,14 @@ class SubjectController extends Controller
         ->groupBy('bai_viet.BV_MA')->select('bai_viet.BV_MA', DB::raw('count(*) as count'))
         ->get();
 
+        $bai_viet_luu= DB::table('danh_dau');
+
         if ($request->ajax()) {//Chạy nút load-more
             $view = view('main_component.post_loadmore')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
             ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
             ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
-            ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get)->render();
+            ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get)
+            ->with('bai_viet_luu', $bai_viet_luu)->render();
   
             return response()->json(['html' => $view]);
         }
@@ -137,7 +140,8 @@ class SubjectController extends Controller
         return view('main_content.subject.show_subject')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
         ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
-        ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get);
+        ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get)
+        ->with('bai_viet_luu', $bai_viet_luu);
     }
 
     /*

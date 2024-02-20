@@ -60,13 +60,15 @@
                                             <td>{{$item->HP_MA}}</td>
                                             <td>{{$item->HP_TEN}}</td>
                                             <td>{{$item->KT_TEN}}</td>
-                                            <td class="d-flex justify-content-between">
-                                                <a href="{{URL::to('/hoc-phan/'.$item -> HP_MA.'/edit')}}"><i class="far fa-edit text-success"></i></a>
-                                                <form role="form" action="{{URL::to('/hoc-phan/'.$item -> HP_MA)}}" method="POST" class="delete-form">
-                                                    @method('DELETE')
-                                                    {{csrf_field()}}
-                                                    <button type="submit" onclick="return confirm('Bạn có chắc chắn muốn xóa mục này không?')" class="delete-button" ui-toggle-class=""><i class="fa fa-times text-danger text"></i></button>
-                                                </form>
+                                            <td>
+                                                <div class="d-flex justify-content-between">
+                                                    <a href="{{URL::to('/hoc-phan/'.$item -> HP_MA.'/edit')}}"><i class="far fa-edit text-success"></i></a>
+                                                    <form role="form" action="{{URL::to('/hoc-phan/'.$item -> HP_MA)}}" method="POST" class="delete-form">
+                                                        @method('DELETE')
+                                                        {{csrf_field()}}
+                                                        <button type="submit" onclick="return confirm('Bạn có chắc chắn muốn xóa mục này không?')" class="delete-button" ui-toggle-class=""><i class="fa fa-times text-danger text"></i></button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                         @endforeach
