@@ -32,7 +32,8 @@ class PostController extends Controller
     - Bài viết - thích (*), Bài viết - lưu (*), Bài viết - báo cáo (*)
 
     KIỂM DUYỆT VIÊN
-    - Xem danh sách bài đăng (**), Duyệt báo cáo bài đăng (**), Cập nhật trạng thái bài viết (**)
+    - Xem danh sách bài đăng (**), Duyệt báo cáo bài đăng (**), 
+      Cập nhật trạng thái bài viết (**), Cập nhật hashtag bài viết (**)
     |--------------------------------------------------------------------------
     */
 
@@ -610,13 +611,13 @@ class PostController extends Controller
                                         if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') $output .=' selected '; 
                                         $output .= ' value="Yêu cầu chỉnh sửa">Yêu cầu chỉnh sửa</option>
                                     <option'; 
-                                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Không duyệt và ẩn đi') $output .=' selected '; 
-                                        $output .= ' value="Không duyệt và ẩn đi">Không duyệt và ẩn đi</option>';
+                                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') $output .=' selected '; 
+                                        $output .= ' value="Vi phạm tiêu chuẩn">Vi phạm tiêu chuẩn</option>';
                                     if($bv->BV_TRANGTHAI == 'Đã xoá') $output .='<option selected value="Đã xoá">Đã xoá</option>';    
                         $output .= '</select>
                             </span>
                             <span id="detail_BV_TRANGTHAI"'; 
-                            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Không duyệt và ẩn đi') 
+                            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Vi phạm tiêu chuẩn') 
                             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                                 <span class="d-flex justify-content-between align-items-center">
@@ -638,7 +639,7 @@ class PostController extends Controller
                     </div>';
             $output .='
                     <!-- Modal body -->
-                    <div class="modal-body px-4 scroll-chat" style="height: auto; max-height: 320px;">
+                    <div class="modal-body px-4 scroll-chat" style="height: auto; max-height: 430px;">
                         <div class="mb-3 mb-sm-0">
                             <div class="pb-2">
                             <a href="'. URL::to('/tai-khoan/'.$bv->ND_MA) .'" class="text-body">
@@ -666,10 +667,22 @@ class PostController extends Controller
                                     $hoc_phan_tim= $hoc_phan->where('HP_MA',$bv->HP_MA)->first();
                                     $output .= '<a href="'. URL::to('/hoc-phan/'.$bv->HP_MA) .'" previewlistener="true"><span class="badge bg-indigo rounded-3"><i class="fa fa-folder"></i> '. $hoc_phan_tim->HP_MA .' '. $hoc_phan_tim->HP_TEN .'</span></a> ';
                                 } 
+                                $output .= '<span class="listhashtag">';
                                 foreach($hashtag_bai_viet as $key => $hbv){
                                     $output .= '<a href="'. URL::to('/hashtag/'.$hbv->H_HASHTAG) .'" previewlistener="true"><span class="badge bg-primary rounded-3 fw-semibold">#'. $hbv->H_HASHTAG .'</span></a> ';
                                 }
-                            $output .= '</div>
+                            $output .= '</span>&ensp;<a class="cursor-pointer" data-bs-toggle="collapse" data-bs-target="#them"><i class="far fa-edit text-muted"></i></a></div>
+                            <form id="them" method="post" enctype="multipart/form-data" class="mb-3 pt-3 collapse">
+                                <div class="output"></div>
+                                <div class="d-flex">
+                                    <input class="basic" name="BV_HASHTAG" placeholder="Hashtag đính kèm"/>
+
+                                    <input type="hidden" name="hashtags" id="hashtagsInput" value="">
+                                    <input type="hidden" name="hashtagsNew" id="hashtagsNewInput" value="">
+
+                                    <button type="button" class="btn btn-primary w-25 float-sm-end" id="dangbai-btn">Cập nhật hashtag</button>
+                                </div>
+                            </form>
                             <div class="d-flex mt-2 pt-2 justify-content-end">
                                 <a class="ms-3 text-muted"><i class="fas fa-eye"></i> Lượt xem: <b>'. $bv->BV_LUOTXEM .'</b></a></a>
                                 <a class="ms-3 text-muted"><i class="fas fa-heart"></i> Thích: <b>'; if($count_thich) $output .= $count_thich; else $output .= '0'; $output .='</b></a>
@@ -726,7 +739,83 @@ class PostController extends Controller
                     </div>
                     <!-- Modal footer -->
                     <div class="modal-footer"></div>';
-
+            $output .= 
+                '<!--XỬ LÝ HASHTAG START-->
+                <script src="'. asset('public/js/tokenfield.web.js') .'"></script>
+                
+                <script>
+                //Thêm bài
+                var myItems = [';
+                    foreach($hashtag as $key => $h){
+                        $output .= "{ name: '".$h->H_HASHTAG."' }, ";
+                    }
+            $output .= '];
+              var instance = new Tokenfield({
+                el: document.querySelector(\'.basic\'),
+                items: myItems,
+        
+                form: true, // Listens to reset event
+                mode: \'tokenfield\', // tokenfield or list.
+                addItemOnBlur: false,
+                addItemsOnPaste: false,
+                keepItemsOrder: true,
+                setItems: [';
+                  foreach($hashtag_bai_viet as $key => $hbvt){
+                    $output .= "{ name: '".$hbvt->H_HASHTAG."' }, ";
+                  }
+            $output .= "], // array of pre-selected items
+                newItems: true,
+                multiple: true,
+                maxItems: 5,
+                minLength: 1,
+                keys: {
+                  17: 'ctrl',
+                  16: 'shift',
+                  91: 'meta',
+                  8: 'delete', // Backspace
+                  27: 'esc',
+                  37: 'left',
+                  38: 'up',
+                  39: 'right',
+                  40: 'down',
+                  46: 'delete',
+                  65: 'select', // A
+                  67: 'copy', // C
+                  88: 'cut', // X
+                  9: 'delimiter', // Tab
+                  13: 'delimiter', // Enter
+                  108: 'delimiter' // Numpad Enter
+                },
+                matchRegex: '{value}',
+                matchFlags: 'i',
+                matchStart: false,
+                matchEnd: false,
+                delimiters: [], // array of strings
+                copyProperty: 'name',
+                copyDelimiter: ', ',
+                placeholder: null,
+                inputType: 'text',
+                minChars: 0,
+                maxSuggest: 10,
+                maxSuggestWindow: 10,
+                filterSetItems: true,
+                filterMatchCase: false,
+                singleInput: false, // true, 'selector', or an element.
+                singleInputValue: 'name',
+                singleInputDelimiter: ', ',
+                itemLabel: 'name',
+                itemName: 'items',
+                newItemName: 'items_new',
+                itemValue: 'name',
+                newItemValue: 'name',
+                itemData: 'name',
+                validateNewItem: null
+              });
+            
+              //******** UPDATE FUTURE: Gợi ý hashtag chọn: Sự kiện thay đổi trạng thái của tokenfield, hiển thị cả item lẫn
+              
+            </script>
+            <!--XỬ LÝ HASHTAG END-->";
             return Response($output);
         }
     }
@@ -770,13 +859,13 @@ class PostController extends Controller
                         if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') $output .=' selected '; 
                         $output .= ' value="Yêu cầu chỉnh sửa">Yêu cầu chỉnh sửa</option>
                     <option'; 
-                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Không duyệt và ẩn đi') $output .=' selected '; 
-                        $output .= ' value="Không duyệt và ẩn đi">Không duyệt và ẩn đi</option>';
+                        if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') $output .=' selected '; 
+                        $output .= ' value="Vi phạm tiêu chuẩn">Vi phạm tiêu chuẩn</option>';
                     if($bv->BV_TRANGTHAI == 'Đã xoá') $output .='<option selected value="Đã xoá">Đã xoá</option>';    
         $output .= '</select>
             </span>
             <span id="detail_BV_TRANGTHAI"'; 
-            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Không duyệt và ẩn đi') 
+            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Vi phạm tiêu chuẩn') 
             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                 <span class="d-flex justify-content-between align-items-center">
@@ -791,6 +880,59 @@ class PostController extends Controller
             $thoiGianGui = ' đã đăng vào '. date('H:i', strtotime($bv->BV_THOIGIANDANG)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANDANG));
         }
         return Response()->json(['output' => $output, 'thoiGianGui' => $thoiGianGui]);
+    }
+
+    /**
+     * Cập nhật hashtag bài viết (**)
+     */
+    public function updateHashtag(Request $request, $BV_MA){ ///
+        $this->AuthLogin_KDV();
+
+        $userLog = Session::get('userLog');
+        //Của bài viết
+        $hashtag_bai_viet = DB::table('cua_bai_viet')->where('BV_MA', $BV_MA)
+        ->delete();
+
+        $hashtags = json_decode($request->input('hashtags'), true);
+        $hashtagsNew = json_decode($request->input('hashtagsNew'), true);
+
+        if ($hashtags && is_array($hashtags)) {
+            foreach ($hashtags as $item) {
+                DB::table('cua_bai_viet')->insert([
+                    'BV_MA' => $BV_MA,
+                    'H_HASHTAG' => $item['name']
+                ]);
+            }
+        } 
+        if ($hashtagsNew && is_array($hashtagsNew)) {
+            foreach ($hashtagsNew as $items_new) {
+                DB::table('hashtag')->insert([
+                    'H_HASHTAG' => $items_new['name']
+                ]);
+
+                DB::table('cua_bai_viet')->insert([
+                    'BV_MA' => $BV_MA,
+                    'H_HASHTAG' => $items_new['name']
+                ]);
+            }
+        } 
+        
+        $hashtag_bai_viet = DB::table('hashtag')
+            ->join('cua_bai_viet', 'cua_bai_viet.H_HASHTAG', '=', 'hashtag.H_HASHTAG')
+            ->where('cua_bai_viet.BV_MA', '=', $BV_MA)->get();
+
+        $output = '';
+        foreach($hashtag_bai_viet as $key => $hbv){
+            $output .= '<a href="'. URL::to('/hashtag/'.$hbv->H_HASHTAG) .'" previewlistener="true"><span class="badge bg-primary rounded-3 fw-semibold">#'. $hbv->H_HASHTAG .'</span></a> ';
+        }
+        
+        $hashtagGui = [];
+        foreach($hashtag_bai_viet as $key => $hbvt){
+            $hashtagGui[] = ["name" => $hbvt->H_HASHTAG];
+        }
+        $hashtagGuiJson = json_encode($hashtagGui);
+
+        return Response()->json(['output' => $output, 'hashtagGui' => $hashtagGui]);
     }
 
     /**

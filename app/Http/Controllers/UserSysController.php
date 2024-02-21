@@ -27,11 +27,12 @@ class UserSysController extends Controller
     - Kiểm tra đăng nhập: Bản thân & quản trị viên => (******)
     
     NGƯỜI DÙNG
-    - Đối với cá nhân: Đăng nhập tài khoản, Đăng xuất tài khoản (*), Đăng ký tài khoản, 
-      Tài khoản cá nhân người dùng, Cập nhật tài khoản người dùng (******), 
-      Vô hiệu hoá tài khoản người dùng (******), Đổi mật khẩu (*)
+    Đối với cá nhân: 
+    - Đăng nhập tài khoản, Đăng xuất tài khoản (*), Đăng ký tài khoản, Tài khoản cá nhân người dùng
+    - Cập nhật tài khoản người dùng (******), Vô hiệu hoá tài khoản người dùng (******), Đổi mật khẩu (*)
 
-    - Đối với người dùng khác: Chặn người dùng (*), Theo dõi người dùng khác (*),
+    Đối với người dùng khác: 
+    - Chặn người dùng (*), Theo dõi người dùng khác (*),
       Danh sách người dùng, Danh sách theo dõi, Danh sách người theo dõi, Danh sách chặn (*)
 
     QUẢN TRỊ VIÊN

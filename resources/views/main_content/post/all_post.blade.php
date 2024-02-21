@@ -152,7 +152,7 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">Mã</th>
-                                            <th scope="col" width="500">Nội dung bài viết</th>
+                                            <th scope="col" width="500">Tiêu đề bài viết</th>
                                             <th scope="col" width="150">Trạng thái</th>
                                             <th scope="col">Ngày tạo</th>
                                             <th scope="col">Báo cáo</th>
@@ -163,7 +163,7 @@
                                         @foreach($bai_viet as $key => $bv)
                                         <tr data-post-id-value="{{$bv->BV_MA}}">
                                             <td>{{$bv->BV_MA}}</td>
-                                            <td><span class="limited-lines">{{$bv->BV_NOIDUNG}}</span></td>
+                                            <td><span class="limited-lines">{{$bv->BV_TIEUDE}}</span></td>
                                             <td class="trangthai">
                                                 <?php 
                                                     if($bv->BV_TRANGTHAI == 'Chưa duyệt') echo '<span class="badge-sm bg-danger rounded-pill fs-2"><i>Chưa duyệt</i></span>'; 
@@ -487,7 +487,7 @@
                             $('input[name="BV_NOIDUNG_TRANGTHAI"]').css('border-color', '');
 
                             var selectedValue = $(this).val();
-                            if(selectedValue == 'Yêu cầu chỉnh sửa' || selectedValue == 'Không duyệt và ẩn đi') $('#detail_BV_TRANGTHAI').show();
+                            if(selectedValue == 'Yêu cầu chỉnh sửa' || selectedValue == 'Vi phạm tiêu chuẩn') $('#detail_BV_TRANGTHAI').show();
                             else $('#detail_BV_TRANGTHAI').hide();
                         });
 
@@ -513,14 +513,14 @@
                                 form.find('input[name="BV_NOIDUNG_TRANGTHAI"]').css('border-color', '#FA896B');
                             }
                             else{
-                                if((BV_TRANGTHAI != defaultValue && BV_TRANGTHAI != 'Đã xoá') || BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' || BV_TRANGTHAI == 'Không duyệt và ẩn đi'){
+                                if((BV_TRANGTHAI != defaultValue && BV_TRANGTHAI != 'Đã xoá') || BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' || BV_TRANGTHAI == 'Vi phạm tiêu chuẩn'){
                                     $('.modal-header form').hide();
                                     $('.modal-body').hide();
                                     $('.modal-auto-load').show();
 
                                     const BV_TRANGTHAI_get = BV_TRANGTHAI;
 
-                                    if(BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' || BV_TRANGTHAI == 'Không duyệt và ẩn đi'){
+                                    if(BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' || BV_TRANGTHAI == 'Vi phạm tiêu chuẩn'){
                                         BV_TRANGTHAI = BV_TRANGTHAI + ': ' + BV_NOIDUNG_TRANGTHAI;
                                     }
                                     
@@ -564,6 +564,92 @@
                         });
                         //|*****************************************************
                         //|CẬP NHẬT TRẠNG THÁI END 
+                        //|*****************************************************
+
+                        //|*****************************************************
+                        //|CẬP NHẬT HASHTAG START 
+                        //|*****************************************************
+                        $('input.tokenfield-input').removeAttr('style');
+                        $('#dangbai-btn').click(function(e) {
+                            e.preventDefault();
+
+                            const selectedItems = instance.getItems();
+                            var form = $('#them');
+                            form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+
+                            if(selectedItems.length==0){
+                                form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '#FA896B');
+                            }
+                            else{
+                                // Hiển thị thông báo xác nhận
+                                var confirmation = confirm("Bạn xác nhận cập nhật hashtag bài viết?");
+                                
+                                if (confirmation) {
+                                    $('.modal-header form').hide();
+                                    $('.modal-body').hide();
+                                    $('.modal-auto-load').show();
+                                    //|-----------------------------------------------------
+                                    //|XỬ LÝ HASHTAG
+                                    //|-----------------------------------------------------
+                                    var hashtagItems = [];
+                                    var hashtagItemsNew = [];
+
+                                    selectedItems.forEach(function(hashtag) {
+                                    if (hashtag.isNew) {
+                                        hashtagItemsNew.push(hashtag);
+                                    } else {
+                                        hashtagItems.push(hashtag);
+                                    }
+                                    });
+                                    document.getElementById('hashtagsInput').value = JSON.stringify(hashtagItems);
+                                    document.getElementById('hashtagsNewInput').value = JSON.stringify(hashtagItemsNew);
+
+                                    //|-----------------------------------------------------
+                                    //|GỬI FORM
+                                    //|-----------------------------------------------------
+                                    var hashtags = form.find('input[name="hashtags"]').val();
+                                    var hashtagsNew = form.find('input[name="hashtagsNew"]').val();
+                                    var _token = $('meta[name="csrf-token"]').attr('content');
+                                    
+                                    $.ajax({
+                                    url: '{{URL::to('/cap-nhat-hashtag-bai-dang/')}}' +'/'+ BV_MA,
+                                    type: 'POST',
+                                    data: {
+                                        hashtags: hashtags,
+                                        hashtagsNew: hashtagsNew,
+                                        _token: _token
+                                    },
+                                    success: function(response) {
+                                        form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+
+                                        $('span.listhashtag').html(response.output);
+
+                                        //instance.setItems([ { name: 'an_chay' }, { name: 'b1' }, { name: 'gf' }, { name: 'sd' },  ]);
+                                        let items = Array.isArray(response.hashtagGui) ? response.hashtagGui : JSON.parse(response.hashtagGui);
+                                        instance.setItems(items.map(item => ({ name: item.name })));
+                                        $('input.tokenfield-input').removeAttr('style');
+                                        
+                                        $('.modal-auto-load').hide();
+                                        $('.modal-header form').show();
+                                        $('.modal-body').show();
+                                        $('#modal-alert-success').show();
+                                        $('#modal-alert-success span').html('Cập nhật hashtag bài viết thành công');
+                                    },
+                                    error: function(error) {
+                                        $('input.tokenfield-input').removeAttr('style');
+                                        $('.modal-auto-load').hide();
+                                        $('.modal-header form').show();
+                                        $('.modal-body').show();
+                                        $('#modal-alert-danger').show();
+                                        $('#modal-alert-danger span').html('Cập nhật hashtag bài viết thất bại');
+                                        console.log(error);
+                                    }
+                                    });
+                                }
+                            }
+                        });
+                        //|*****************************************************
+                        //|CẬP NHẬT HASHTAG END 
                         //|*****************************************************
                     },
                     error: function(error) {
