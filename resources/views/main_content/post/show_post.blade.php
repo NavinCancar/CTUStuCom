@@ -29,7 +29,15 @@
           <hr>
           @if($isBlock != 1)
             @foreach($bai_viet as $key => $bv)
-            <?php $BV_MA = $bv->BV_MA; ?>
+            <?php 
+              $BV_MA = $bv->BV_MA; 
+              if ($userLog && $bv->BV_TRANGTHAI != 'Đã duyệt' && $userLog->ND_MA == $bv->ND_MA){
+                echo '<b class="text-danger"><i>(*) Chú ý: Bài viết này chưa được hiển thị với người dùng khác và đang ở trạng thái <span class="badge-sm bg-warning rounded-pill">'; 
+                if(substr($bv->BV_TRANGTHAI, -1) === ':') echo rtrim($bv->BV_TRANGTHAI, ':') ;
+                else echo $bv->BV_TRANGTHAI;
+                echo '</span></i></b>';
+              }
+            ?>
               <div class="card">
                 <div class="card-body p-4">
                   <div class="mb-3 mb-sm-0">
@@ -49,8 +57,7 @@
                         đã đăng vào {{date('H:i', strtotime($bv->BV_THOIGIANDANG))}} ngày {{date('d/m/Y', strtotime($bv->BV_THOIGIANDANG))}}
                         @endif
                       </span>
-                    
-                      @if($userLog && $userLog->ND_MA == $bv->ND_MA)
+                      @if($userLog && $userLog->ND_MA == $bv->ND_MA && ((trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') || ($bv->BV_TRANGTHAI == 'Đã duyệt') || ($bv->BV_TRANGTHAI == 'Chưa duyệt')))
                       <i class="fas fa-ellipsis-v cursor-pointer float-end" data-bs-toggle="dropdown"></i>
                       <ul class="dropdown-menu">
                         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#suabaiviet">Sửa bài viết</a>
@@ -554,6 +561,7 @@
           65: 'select', // A
           67: 'copy', // C
           88: 'cut', // X
+          32: 'delimiter', //Space
           9: 'delimiter', // Tab
           13: 'delimiter', // Enter
           108: 'delimiter' // Numpad Enter
@@ -823,7 +831,7 @@
                           form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
                           //console.log('Thành công');
 
-                          window.location.href = '{{URL::to('/')}}';
+                          window.location.href = '{{URL::to('/bai-dang/'.$BV_MA)}}';
                       },
                       error: function(error) {
                           document.getElementById('dangbai-btn').style.display = 'block';

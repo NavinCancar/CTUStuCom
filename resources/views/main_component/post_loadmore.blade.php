@@ -1,3 +1,4 @@
+<?php $userLog= Session::get('userLog'); ?>
 @foreach($bai_viet as $key => $bv)
   <div class="card">
     <div class="card-body p-4">

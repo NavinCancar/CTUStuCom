@@ -43,7 +43,7 @@
                                             <a href="{{URL::to('/danh-sach-theo-doi/'.$info->ND_MA)}}" class="col-lg-3 col-md-3 col-sm-6 text-muted">
                                                 <b class="fs-6"><?php if($dang_theo_doi) echo $dang_theo_doi; else echo '0'; ?></b><br> Đang theo dõi
                                             </a>
-                                            <a href="javascript:void(0)" class="col-lg-3 col-md-3 col-sm-6 text-muted">
+                                            <a href="{{URL::to('/danh-sach-bai-dang')}}" class="col-lg-3 col-md-3 col-sm-6 text-muted">
                                                 <b class="fs-6"><?php if($bai_viet_count) echo $bai_viet_count; else echo '0'; ?></b><br> Bài đăng
                                             </a>
                                             <a href="javascript:void(0)" class="col-lg-3 col-md-3 col-sm-6 text-muted ml-3">
@@ -77,7 +77,8 @@
                     <div class="mt-3 mb-3 d-flex justify-content-end">
                         @if ($userLog)
                             @if($userLog && $info->ND_MA == $userLog->ND_MA)
-                                <a href="javascript:void(0)"><button class="btn btn-primary ms-2" type="button"><i class="fas fa-chart-pie"></i> Nhìn lại quá trình</button></a>
+                                <a href="{{URL::to('/danh-sach-bai-dang')}}"><button class="btn btn-primary ms-2" type="button"><i class="fa fa-comment-alt"></i> Bài viết của bạn</button></a>
+                                <a href="javascript:void(0)"><button class="btn btn-success ms-2" type="button"><i class="fas fa-chart-pie"></i> Nhìn lại quá trình</button></a>
                             @else
                                 <a href="{{URL::to('/tin-nhan/'.$info->ND_MA)}}"><button class="btn btn-primary" type="button"><i class="fab fa-facebook-messenger"></i> Nhắn tin</button></a>
                                 <?php 

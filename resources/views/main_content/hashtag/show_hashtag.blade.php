@@ -6,7 +6,12 @@
   <div class="row">
     <div class="col-lg-12">
         <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
-              <h5 class="card-title fw-semibold">#<?php echo $hashtag_get->H_HASHTAG ?></h5>
+              <span>
+                <h5 class="card-title fw-semibold">#<?php echo $hashtag_get->H_HASHTAG ?></h5>
+                @if($count_theo_doi)
+                  <i class="fs-2 px-3"><span id="sltheodoi">{{$count_theo_doi}}</span> đang theo dõi hashtag này</i>
+                @endif
+              </span>
               <?php if($userLog) { ?>
               @if(!$isFollowHashtag)
               <a class="btn btn-primary follow-hashtag" data-hashtag-value="<?php echo $hashtag_get->H_HASHTAG ?>">
@@ -19,7 +24,7 @@
               @endif
               <?php } ?>
         </div>
-      
+        
         <hr>
         <div class="mb-3 mb-sm-0 pb-3">
             <span>Hashtag thường đi kèm:</span>
@@ -123,7 +128,8 @@
 
                 element.addClass('btn-outline-primary');
                 iconElement.addClass('spinner-border text-primary spinner-border-sm');
-
+                
+                var sltheodoi = parseInt($('#sltheodoi').text());
                 $.ajax({
                   url: '{{URL::to('/theo-doi-hashtag/')}}' +'/'+ H_HASHTAG,
                   type: 'GET',
@@ -133,6 +139,8 @@
 
                     iconElement.removeClass('spinner-border text-primary spinner-border-sm');
                     iconElement.addClass('fa-check');
+
+                    $('#sltheodoi').text(sltheodoi+1);
                     //console.log(number);
                   },
                   error: function(error) {
@@ -161,6 +169,7 @@
                 element.addClass('btn-outline-primary');
                 iconElement.addClass('spinner-border text-primary spinner-border-sm');
 
+                var sltheodoi = parseInt($('#sltheodoi').text());
                 $.ajax({
                   url: '{{URL::to('/huy-theo-doi-hashtag/')}}' +'/'+ H_HASHTAG,
                   type: 'GET',
@@ -171,6 +180,8 @@
                     iconElement.removeClass('spinner-border text-primary spinner-border-sm');
                     iconElement.addClass('fa-plus');
                     //console.log(number);
+
+                    $('#sltheodoi').text(sltheodoi-1);
                   },
                   error: function(error) {
                     element.removeClass('btn-outline-primary');

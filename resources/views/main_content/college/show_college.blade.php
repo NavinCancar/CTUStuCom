@@ -218,6 +218,7 @@
           65: 'select', // A
           67: 'copy', // C
           88: 'cut', // X
+          32: 'delimiter', //Space
           9: 'delimiter', // Tab
           13: 'delimiter', // Enter
           108: 'delimiter' // Numpad Enter

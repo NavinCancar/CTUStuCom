@@ -48,6 +48,14 @@
                 <span class="hide-menu">Kiểm duyệt bình luận</span>
               </a>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{{URL::to('/hashtag')}}" aria-expanded="false">
+                <span>
+                  <i class="fa fa-hashtag"></i>
+                </span>
+                <span class="hide-menu">Kiểm duyệt hashtag</span>
+              </a>
+            </li>
           </div>
           @endif
 
@@ -160,11 +168,19 @@
               </a>
             </li>
             <li class="sidebar-item">
+              <a class="sidebar-link" href="{{URL::to('/hashtag-theo-doi')}}" aria-expanded="false">
+                <span>
+                  <i class="fab fa-slack-hash"></i>
+                </span>
+                <span class="hide-menu">Hashtag theo dõi</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
               <a class="sidebar-link" href="{{URL::to('/danh-sach-theo-doi/'.$userLog->ND_MA)}}" aria-expanded="false">
                 <span>
                   <i class="fa fa-portrait"></i>
                 </span>
-                <span class="hide-menu">Theo dõi</span>
+                <span class="hide-menu">Người dùng theo dõi</span>
               </a>
             </li>
             <li class="sidebar-item">

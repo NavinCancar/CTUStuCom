@@ -114,6 +114,21 @@ class PostController extends Controller
     */
 
     /**
+     * Xem danh sách bài đăng của người dùng
+     */
+    public function list(){ ///
+        $this->AuthLogin_ND();
+
+        $userLog = Session::get('userLog');
+
+        $bai_viet = DB::table('bai_viet')
+            ->orderBy('BV_THOIGIANTAO', 'desc')
+            ->where('ND_MA', $userLog->ND_MA)->paginate(10);
+
+        return view('main_content.post.list_post')->with('bai_viet', $bai_viet);
+    }
+
+    /**
      * Tạo bài đăng mới (*)
      */
     public function create(){ //Không dùng
@@ -242,8 +257,8 @@ class PostController extends Controller
         $isBlock=0;
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
 
-        $checkBlockBVTT = DB::table('bai_viet')->where('BV_MA', '=', $bai_dang->BV_MA)->where('BV_TRANGTHAI', '!=', 'Đã duyệt')->exists();
-        if($checkBlockBVTT) $isBlock=1;
+        $checkBV = DB::table('bai_viet')->where('BV_MA', '=', $bai_dang->BV_MA)->first();
+        if($checkBV->BV_TRANGTHAI != 'Đã duyệt') $isBlock=1;
         
         if($userLog){
             $checkBlockBV = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->where('BV_MA', '=', $bai_dang->BV_MA)->exists();
@@ -251,7 +266,7 @@ class PostController extends Controller
             $checkBlockND2 = DB::table('chan')->where('ND_CHAN_MA', $bai_dang->ND_MA)->where('ND_BICHAN_MA', '=', $userLog->ND_MA)->exists(); 
             $checkBlockND3 = DB::table('nguoi_dung')->where('ND_MA', $bai_dang->ND_MA)->where('ND_TRANGTHAI', 0)->exists(); 
             if($checkBlockBV || $checkBlockND || $checkBlockND2 || $checkBlockND3) $isBlock=1;
-            if($userLog->VT_MA == 1 || $userLog->VT_MA == 2) $isBlock=0;
+            if($userLog->VT_MA == 1 || $userLog->VT_MA == 2 || ($checkBV->BV_TRANGTHAI != 'Đã duyệt' && $userLog->ND_MA == $checkBV->ND_MA)) $isBlock=0;
 
             $binh_luan_not_in = DB::table('binhluan_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BL_MA')->toArray();
             $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
@@ -546,7 +561,7 @@ class PostController extends Controller
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
         $bai_viet = DB::table('bai_viet')
             ->orderBy('BV_THOIGIANTAO', 'desc')
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(10);
+            ->whereNotIn('ND_MA', $nguoi_dung_not_in3)->paginate(10);
 
         $baiviet_baocao_noget = DB::table('baiviet_baocao')->where('BVBC_TRANGTHAI', 0);
 
@@ -782,6 +797,7 @@ class PostController extends Controller
                   65: 'select', // A
                   67: 'copy', // C
                   88: 'cut', // X
+                  32: 'delimiter', //Space
                   9: 'delimiter', // Tab
                   13: 'delimiter', // Enter
                   108: 'delimiter' // Numpad Enter

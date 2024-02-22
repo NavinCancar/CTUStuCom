@@ -4,11 +4,11 @@
 <!-- Content Start -->
 <div class="container-fluid">
   <div class="row">
-    <div class="col-lg-8">
+    <div class="col-lg-12">
       <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
-            <h5 class="card-title fw-semibold">Hashtag</h5>
-            <a class="btn btn-primary" href="{{URL::to('/hashtag-theo-doi')}}" previewlistener="true">
-              Hashtag bạn đang theo dõi
+            <h5 class="card-title fw-semibold">Hashtag bạn đang theo dõi</h5>
+            <a class="btn btn-primary" href="{{URL::to('/danh-sach-hashtag')}}" previewlistener="true">
+                Tất cả hashtag
             </a>
       </div>
       <hr>
@@ -78,55 +78,6 @@
           </div>
       </nav>
       <!-- Page number end-->
-    </div>
-
-    <div class="col-lg-4">
-      <div class="mb-3 mb-sm-0">
-        <h5 class="card-title fw-semibold">Gợi ý khám phá</h5>
-      </div>
-      <hr>
-      <div class="card">
-        <div class="card-body p-4">
-          <div class="mb-3 mb-sm-0">
-            <h5 class="card-title fw-semibold">Bạn tương tác nhiều nhất:</h5>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body p-4">
-          <div class="mb-3 mb-sm-0">
-            <h5 class="card-title fw-semibold">Có thể bạn muốn khám phá thêm:</h5>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body p-4">
-          <div class="mb-3 mb-sm-0">
-            <h5 class="card-title fw-semibold">Hot nhất gần đây:</h5>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-          </div>
-        </div>
-      </div>
-      
     </div>
   </div>
 </div>

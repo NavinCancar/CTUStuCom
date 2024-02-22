@@ -19,10 +19,14 @@ class HashtagController extends Controller
     |--------------------------------------------------------------------------
     HÀM HỖ TRỢ
     - Kiểm tra đăng nhập: Người dùng => (*)
+    - Kiểm tra đăng nhập: Kiểm duyệt viên => (**)
     
     NGƯỜI DÙNG
     - Danh sách hashtag, Chi tiết hashtag
-    - Theo dõi hashtag (*)
+    - Theo dõi hashtag (*), Danh sách hashtag bạn đang theo dõi (*)
+
+    KIỂM DUYỆT VIÊN
+    - Tất cả hashtag (**), Thêm hashtag (**), Sửa hashtag (**), Xoá hashtag (**)
     |--------------------------------------------------------------------------
     */
 
@@ -37,6 +41,22 @@ class HashtagController extends Controller
         }
     }
 
+
+    /**
+     * Kiểm tra đăng nhập: Kiểm duyệt viên => (**)
+     */
+    public function AuthLogin_KDV(){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->VT_MA == 1 || $userLog->VT_MA == 2){
+            }
+            else{
+                return Redirect::to('/')->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
     
     /*
     |--------------------------------------------------------------------------
@@ -48,7 +68,18 @@ class HashtagController extends Controller
      * Danh sách hashtag
      */
     public function list(){ ///
+        $userLog = Session::get('userLog');
+
         $hashtag = DB::table('hashtag')->paginate(20);
+
+        if($userLog){
+            $hashtag_theodoi_noget = DB::table('theo_doi_boi')
+            ->where("ND_MA", $userLog->ND_MA);
+
+            return view('main_content.hashtag.list_hashtag')->with('hashtag', $hashtag)
+            ->with('hashtag_theodoi_noget', $hashtag_theodoi_noget);
+        }
+        
         return view('main_content.hashtag.list_hashtag')->with('hashtag', $hashtag);
     }
 
@@ -92,7 +123,8 @@ class HashtagController extends Controller
 
             $isFollowHashtag = null;
         }
-        
+        $count_theo_doi = DB::table('theo_doi_boi')->where('H_HASHTAG', $hashtag->H_HASHTAG)->count();
+
         $hashtag_bai_viet = DB::table('hashtag')
         ->join('cua_bai_viet', 'cua_bai_viet.H_HASHTAG', '=', 'hashtag.H_HASHTAG')->get();
         $hoc_phan = DB::table('hoc_phan')->get();
@@ -119,7 +151,8 @@ class HashtagController extends Controller
             ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
             ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
             ->with('thich_no_get', $thich_no_get)->with('hashtag_get', $hashtag_get)
-            ->with('isFollowHashtag', $isFollowHashtag)->with('bai_viet_luu', $bai_viet_luu)->render();
+            ->with('isFollowHashtag', $isFollowHashtag)->with('bai_viet_luu', $bai_viet_luu)
+            ->with('count_theo_doi', $count_theo_doi)->render();
   
             return response()->json(['html' => $view]);
         }
@@ -129,7 +162,8 @@ class HashtagController extends Controller
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
         ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
         ->with('thich_no_get', $thich_no_get)->with('hashtag_get', $hashtag_get)
-        ->with('isFollowHashtag', $isFollowHashtag)->with('bai_viet_luu', $bai_viet_luu);
+        ->with('isFollowHashtag', $isFollowHashtag)->with('bai_viet_luu', $bai_viet_luu)
+        ->with('count_theo_doi', $count_theo_doi);
     }
 
 
@@ -167,6 +201,22 @@ class HashtagController extends Controller
         }
     }
 
+    /**
+     * Danh sách hashtag bạn đang theo dõi (*)
+     */
+
+    public function list_hashtag_theodoi(){ ///
+        $this->AuthLogin_ND();
+        $userLog = Session::get('userLog');
+
+        $hashtag_theodoi_noget = DB::table('theo_doi_boi')
+        ->where("ND_MA", $userLog->ND_MA);
+
+        $hashtag = $hashtag_theodoi_noget->clone()->paginate(20);
+
+        return view('main_content.hashtag.list_hashtag_theodoi')->with('hashtag', $hashtag)
+        ->with('hashtag_theodoi_noget', $hashtag_theodoi_noget);
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -175,34 +225,109 @@ class HashtagController extends Controller
     */
 
     /**
-     * Tất cả hashtag
+     * Tất cả hashtag (**)
      */
-    public function index()
-    {
-    }
-    /**
-     * Thêm hashtag
-     */
-    public function create(){ //Không dùng
+    public function index(){ ///
+        $this->AuthLogin_KDV();
+        $all_hashtag = DB::table('hashtag')->paginate(10);
+        return view('main_content.hashtag.all_hashtag')->with('all_hashtag', $all_hashtag);
     }
 
-    public function store(Request $request){ //Không dùng
-    }
 
     /**
-     * Sửa hashtag
+     * Thêm hashtag (**)
      */
-    public function edit(Hashtag $hashtag){ //Không dùng
+    public function create(){ ///
+        $this->AuthLogin_KDV();
+        return view('main_content.hashtag.add_hashtag');
     }
 
-    public function update(Request $request, Hashtag $hashtag){ //Không dùng
+    public function store(Request $request){ ///
+        $this->AuthLogin_KDV();
+        
+        //Dò rỗng
+        if(trim($request->H_HASHTAG) == ""){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Tên hashtag không thể rỗng!']);
+            return Redirect::to('hashtag/create');
+        }
+
+        //Dò trùng
+        $dsh=DB::table('hashtag')->get();
+        foreach ($dsh as $ds){
+            if (strtolower($ds->H_HASHTAG)==strtolower(trim($request->H_HASHTAG))) {
+                Session::put('alert', ['type' => 'warning', 'content' => 'Tên hashtag không thể trùng!']);
+                return Redirect::to('hashtag/create');
+            }
+        }
+
+        DB::table('hashtag')->insert([
+            'H_HASHTAG' => trim($request->H_HASHTAG),
+        ]);
+        Session::put('alert', ['type' => 'success', 'content' => 'Thêm hashtag thành công!']);
+        return Redirect::to('hashtag');
+    }
+
+    
+    /**
+     * Sửa hashtag (**)
+     */
+    public function edit(Hashtag $hashtag){ ///
+        $this->AuthLogin_KDV();
+        $all_hashtag = DB::table('hashtag')->where('H_HASHTAG', $hashtag->H_HASHTAG)->get();
+        return view('main_content.hashtag.edit_hashtag')->with('all_hashtag', $all_hashtag);
+    }
+
+    public function update(Request $request, Hashtag $hashtag){ ///
+        $this->AuthLogin_KDV();
+        
+        //Dò rỗng
+        if(trim($request->H_HASHTAG) == ""){
+            Session::put('alert', ['type' => 'warning', 'content' => 'Tên hashtag không thể rỗng!']);
+            return Redirect::to('hashtag/'.$hashtag->H_HASHTAG.'/edit');
+        }
+
+        //Dò trùng
+        $dsh=DB::table('hashtag')->get();
+        foreach ($dsh as $ds){
+            if ($ds->H_HASHTAG != $hashtag->H_HASHTAG && strtolower($ds->H_HASHTAG)==strtolower(trim($request->H_HASHTAG))) {
+                Session::put('alert', ['type' => 'warning', 'content' => 'Tên hashtag không thể trùng!']);
+                return Redirect::to('hashtag/'.$hashtag->H_HASHTAG.'/edit');
+            }
+        }
+
+        DB::table('hashtag')->insert([
+            'H_HASHTAG' => trim($request->H_HASHTAG),
+        ]);
+
+        DB::table('cua_bai_viet')
+        ->where('H_HASHTAG', $hashtag->H_HASHTAG)
+        ->update([
+            'H_HASHTAG' => trim($request->H_HASHTAG),
+        ]);
+
+        DB::table('theo_doi_boi')
+        ->where('H_HASHTAG', $hashtag->H_HASHTAG)
+        ->update([
+            'H_HASHTAG' => trim($request->H_HASHTAG),
+        ]);
+
+        DB::table('hashtag')->where('H_HASHTAG', $hashtag->H_HASHTAG)->delete();
+
+        Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật hashtag thành công!']);
+        return Redirect::to('hashtag');
     }
 
     /**
-     * Xoá hashtag
+     * Xoá hashtag (**)
      */
-    public function destroy(Hashtag $hashtag)
-    {
-        //
+    public function destroy(Hashtag $hashtag){ ///
+        $this->AuthLogin_KDV();
+
+        DB::table('cua_bai_viet')->where('H_HASHTAG', $hashtag->H_HASHTAG)->delete();
+        DB::table('theo_doi_boi')->where('H_HASHTAG', $hashtag->H_HASHTAG)->delete();
+        DB::table('hashtag')->where('H_HASHTAG', $hashtag->H_HASHTAG)->delete();
+
+        Session::put('alert', ['type' => 'success', 'content' => 'Xoá hashtag thành công!']);
+        return Redirect::to('hashtag');
     }
 }

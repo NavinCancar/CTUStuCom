@@ -307,3 +307,10 @@
 .d-none {
   display: none !important; 
 }
+
+.long-hashtag{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 85%;
+  display: inline-block;
+}

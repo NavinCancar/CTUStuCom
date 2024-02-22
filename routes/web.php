@@ -63,6 +63,7 @@ Route::get('/bo-chan/{ND_MA}', 'App\Http\Controllers\UserSysController@destroy_c
 //Post: Bài đăng
 Route::resource('/bai-dang', 'App\Http\Controllers\PostController')->except(['create','edit']); ///ok: C_ND
 Route::get('/bai-dang-binh-luan={BL_MA}', 'App\Http\Controllers\PostController@find_baidang_binhluan'); ///ok
+Route::get('/danh-sach-bai-dang', 'App\Http\Controllers\PostController@list'); ///
 Route::get('/chi-tiet-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@index_detail'); ///
 Route::post('/cap-nhat-trang-thai-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@updateState'); ///ok
 Route::post('/cap-nhat-hashtag-bai-dang/{BV_MA}', 'App\Http\Controllers\PostController@updateHashtag'); ///
@@ -98,11 +99,12 @@ Route::post('/duyet-bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentCon
 
 //Hashtag
 Route::get('/danh-sach-hashtag', 'App\Http\Controllers\HashtagController@list'); ///ok
-Route::resource('/hashtag', 'App\Http\Controllers\HashtagController')->only(['show']);
+Route::resource('/hashtag', 'App\Http\Controllers\HashtagController');
 
 //--Theo dõi hashtag
 Route::get('/theo-doi-hashtag/{H_HASHTAG}', 'App\Http\Controllers\HashtagController@hashtag_theodoi'); ///ok
 Route::get('/huy-theo-doi-hashtag/{H_HASHTAG}', 'App\Http\Controllers\HashtagController@destroy_hashtag_theodoi'); ///ok
+Route::get('/hashtag-theo-doi', 'App\Http\Controllers\HashtagController@list_hashtag_theodoi'); ///
 
 
 //College: Khoa trường
