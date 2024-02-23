@@ -32,7 +32,7 @@ class PostController extends Controller
     - Bài viết - thích (*), Bài viết - lưu (*), Bài viết - báo cáo (*)
 
     KIỂM DUYỆT VIÊN
-    - Xem danh sách bài đăng (**), Duyệt báo cáo bài đăng (**), 
+    - Xem danh sách bài đăng (**), Bỏ qua báo cáo bài đăng (**), 
       Cập nhật trạng thái bài viết (**), Cập nhật hashtag bài viết (**)
     |--------------------------------------------------------------------------
     */
@@ -251,6 +251,7 @@ class PostController extends Controller
         //Bình luận
         $count_binh_luan = DB::table('bai_viet')
         ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá')
         ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->count();
 
         $userLog = Session::get('userLog');
@@ -276,6 +277,7 @@ class PostController extends Controller
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+            ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
             ->where('binh_luan.BL_TRALOI_MA', '=', null)
             ->whereNotIn('BL_MA', $binh_luan_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
@@ -286,6 +288,7 @@ class PostController extends Controller
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+            ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
             ->where('binh_luan.BL_TRALOI_MA', '!=', null)
             ->whereNotIn('BL_MA', $binh_luan_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
@@ -297,6 +300,7 @@ class PostController extends Controller
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+            ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
             ->where('binh_luan.BL_TRALOI_MA', '=', null)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
 
@@ -304,20 +308,22 @@ class PostController extends Controller
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+            ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
             ->where('binh_luan.BL_TRALOI_MA', '!=', null)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
         }
 
         $binh_luan_bv= DB::table('binh_luan')
         ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
+        ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
         ->pluck('BL_MA')->toArray();
 
         $binh_luan_no_get= DB::table('binh_luan')
-        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA);
+        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá');
 
         $binh_luan_thich_no_get = DB::table('binh_luan')
         ->join('binhluan_thich', 'binhluan_thich.BL_MA', '=', 'binh_luan.BL_MA')
-        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA);
+        ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá');
 
         $bai_viet_luu= DB::table('danh_dau')
         ->where('danh_dau.BV_MA', '=', $bai_dang->BV_MA);
@@ -519,10 +525,9 @@ class PostController extends Controller
                 'ND_MA' => $userLog->ND_MA,
                 'BV_MA' => $BV_MA,
                 'BVBC_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh'),
-                'BVBC_TRANGTHAI' => 0,
                 'BVBC_NOIDUNG' => $request->BVBC_NOIDUNG,
             ]);
-            Session::put('alert', ['type' => 'success', 'content' => 'Gửi báo cáo thành công!']);
+            Session::put('alert', ['type' => 'success', 'content' => '<span class="px-4">Gửi báo cáo bài viết thành công, bài viết này sẽ bị ẩn đến bạn cho đến khi được kiểm duyệt viên xử lý</span>']);
         }
         else{
             DB::table('baiviet_baocao')
@@ -530,10 +535,9 @@ class PostController extends Controller
             ->where('BV_MA', $BV_MA)
             ->update([
                 'BVBC_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh'),
-                'BVBC_TRANGTHAI' => 0,
                 'BVBC_NOIDUNG' => $request->BVBC_NOIDUNG,
             ]);
-            Session::put('alert', ['type' => 'success', 'content' => 'Gửi báo cáo thành công!']);
+            Session::put('alert', ['type' => 'success', 'content' => '<span class="px-4">Gửi báo cáo bài viết thành công, bài viết này sẽ bị ẩn đến bạn cho đến khi được kiểm duyệt viên xử lý</span>']);
         }
     }
 
@@ -563,7 +567,7 @@ class PostController extends Controller
             ->orderBy('BV_THOIGIANTAO', 'desc')
             ->whereNotIn('ND_MA', $nguoi_dung_not_in3)->paginate(10);
 
-        $baiviet_baocao_noget = DB::table('baiviet_baocao')->where('BVBC_TRANGTHAI', 0);
+        $baiviet_baocao_noget = DB::table('baiviet_baocao');
 
         return view('main_content.post.all_post')
         ->with('bai_viet', $bai_viet)->with('baiviet_baocao_noget', $baiviet_baocao_noget);
@@ -599,10 +603,11 @@ class PostController extends Controller
             //Bình luận
             $count_binh_luan = DB::table('bai_viet')
             ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
-            ->where('bai_viet.BV_MA', '=', $BV_MA)->count();
+            ->where('bai_viet.BV_MA', '=', $BV_MA)
+            ->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá')->count();
 
             //Báo cáo
-            $bao_cao_noget = DB::table('baiviet_baocao')->where('BVBC_TRANGTHAI', 0)->where('BV_MA', $bv->BV_MA); 
+            $bao_cao_noget = DB::table('baiviet_baocao')->where('BV_MA', $bv->BV_MA); 
             $bao_cao = $bao_cao_noget->clone()
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'baiviet_baocao.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')->orderby('BVBC_THOIDIEM', 'desc')->get(); 
@@ -631,13 +636,36 @@ class PostController extends Controller
                                     if($bv->BV_TRANGTHAI == 'Đã xoá') $output .='<option selected value="Đã xoá">Đã xoá</option>';    
                         $output .= '</select>
                             </span>
-                            <span id="detail_BV_TRANGTHAI"'; 
-                            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Vi phạm tiêu chuẩn') 
+                            <span id="edit_BV_TRANGTHAI"'; 
+                            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa') 
                             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                                 <span class="d-flex justify-content-between align-items-center">
-                                    <b>Chi tiết trạng thái:</b>
-                                    <input type="text" name="BV_NOIDUNG_TRANGTHAI" value="'. trim(strstr($bv->BV_TRANGTHAI, ':'), ': ') .'" class="form-control w-75">
+                                    <b>Yêu cầu chỉnh sửa:</b>
+                                    <input class="form-control w-75" name="BV_NOIDUNG_TRANGTHAI" value="'. ((trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') ? trim(strstr($bv->BV_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsEdit" placeholder="Chọn hoăc nhập mới...">
+                                    <datalist id="datalistOptionsEdit">
+                                        <option value="Tiêu đề">
+                                        <option value="Nội dung">
+                                        <option value="File đính kèm">
+                                        <option value="Ngôn từ">
+                                        <option value="Viết tắt/teencode/chính tả">
+                                    </datalist>
+                                </span>
+                            </span>
+                            <span id="ban_BV_TRANGTHAI"'; 
+                            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Vi phạm tiêu chuẩn') 
+                            $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
+
+                                <span class="d-flex justify-content-between align-items-center">
+                                    <b>Vi phạm tiêu chuẩn:</b>
+                                    <input class="form-control w-75" name="BV_NOIDUNG_VIPHAM" value="'. ((trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') ? trim(strstr($bv->BV_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
+                                    <datalist id="datalistOptionsBan">
+                                        <option value="Thông tin sai sự thật">
+                                        <option value="Spam/Quảng cáo">
+                                        <option value="Ngôn từ không phù hợp">
+                                        <option value="Kích động, gây hiểu lầm">
+                                        <option value="Phân biệt dân tộc/vùng miền/tôn giáo">
+                                    </datalist>
                                 </span>
                             </span>
                             <button type="button" id="update_BV_TRANGTHAI" class="btn btn-primary col-sm-3 mb-2">Cập nhật</button>
@@ -716,7 +744,7 @@ class PostController extends Controller
                                     <input class="form-check-input mt-1" id="check-all-BC_DUYET" type="checkbox">&ensp; Tất cả
                                     
                                     <a class="btn btn-danger btn-sm ms-4" previewlistener="true" id="check-BC_DUYET" >
-                                        <i class="fas fa-check-square"></i> Duyệt báo cáo
+                                        <i class="fas fa-times"></i> Bỏ qua báo cáo
                                     </a>
                                 </span>
                             </div>
@@ -880,13 +908,36 @@ class PostController extends Controller
                     if($bv->BV_TRANGTHAI == 'Đã xoá') $output .='<option selected value="Đã xoá">Đã xoá</option>';    
         $output .= '</select>
             </span>
-            <span id="detail_BV_TRANGTHAI"'; 
-            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa' && trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Vi phạm tiêu chuẩn') 
+            <span id="edit_BV_TRANGTHAI"'; 
+            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Yêu cầu chỉnh sửa') 
             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                 <span class="d-flex justify-content-between align-items-center">
-                    <b>Chi tiết trạng thái:</b>
-                    <input type="text" name="BV_NOIDUNG_TRANGTHAI" value="'. trim(strstr($bv->BV_TRANGTHAI, ':'), ': ') .'" class="form-control w-75">
+                    <b>Yêu cầu chỉnh sửa:</b>
+                    <input class="form-control w-75" name="BV_NOIDUNG_TRANGTHAI" value="'. ((trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') ? trim(strstr($bv->BV_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsEdit" placeholder="Chọn hoăc nhập mới...">
+                    <datalist id="datalistOptionsEdit">
+                        <option value="Tiêu đề">
+                        <option value="Nội dung">
+                        <option value="File đính kèm">
+                        <option value="Ngôn từ">
+                        <option value="Viết tắt/teencode/chính tả">
+                    </datalist>
+                </span>
+            </span>
+            <span id="ban_BV_TRANGTHAI"'; 
+            if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) != 'Vi phạm tiêu chuẩn') 
+            $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
+
+                <span class="d-flex justify-content-between align-items-center">
+                    <b>Vi phạm tiêu chuẩn:</b>
+                    <input class="form-control w-75" name="BV_NOIDUNG_VIPHAM" value="'. ((trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') ? trim(strstr($bv->BV_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
+                    <datalist id="datalistOptionsBan">
+                        <option value="Thông tin sai sự thật">
+                        <option value="Spam/Quảng cáo">
+                        <option value="Ngôn từ không phù hợp">
+                        <option value="Kích động, gây hiểu lầm">
+                        <option value="Phân biệt dân tộc/vùng miền/tôn giáo">
+                    </datalist>
                 </span>
             </span>
             <button type="button" id="update_BV_TRANGTHAI" class="btn btn-primary col-sm-3 mb-2">Cập nhật</button>';
@@ -952,7 +1003,7 @@ class PostController extends Controller
     }
 
     /**
-     * Duyệt báo cáo bài đăng (**)
+     * Bỏ qua báo cáo bài đăng (**)
      */
     public function duyet_baidang_baocao(Request $request, $BV_MA){ ///
         $this->AuthLogin_KDV();
@@ -963,11 +1014,8 @@ class PostController extends Controller
         if ($bcDuyetValues && is_array($bcDuyetValues)) {
             foreach ($bcDuyetValues as $ND) {
                 DB::table('baiviet_baocao')
-                ->where('ND_MA', $ND)
-                ->where('BV_MA', $BV_MA)
-                ->update([
-                    'BVBC_TRANGTHAI' => 1,
-                ]);
+                ->where('ND_MA', $ND)->where('BV_MA', $BV_MA)
+                ->delete();
             }
         } 
     }

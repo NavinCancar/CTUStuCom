@@ -35,7 +35,7 @@ class CommentController extends Controller
 
 
     KIỂM DUYỆT VIÊN
-    - Xem danh sách bình luận (**), Duyệt báo cáo bình luận (**)
+    - Xem danh sách bình luận (**), Bỏ qua báo cáo bình luận (**)
     |--------------------------------------------------------------------------
     */
 
@@ -155,6 +155,7 @@ class CommentController extends Controller
             'BV_MA' => $request->BV_MA,
             'BL_TRALOI_MA' => $BL_TRALOI_MA,
             'BL_NOIDUNG' => $request->BL_NOIDUNG,
+            'BL_TRANGTHAI' => 'Đang hiển thị',
             'BL_THOIGIANTAO' => Carbon::now('Asia/Ho_Chi_Minh')
         ]);
 
@@ -244,7 +245,10 @@ class CommentController extends Controller
         $userLog = Session::get('userLog');
         //Bài viết
         DB::table('binh_luan')
-        ->where('BL_MA', $binh_luan->BL_MA)->delete();
+        ->where('BL_MA', $binh_luan->BL_MA)
+        ->update([ 
+            'BL_TRANGTHAI' => 'Đã xoá',
+        ]);
 
         Session::put('alert', ['type' => 'success', 'content' => 'Xoá bình luận thành công!']);
         return;
@@ -335,10 +339,9 @@ class CommentController extends Controller
                 'ND_MA' => $userLog->ND_MA,
                 'BL_MA' => $BL_MA,
                 'BLBC_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh'),
-                'BLBC_TRANGTHAI' => 0,
                 'BLBC_NOIDUNG' => $request->BLBC_NOIDUNG,
             ]);
-            Session::put('alert', ['type' => 'success', 'content' => 'Gửi báo cáo thành công!']);
+            Session::put('alert', ['type' => 'success', 'content' => '<span class="px-4">Gửi báo cáo bình luận thành công, bình luận này sẽ bị ẩn đến bạn cho đến khi được kiểm duyệt viên xử lý</span>']);
         }
         else{
             DB::table('binhluan_baocao')
@@ -346,10 +349,9 @@ class CommentController extends Controller
             ->where('BL_MA', $BL_MA)
             ->update([
                 'BLBC_THOIDIEM' => Carbon::now('Asia/Ho_Chi_Minh'),
-                'BLBC_TRANGTHAI' => 0,
                 'BLBC_NOIDUNG' => $request->BLBC_NOIDUNG,
             ]);
-            Session::put('alert', ['type' => 'success', 'content' => 'Gửi báo cáo thành công!']);
+            Session::put('alert', ['type' => 'success', 'content' => '<span class="px-4">Gửi báo cáo bình luận thành công, bình luận này sẽ bị ẩn đến bạn cho đến khi được kiểm duyệt viên xử lý</span>']);
         }
     }
     /*
@@ -376,7 +378,7 @@ class CommentController extends Controller
             ->orderBy('BL_THOIGIANTAO', 'desc')
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(10);
 
-        $binhluan_baocao_noget = DB::table('binhluan_baocao')->where('BLBC_TRANGTHAI', 0);
+        $binhluan_baocao_noget = DB::table('binhluan_baocao');
 
         return view('main_content.comment.all_comment')
         ->with('binh_luan', $binh_luan)->with('binhluan_baocao_noget', $binhluan_baocao_noget);
@@ -403,10 +405,10 @@ class CommentController extends Controller
 
             //Bình luận
             $count_bl_traloi = DB::table('binh_luan')
-            ->where('binh_luan.BL_TRALOI_MA', $BL_MA)->count();
+            ->where('binh_luan.BL_TRALOI_MA', $BL_MA)->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá')->count();
 
             //Báo cáo
-            $bao_cao_noget = DB::table('binhluan_baocao')->where('BLBC_TRANGTHAI', 0)->where('BL_MA', $bl->BL_MA); 
+            $bao_cao_noget = DB::table('binhluan_baocao')->where('BL_MA', $bl->BL_MA); 
             $bao_cao = $bao_cao_noget->clone()
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binhluan_baocao.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')->orderby('BLBC_THOIDIEM', 'desc')->get(); 
@@ -416,6 +418,39 @@ class CommentController extends Controller
             $output .= 
                 '<!-- Modal Header -->
                     <div class="modal-header">
+                    <form class="modal-title row" style="width: 95%">
+                            <span class="d-flex justify-content-between align-items-center col-sm-9 mb-2">
+                                <b>Trạng thái bài viết:</b>
+                                <select name="BL_TRANGTHAI" ';
+                                if($bl->BL_TRANGTHAI == 'Đã xoá') $output .=' disabled '; 
+                                $output .= 'class="form-select w-75">
+                                    <option';
+                                        if($bl->BL_TRANGTHAI == 'Đang hiển thị') $output .=' selected '; 
+                                        $output .= ' value="Đang hiển thị">Đang hiển thị</option>
+                                    <option'; 
+                                        if(trim(strstr($bl->BL_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') $output .=' selected '; 
+                                        $output .= ' value="Vi phạm tiêu chuẩn">Vi phạm tiêu chuẩn</option>';
+                                    if($bl->BL_TRANGTHAI == 'Đã xoá') $output .='<option selected value="Đã xoá">Đã xoá</option>';    
+                        $output .= '</select>
+                            </span>
+                            <span id="ban_BL_TRANGTHAI"'; 
+                            if(trim(strstr($bl->BL_TRANGTHAI, ':', true)) != 'Vi phạm tiêu chuẩn') 
+                            $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
+
+                                <span class="d-flex justify-content-between align-items-center">
+                                    <b>Vi phạm tiêu chuẩn:</b>
+                                    <input class="form-control w-75" name="BL_NOIDUNG_VIPHAM" value="'. ((trim(strstr($bl->BL_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') ? trim(strstr($bl->BL_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
+                                    <datalist id="datalistOptionsBan">
+                                        <option value="Thông tin sai sự thật">
+                                        <option value="Spam/Quảng cáo">
+                                        <option value="Ngôn từ không phù hợp">
+                                        <option value="Kích động, gây hiểu lầm">
+                                        <option value="Phân biệt dân tộc/vùng miền/tôn giáo">
+                                    </datalist>
+                                </span>
+                            </span>
+                            <button type="button" id="update_BL_TRANGTHAI" class="btn btn-primary col-sm-3 mb-2">Cập nhật</button>
+                        </form>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="text-notice text-notice-success alert alert-success mx-4" id="modal-alert-success" style="display: none">
@@ -437,7 +472,6 @@ class CommentController extends Controller
                             </a>';
                             if($bl->VT_MA != 3) $output .='<span class="badge-sm bg-warning rounded-pill"><i>'. $bl->VT_TEN .'</i></span>';
                             $output .= ' đã gửi vào '. date('H:i', strtotime($bl->BL_THOIGIANTAO)) .' ngày '. date('d/m/Y', strtotime($bl->BL_THOIGIANTAO)) .'
-                            <button type="button" class="btn btn-danger xoabinhluan-btn btn-sm float-end"><i class="fa fa-times text-white text"></i> Xoá bình luận</button>
                             </div>
 
                             <div class="mx-2">
@@ -470,7 +504,7 @@ class CommentController extends Controller
                                     <input class="form-check-input mt-1" id="check-all-BC_DUYET" type="checkbox">&ensp; Tất cả
                                     
                                     <a class="btn btn-danger btn-sm ms-4" previewlistener="true" id="check-BC_DUYET" >
-                                        <i class="fas fa-check-square"></i> Duyệt báo cáo
+                                        <i class="fas fa-times"></i> Bỏ qua báo cáo
                                     </a>
                                 </span>
                             </div>
@@ -514,7 +548,7 @@ class CommentController extends Controller
     }
 
     /**
-     * Duyệt báo cáo bình luận (**)
+     * Bỏ qua báo cáo bình luận (**)
      */
     public function duyet_binhluan_baocao(Request $request, $BL_MA){ ///
         $this->AuthLogin_KDV();
@@ -525,13 +559,63 @@ class CommentController extends Controller
         if ($bcDuyetValues && is_array($bcDuyetValues)) {
             foreach ($bcDuyetValues as $ND) {
                 DB::table('binhluan_baocao')
-                ->where('ND_MA', $ND)
-                ->where('BL_MA', $BL_MA)
-                ->update([
-                    'BLBC_TRANGTHAI' => 1,
-                ]);
+                ->where('ND_MA', $ND)->where('BL_MA', $BL_MA)
+                ->delete();
             }
         } 
+    }
+
+    /**
+     * Cập nhật trạng thái bình luận (**)
+     */
+    public function updateState(Request $request, $BL_MA){ ///
+        $this->AuthLogin_KDV();
+
+        $userLog = Session::get('userLog');
+        //Bài viết
+        DB::table('binh_luan')
+        ->where('BL_MA', $BL_MA)
+        ->update([ 
+            'BL_TRANGTHAI' => $request->BL_TRANGTHAI,
+        ]);
+
+        $bl = DB::table('binh_luan')->where('binh_luan.BL_MA', '=', $BL_MA)->first();
+
+        $output = '';
+        $output .= 
+                '<span class="d-flex justify-content-between align-items-center col-sm-9 mb-2">
+                <b>Trạng thái bài viết:</b>
+                <select name="BL_TRANGTHAI" ';
+                if($bl->BL_TRANGTHAI == 'Đã xoá') $output .=' disabled '; 
+                $output .= 'class="form-select w-75">
+                    <option';
+                        if($bl->BL_TRANGTHAI == 'Đang hiển thị') $output .=' selected '; 
+                        $output .= ' value="Đang hiển thị">Đang hiển thị</option>
+                    <option'; 
+                        if(trim(strstr($bl->BL_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') $output .=' selected '; 
+                        $output .= ' value="Vi phạm tiêu chuẩn">Vi phạm tiêu chuẩn</option>';
+                    if($bl->BL_TRANGTHAI == 'Đã xoá') $output .='<option selected value="Đã xoá">Đã xoá</option>';    
+        $output .= '</select>
+            </span>
+            <span id="ban_BL_TRANGTHAI"'; 
+            if(trim(strstr($bl->BL_TRANGTHAI, ':', true)) != 'Vi phạm tiêu chuẩn') 
+            $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
+
+                <span class="d-flex justify-content-between align-items-center">
+                    <b>Vi phạm tiêu chuẩn:</b>
+                    <input class="form-control w-75" name="BL_NOIDUNG_VIPHAM" value="'. ((trim(strstr($bl->BL_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') ? trim(strstr($bl->BL_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
+                    <datalist id="datalistOptionsBan">
+                        <option value="Thông tin sai sự thật">
+                        <option value="Spam/Quảng cáo">
+                        <option value="Ngôn từ không phù hợp">
+                        <option value="Kích động, gây hiểu lầm">
+                        <option value="Phân biệt dân tộc/vùng miền/tôn giáo">
+                    </datalist>
+                </span>
+            </span>
+            <button type="button" id="update_BL_TRANGTHAI" class="btn btn-primary col-sm-3 mb-2">Cập nhật</button>';
+        
+        return Response($output);
     }
 
 

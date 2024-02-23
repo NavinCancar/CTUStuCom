@@ -60,7 +60,8 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">Mã</th>
-                                            <th scope="col" width="650">Nội dung bình luận</th>
+                                            <th scope="col" width="500">Nội dung bình luận</th>
+                                            <th scope="col" width="150">Trạng thái</th>
                                             <th scope="col">Ngày tạo</th>
                                             <th scope="col">Báo cáo</th>
                                             <th scope="col" width="70"></th>
@@ -71,6 +72,13 @@
                                         <tr data-comment-id-value="{{$bl->BL_MA}}">
                                             <td>{{$bl->BL_MA}}</td>
                                             <td><span class="limited-lines">{{$bl->BL_NOIDUNG}}</span></td>
+                                            <td class="trangthai">
+                                                <?php 
+                                                    if($bl->BL_TRANGTHAI == 'Đang hiển thị') echo '<span class="badge-sm bg-success rounded-pill fs-2"><i>Đang hiển thị</i></span>';
+                                                    else if($bl->BL_TRANGTHAI == 'Đã xoá') echo '<span class="badge-sm bg-light rounded-pill fs-2"><i>Đã xoá</i></span>'; 
+                                                    else echo '<span class="badge-sm bg-warning rounded-pill fs-2"><i>'.trim(strstr($bl->BL_TRANGTHAI, ':', true)).'</i></span>'; 
+                                                ?>
+                                            </td>
                                             <td>{{date('d/m/Y', strtotime($bl->BL_THOIGIANTAO))}}</td>
                                             <td class="text-center td_sl_baocao"><?php 
                                                 $count = $binhluan_baocao_noget->clone()->groupby('BL_MA')->where('BL_MA', $bl->BL_MA)->count(); 
@@ -222,6 +230,8 @@
 
             $(document).on('click', '.show-detail', function(e) {
                 e.preventDefault();
+                $('#modal-content').html('');
+
                 // Truy cập giá trị của tham số từ thuộc tính dữ liệu
                 var element = $(this);
                 var BL_MA = $(this).data('comment-id-value');
@@ -231,6 +241,7 @@
                     type: 'GET',
                     success: function(response) {
                         $('#modal-content').html(response);
+                        var defaultValue = $('select[name="BL_TRANGTHAI"]').val();
 
                         //|-----------------------------------------------------
                         //|HIỆN FILE BÌNH LUẬN
@@ -363,13 +374,13 @@
                                         }
                                         $('.modal-auto-load').hide();
                                         $('#modal-alert-success').show();
-                                        $('#modal-alert-success span').html('Duyệt báo cáo thành công');
+                                        $('#modal-alert-success span').html('Bỏ qua báo cáo thành công');
                                     },
                                     error: function(error) {
                                         $('#modal-baocao').show();
                                         $('.modal-auto-load').hide();
                                         $('#modal-alert-danger').show();
-                                        $('#modal-alert-danger span').html('Duyệt báo cáo thất bại');
+                                        $('#modal-alert-danger span').html('Bỏ qua báo cáo thất bại');
                                         console.log(error);
                                     }
                                 });
@@ -377,38 +388,105 @@
                             
                         });
                         
-                        //|*****************************************************
-                        //|XOÁ BÌNH LUẬN START 
-                        //|*****************************************************
-                        $('.xoabinhluan-btn').click(function(e) {
-                            e.preventDefault();
-                            // Hiển thị hộp thoại xác nhận
-                            var isConfirmed = window.confirm('Bạn có chắc chắn muốn xoá bình luận này không?');
+                        //|-----------------------------------------------------
+                        //|SELECT
+                        //|-----------------------------------------------------
+                        $('select[name="BL_TRANGTHAI"]').change(function() {
+                            $('input[name="BL_NOIDUNG_VIPHAM"]').css('border-color', '');
 
-                            if (isConfirmed) {
-                                var _token = $('meta[name="csrf-token"]').attr('content');
-                                $.ajax({
-                                url: '{{URL::to('/binh-luan/')}}'+'/'+BL_MA,
-                                type: 'DELETE',
-                                data: {
-                                    _token: _token // Include the CSRF token in the data
-                                },
-                                success: function(response) {
-                                    window.location.href = '{{URL::to('/binh-luan')}}';
-                                },
-                                error: function(error) {
-                                    $('#alert-danger span').html('Xoá bình luận thất bại');
-                                    $('html, body').animate({
-                                        scrollTop: $('#alert-danger').offset().top
-                                    });
-                                    document.getElementById('alert-danger').style.display = 'block';
-                                    console.log(error);
-                                }
-                                });
+                            var selectedValue = $(this).val();
+                            if(selectedValue == 'Vi phạm tiêu chuẩn'){
+                                $('#ban_BL_TRANGTHAI').show();
+                            } 
+                            else{
+                                $('#ban_BL_TRANGTHAI').hide();
                             } 
                         });
+
+                        //|-----------------------------------------------------
+                        //|NGĂN GÕ : TRONG CHI TIẾT TRẠNG THÁI
+                        //|-----------------------------------------------------
+                        $('input[name="BL_NOIDUNG_VIPHAM"]').on('keydown', function(e) {
+                            if (e.key === ":") {
+                                e.preventDefault();
+                            }
+                        });
+
                         //|*****************************************************
-                        //|XOÁ BÌNH LUẬN END
+                        //|CẬP NHẬT TRẠNG THÁI START 
+                        //|*****************************************************
+                        $('#update_BL_TRANGTHAI').click(function() {
+                            var form = $(this).closest('form');
+                            var BL_TRANGTHAI = form.find('select[name="BL_TRANGTHAI"]').val();
+                            var BL_NOIDUNG_VIPHAM = form.find('input[name="BL_NOIDUNG_VIPHAM"]').val();
+                            var _token = $('meta[name="csrf-token"]').attr('content');
+
+                            if(BL_TRANGTHAI == 'Vi phạm tiêu chuẩn' && BL_NOIDUNG_VIPHAM == ''){
+                                form.find('input[name="BL_NOIDUNG_VIPHAM"]').css('border-color', '#FA896B');
+                            }
+                            else{
+                                if((BL_TRANGTHAI != defaultValue && BL_TRANGTHAI != 'Đã xoá') || BL_TRANGTHAI == 'Vi phạm tiêu chuẩn'){
+                                    $('.modal-header form').hide();
+                                    $('.modal-body').hide();
+                                    $('.modal-auto-load').show();
+
+                                    const BL_TRANGTHAI_get = BL_TRANGTHAI;
+
+                                    if(BL_TRANGTHAI == 'Vi phạm tiêu chuẩn'){
+                                        BL_TRANGTHAI = BL_TRANGTHAI + ': ' + BL_NOIDUNG_VIPHAM;
+                                    }
+                                    
+                                    $.ajax({
+                                    url: '{{URL::to('/cap-nhat-trang-thai-binh-luan/')}}' +'/'+ BL_MA,
+                                    type: 'POST',
+                                    data: {
+                                        BL_TRANGTHAI: BL_TRANGTHAI,
+                                        _token: _token 
+                                    },
+                                    success: function(response) {
+                                        //Notification start
+                                        $.ajax({
+                                            url: '{{URL::to('/thong-bao-trang-thai-binh-luan/')}}' +'/'+ BL_MA,
+                                            type: 'GET',
+                                            success: function(response2) {
+                                                //console.log('ok');
+                                            },
+                                            error: function(error2) {
+                                                console.log(error);
+                                            }
+                                        });
+                                        //Notification end
+
+                                        form[0].reset();
+                                        $('.modal-header form').html(response);
+
+                                        var trangThaiNew = '';
+                                        if(BL_TRANGTHAI_get == 'Đang hiển thị') trangThaiNew = '<span class="badge-sm bg-success rounded-pill fs-2"><i>Đang hiển thị</i></span>';
+                                        else if(BL_TRANGTHAI_get == 'Đã xoá') trangThaiNew = '<span class="badge-sm bg-light rounded-pill fs-2"><i>Đã xoá</i></span>'; 
+                                        else trangThaiNew = '<span class="badge-sm bg-warning rounded-pill fs-2"><i>'+BL_TRANGTHAI_get+'</i></span>'; 
+                                        $('tr[data-comment-id-value="' + BL_MA + '"]').find('td.trangthai').html(trangThaiNew);
+
+                                        $('.modal-auto-load').hide();
+                                        $('.modal-header form').show();
+                                        $('.modal-body').show();
+                                        $('#modal-alert-success').show();
+                                        $('#modal-alert-success span').html('Cập nhật trạng thái bài viết thành công');
+                                    },
+                                    error: function(error) {
+                                        $('.modal-auto-load').hide();
+                                        $('.modal-header form').show();
+                                        $('.modal-body').show();
+                                        $('#modal-alert-danger').show();
+                                        $('#modal-alert-danger span').html('Cập nhật trạng thái bài viết thất bại');
+                                        console.log(error);
+                                    }
+                                    });
+                                }
+                            }
+                            
+                        });
+                        //|*****************************************************
+                        //|CẬP NHẬT TRẠNG THÁI END 
                         //|*****************************************************
                     },
                     error: function(error) {

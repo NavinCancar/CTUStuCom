@@ -95,7 +95,7 @@
                                     <input class="form-check-input mt-1" type="checkbox">&ensp; Tất cả
                                     
                                     <a class="btn btn-danger btn-sm ms-4" previewlistener="true">
-                                        <i class="fas fa-check-square"></i> Duyệt báo cáo
+                                        <i class="fas fa-check-square"></i> Bỏ qua báo cáo
                                     </a>
                                 </span>
                             </div>
@@ -466,13 +466,13 @@
                                         }
                                         $('.modal-auto-load').hide();
                                         $('#modal-alert-success').show();
-                                        $('#modal-alert-success span').html('Duyệt báo cáo thành công');
+                                        $('#modal-alert-success span').html('Bỏ qua báo cáo thành công');
                                     },
                                     error: function(error) {
                                         $('#modal-baocao').show();
                                         $('.modal-auto-load').hide();
                                         $('#modal-alert-danger').show();
-                                        $('#modal-alert-danger span').html('Duyệt báo cáo thất bại');
+                                        $('#modal-alert-danger span').html('Bỏ qua báo cáo thất bại');
                                         console.log(error);
                                     }
                                 });
@@ -485,16 +485,32 @@
                         //|-----------------------------------------------------
                         $('select[name="BV_TRANGTHAI"]').change(function() {
                             $('input[name="BV_NOIDUNG_TRANGTHAI"]').css('border-color', '');
+                            $('input[name="BV_NOIDUNG_VIPHAM"]').css('border-color', '');
 
                             var selectedValue = $(this).val();
-                            if(selectedValue == 'Yêu cầu chỉnh sửa' || selectedValue == 'Vi phạm tiêu chuẩn') $('#detail_BV_TRANGTHAI').show();
-                            else $('#detail_BV_TRANGTHAI').hide();
+                            if(selectedValue == 'Yêu cầu chỉnh sửa'){
+                                $('#edit_BV_TRANGTHAI').show();
+                                $('#ban_BV_TRANGTHAI').hide();
+                            }
+                            else if(selectedValue == 'Vi phạm tiêu chuẩn'){
+                                $('#ban_BV_TRANGTHAI').show();
+                                $('#edit_BV_TRANGTHAI').hide();
+                            } 
+                            else{
+                                $('#edit_BV_TRANGTHAI').hide();
+                                $('#ban_BV_TRANGTHAI').hide();
+                            } 
                         });
 
                         //|-----------------------------------------------------
                         //|NGĂN GÕ : TRONG CHI TIẾT TRẠNG THÁI
                         //|-----------------------------------------------------
                         $('input[name="BV_NOIDUNG_TRANGTHAI"]').on('keydown', function(e) {
+                            if (e.key === ":") {
+                                e.preventDefault();
+                            }
+                        });
+                        $('input[name="BV_NOIDUNG_VIPHAM"]').on('keydown', function(e) {
                             if (e.key === ":") {
                                 e.preventDefault();
                             }
@@ -507,10 +523,14 @@
                             var form = $(this).closest('form');
                             var BV_TRANGTHAI = form.find('select[name="BV_TRANGTHAI"]').val();
                             var BV_NOIDUNG_TRANGTHAI = form.find('input[name="BV_NOIDUNG_TRANGTHAI"]').val();
+                            var BV_NOIDUNG_VIPHAM = form.find('input[name="BV_NOIDUNG_VIPHAM"]').val();
                             var _token = $('meta[name="csrf-token"]').attr('content');
 
                             if(BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' && BV_NOIDUNG_TRANGTHAI == ''){
                                 form.find('input[name="BV_NOIDUNG_TRANGTHAI"]').css('border-color', '#FA896B');
+                            }
+                            else if(BV_TRANGTHAI == 'Vi phạm tiêu chuẩn' && BV_NOIDUNG_VIPHAM == ''){
+                                form.find('input[name="BV_NOIDUNG_VIPHAM"]').css('border-color', '#FA896B');
                             }
                             else{
                                 if((BV_TRANGTHAI != defaultValue && BV_TRANGTHAI != 'Đã xoá') || BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' || BV_TRANGTHAI == 'Vi phạm tiêu chuẩn'){
@@ -520,8 +540,11 @@
 
                                     const BV_TRANGTHAI_get = BV_TRANGTHAI;
 
-                                    if(BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' || BV_TRANGTHAI == 'Vi phạm tiêu chuẩn'){
+                                    if(BV_TRANGTHAI == 'Yêu cầu chỉnh sửa'){
                                         BV_TRANGTHAI = BV_TRANGTHAI + ': ' + BV_NOIDUNG_TRANGTHAI;
+                                    }
+                                    else if(BV_TRANGTHAI == 'Vi phạm tiêu chuẩn'){
+                                        BV_TRANGTHAI = BV_TRANGTHAI + ': ' + BV_NOIDUNG_VIPHAM;
                                     }
                                     
                                     $.ajax({
@@ -532,6 +555,19 @@
                                         _token: _token 
                                     },
                                     success: function(response) {
+                                        //Notification start
+                                        $.ajax({
+                                            url: '{{URL::to('/thong-bao-trang-thai-bai-dang/')}}' +'/'+ BV_MA,
+                                            type: 'GET',
+                                            success: function(response2) {
+                                                //console.log('ok');
+                                            },
+                                            error: function(error2) {
+                                                console.log(error);
+                                            }
+                                        });
+                                        //Notification end
+
                                         form[0].reset();
                                         $('.modal-header form').html(response.output);
                                         if(response.thoiGianGui != '') $('span.thoigian').html(response.thoiGianGui);

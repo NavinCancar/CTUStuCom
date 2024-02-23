@@ -83,6 +83,7 @@ Route::post('/duyet-bao-cao-bai-dang/{BV_MA}', 'App\Http\Controllers\PostControl
 //Comment: Bình luận
 Route::resource('/binh-luan', 'App\Http\Controllers\CommentController')->except(['create','show','edit']); ///ok: C_ND
 Route::get('/chi-tiet-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@index_detail'); ///
+Route::post('/cap-nhat-trang-thai-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@updateState');
 
 //-- Bình luận và thích
 Route::get('/thich-binh-luan/{BL_MA}', 'App\Http\Controllers\CommentController@binhluan_thich'); ///ok
@@ -144,3 +145,7 @@ Route::get('/thong-bao-bao-cao-binh-luan/{BL_MA}', 'App\Http\Controllers\Notific
 
 //-- Cập nhật thông báo theo dõi
 Route::get('/thong-bao-theo-doi/{ND_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_FollowUser');
+
+//-- Cập nhật thông báo trạng thái
+Route::get('/thong-bao-trang-thai-bai-dang/{BV_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_StatePost'); ///
+Route::get('/thong-bao-trang-thai-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_StateComment'); ///

@@ -21,11 +21,13 @@ class NotificatonController_FB extends Controller
     HÀM HỖ TRỢ
     - Hàm xây dựng FireStore
     - Kiểm tra đăng nhập: Người dùng => (*)
-    
+    - Kiểm tra đăng nhập: Kiểm duyệt viên => (**)
+
     NGƯỜI DÙNG
     - Thông báo (*)
     - Cập nhật thông báo thích (*), Cập nhật thông báo bình luận (*), Cập nhật thông báo báo cáo (*),
       Cập nhật thông báo theo dõi (*)
+    - Cập nhật thông báo trạng thái (**)
     |--------------------------------------------------------------------------
     */
 
@@ -49,6 +51,21 @@ class NotificatonController_FB extends Controller
         }
     }
 
+    /**
+     * Kiểm tra đăng nhập: Kiểm duyệt viên => (**)
+     */
+    public function AuthLogin_KDV(){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->VT_MA == 1 || $userLog->VT_MA == 2){
+            }
+            else{
+                return Redirect::to('/')->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -368,6 +385,59 @@ class NotificatonController_FB extends Controller
             'TB_NOIDUNG' =>  $string,
             'TB_DUONGDAN'=> URL::to('/tai-khoan/'.$userLog->ND_MA),
             'TB_LOAI' => 'theo dõi',
+            'TB_TRANGTHAI' => 0,
+            'TB_REALTIME' => new FirestoreTimestamp,
+        ]);
+    }
+
+
+    /**
+     * Cập nhật thông báo trạng thái (**)
+     */
+    public function UpdateNotification_StatePost($BV_MA){ ///
+        $this->AuthLogin_KDV();
+
+        $userLog = Session::get('userLog');
+        $bai_viet = DB::table('bai_viet')
+        ->where('BV_MA', $BV_MA)->select('bai_viet.ND_MA', 'bai_viet.BV_TIEUDE', 'bai_viet.BV_TRANGTHAI')->first();
+
+        $trangThai = $bai_viet->BV_TRANGTHAI;
+        if (strpos($trangThai, ':') !== false) {
+            $trangThai = trim(strstr($bai_viet->BV_TRANGTHAI, ':', true));
+        } 
+        $string = ' Kiểm duyệt viên đã cập nhật trạng thái bài viết "'.$bai_viet->BV_TIEUDE.'" của bạn sang "'.$trangThai.'"';
+
+        $documentRoot = 'THONG_BAO/KDVcapnhattrangthaibaiviet'.$BV_MA;
+        $this->firestoreClient->updateDocument($documentRoot, [
+            'ND_NHAN_MA' =>  $bai_viet->ND_MA,  
+            'TB_ANHDINHKEM' => 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/systems%2Fadmin.png?alt=media&token=f82d438f-2e0c-4c9e-9afc-bef2784b2f77',
+            'TB_NOIDUNG' =>  $string,
+            'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA),
+            'TB_LOAI' => 'cập nhật trạng thái bài viết',
+            'TB_TRANGTHAI' => 0,
+            'TB_REALTIME' => new FirestoreTimestamp,
+        ]);
+    }
+
+    public function UpdateNotification_StateComment($BL_MA){ ///
+        $this->AuthLogin_KDV();
+
+        $userLog = Session::get('userLog');
+
+        $binh_luan = DB::table('binh_luan')
+        ->where('BL_MA', $BL_MA)
+        ->select('ND_MA', 'BV_MA', 'BL_TRANGTHAI', DB::raw('LEFT(BL_NOIDUNG, 20) AS BL_NOIDUNG_20'))
+        ->first();
+
+        $string = ' Kiểm duyệt viên đã cập nhật trạng thái bình luận "'.$binh_luan->BL_NOIDUNG_20.'..." của bạn sang "'.$binh_luan->BL_TRANGTHAI.'"';
+
+        $documentRoot = 'THONG_BAO/KDVcapnhattrangthaibinhluan'.$BL_MA;
+        $this->firestoreClient->updateDocument($documentRoot, [
+            'ND_NHAN_MA' =>  $binh_luan->ND_MA,  
+            'TB_ANHDINHKEM' => 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/systems%2Fadmin.png?alt=media&token=f82d438f-2e0c-4c9e-9afc-bef2784b2f77',
+            'TB_NOIDUNG' =>  $string,
+            'TB_DUONGDAN'=> URL::to('/bai-dang/'.$binh_luan->BV_MA.'?binh-luan='.$BL_MA),
+            'TB_LOAI' => 'cập nhật trạng thái bình luận',
             'TB_TRANGTHAI' => 0,
             'TB_REALTIME' => new FirestoreTimestamp,
         ]);

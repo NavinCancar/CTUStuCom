@@ -244,7 +244,8 @@ class UserSysController extends Controller
         }
 
         //Bình luân nổi bật
-        $binh_luan_notget = DB::table('binh_luan')->where('ND_MA', $tai_khoan->ND_MA);
+        $binh_luan_notget = DB::table('binh_luan')
+        ->where('ND_MA', $tai_khoan->ND_MA)->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị');
         $binh_luan_count = $binh_luan_notget->clone()->count();
         if($userLog){
             $binh_luan_not_in = DB::table('binhluan_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BL_MA')->toArray();
@@ -254,10 +255,10 @@ class UserSysController extends Controller
             $binh_luan = $binh_luan_notget->clone()->take(5)->get();
         }
 
-        $binh_luan_no_get= DB::table('binh_luan');
+        $binh_luan_no_get= DB::table('binh_luan')->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá');
         $binh_luan_thich_no_get = DB::table('binh_luan')
         ->join('binhluan_thich', 'binhluan_thich.BL_MA', '=', 'binh_luan.BL_MA')
-        ->where('binh_luan.ND_MA', $tai_khoan->ND_MA);
+        ->where('binh_luan.ND_MA', $tai_khoan->ND_MA)->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá');
         
         return view('main_content.user.show_user')
         ->with('account_info', $account_info)->with('college', $college)

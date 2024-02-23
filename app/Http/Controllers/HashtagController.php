@@ -141,6 +141,7 @@ class HashtagController extends Controller
         
         $count_binh_luan = DB::table('bai_viet')
         ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá')
         ->groupBy('bai_viet.BV_MA')->select('bai_viet.BV_MA', DB::raw('count(*) as count'))
         ->get();
 

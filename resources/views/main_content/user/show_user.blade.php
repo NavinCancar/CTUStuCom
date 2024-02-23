@@ -166,6 +166,7 @@
                                                     ?>
                                                 </b>
                                                 </a>
+                                                @if($bl->BL_TRALOI_MA == null)
                                                 <a class="ms-3 text-muted reply-comment-btn" data-comment-id-value="{{$bl->BL_MA}}">
                                                 <i class="fas fa-reply"></i> Trả lời: 
                                                 <b>
@@ -176,6 +177,7 @@
                                                     ?>
                                                 </b>
                                                 </a>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>

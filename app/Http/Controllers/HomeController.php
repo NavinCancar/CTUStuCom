@@ -88,6 +88,7 @@ class HomeController extends Controller
         
         $count_binh_luan = DB::table('bai_viet')
         ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá')
         ->groupBy('bai_viet.BV_MA')->select('bai_viet.BV_MA', DB::raw('count(*) as count'))
         ->get();
 
@@ -157,6 +158,7 @@ class HomeController extends Controller
         
         $count_binh_luan = DB::table('bai_viet')
         ->join('binh_luan', 'binh_luan.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá')
         ->groupBy('bai_viet.BV_MA')->select('bai_viet.BV_MA', DB::raw('count(*) as count'))
         ->get();
 
@@ -192,15 +194,17 @@ class HomeController extends Controller
         ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
         ->join('danh_dau_boi', 'danh_dau_boi.BL_MA', '=', 'binh_luan.BL_MA')
         ->where('danh_dau_boi.ND_MA', $userLog->ND_MA)
+        ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
         ->whereNotIn('binh_luan.BL_MA', $binh_luan_not_in)
         ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
         ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
         ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
         ->orderby('binh_luan.BL_THOIGIANTAO', 'desc')->paginate(5);
 
-        $binh_luan_no_get= DB::table('binh_luan');
+        $binh_luan_no_get= DB::table('binh_luan')->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá');
         $binh_luan_thich_no_get = DB::table('binh_luan')
-        ->join('binhluan_thich', 'binhluan_thich.BL_MA', '=', 'binh_luan.BL_MA');
+        ->join('binhluan_thich', 'binhluan_thich.BL_MA', '=', 'binh_luan.BL_MA')
+        ->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá');
 
         $binh_luan_luu= DB::table('danh_dau_boi');
         

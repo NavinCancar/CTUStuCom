@@ -108,9 +108,11 @@
                     <div class="row">
                       <div class="col-sm-6 d-flex mt-2 justify-content-start">
                         <a class="ms-3 text-muted"><i class="fas fa-eye"></i> Lượt xem: <b>{{$bv->BV_LUOTXEM}}</b></a>
-                        <a class="ms-3 text-muted cursor-pointer report-post" data-post-id-value="{{$bv->BV_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
                       </div>
                       <div class="col-sm-6 d-flex mt-2 justify-content-end">
+                        @if($userLog && $userLog->ND_MA != $bv->ND_MA)
+                        <a class="ms-3 text-muted cursor-pointer report-post" data-post-id-value="{{$bv->BV_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
+                        @endif
                         <a class="ms-3 cursor-pointer <?php 
                             if($userLog){
                                 $check_bv_thich = $thich_no_get->clone()
@@ -223,7 +225,9 @@
                                       <span>{{date('H:i', strtotime($blg->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($blg->BL_THOIGIANTAO))}}</span>
                                     </div>
                                     <div class="col-sm-6 d-flex mt-2 justify-content-end">
+                                      @if($userLog && $userLog->ND_MA != $blg->ND_MA)
                                       <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$blg->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
+                                      @endif
                                       <a class="ms-3 cursor-pointer <?php 
                                           if($userLog){
                                               $check_bl_thich0 = $binh_luan_thich_no_get->clone()
@@ -303,7 +307,9 @@
                                           <span>{{date('H:i', strtotime($bltl->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($bltl->BL_THOIGIANTAO))}}</span>
                                         </div>
                                         <div class="col-sm-6 d-flex mt-2 justify-content-end">
+                                          @if($userLog && $userLog->ND_MA != $bltl->ND_MA)
                                           <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$bltl->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
+                                          @endif
                                           <a class="ms-3 cursor-pointer <?php 
                                               if($userLog){
                                                   $check_bl_thich1 = $binh_luan_thich_no_get->clone()
@@ -511,6 +517,42 @@
       </div>
     </div>
     <!-- MODAL BÌNH LUẬN END -->
+    <!-- MODAL REPORT START -->
+    <div class="modal" id="reportmodal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Gửi báo cáo</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <span class="d-flex justify-content-between align-items-center mb-3">
+                <b>Nội dung báo cáo:</b>
+                <input class="form-control w-75" name="BC_NOIDUNG" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
+                <datalist id="datalistOptionsBan">
+                    <option value="Thông tin sai sự thật">
+                    <option value="Spam/Quảng cáo">
+                    <option value="Ngôn từ không phù hợp">
+                    <option value="Kích động, gây hiểu lầm">
+                    <option value="Phân biệt dân tộc/vùng miền/tôn giáo">
+                </datalist>
+            </span>
+
+            <button type="button" class="btn btn-primary float-sm-end" id="report-btn">Gửi</button>
+            <button type="button" class="btn btn-outline-primary float-sm-end me-2" id="hoantac-btn" onclick="location.reload();">Hoàn tác</button>
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer"></div>
+
+        </div>
+      </div>
+    </div>
+    <!-- MODAL REPORT END -->
     @endif
 
     @if($isBlock != 1)
@@ -2173,55 +2215,48 @@
           //|*****************************************************
           <?php if($userLog) { ?>
             $(document).on('click', '.report-post', function() {
-              var BVBC_NOIDUNG;
+              $('input[name="BC_NOIDUNG"]').css('border-color', '');
+              $('#reportmodal').modal('show');
+              var $element = $(this);
+              var BV_MA = $(this).data('post-id-value');
+              var _token = $('meta[name="csrf-token"]').attr('content');
 
-              while (true) {
-                  BVBC_NOIDUNG = prompt("Nội dung báo cáo:");
+              $('#report-btn').click(function(e) {
+                var BVBC_NOIDUNG = $('input[name="BC_NOIDUNG"]').val();
+                if (BVBC_NOIDUNG !== null && BVBC_NOIDUNG.trim() !== "") {
+                    $.ajax({
+                      url: '{{URL::to('/bao-cao-bai-dang/')}}' +'/'+ BV_MA,
+                      type: 'POST',
+                      data: {
+                        BVBC_NOIDUNG: BVBC_NOIDUNG,
+                        _token: _token // Include the CSRF token in the data
+                      },
+                      success: function(response) {
+                        //Notification start
+                        $.ajax({
+                            url: '{{URL::to('/thong-bao-bao-cao-bai-dang/')}}' +'/'+ BV_MA,
+                            type: 'GET',
+                            success: function(response2) {
+                              //console.log('ok');
+                            },
+                            error: function(error2) {
+                              console.log(error);
+                            }
+                        });
+                        //Notification end
 
-                  if (BVBC_NOIDUNG !== null && BVBC_NOIDUNG.trim() !== "") {
-                      //Báo cáo hơp lệ có nội dung
-                      //console.log("Giá trị đã nhập: " + BVBC_NOIDUNG);
-                      // Truy cập giá trị của tham số từ thuộc tính dữ liệu
-                      var $element = $(this);
-                      var BV_MA = $(this).data('post-id-value');
-                      var _token = $('meta[name="csrf-token"]').attr('content');
-
-                      $.ajax({
-                        url: '{{URL::to('/bao-cao-bai-dang/')}}' +'/'+ BV_MA,
-                        type: 'POST',
-                        data: {
-                          BVBC_NOIDUNG: BVBC_NOIDUNG,
-                          _token: _token // Include the CSRF token in the data
-                        },
-                        success: function(response) {
-                          //Notification start
-                          $.ajax({
-                              url: '{{URL::to('/thong-bao-bao-cao-bai-dang/')}}' +'/'+ BV_MA,
-                              type: 'GET',
-                              success: function(response2) {
-                                //console.log('ok');
-                              },
-                              error: function(error2) {
-                                console.log(error);
-                              }
-                          });
-                          //Notification end
-
-                          window.location.href = '{{URL::to('/trang-chu')}}';
-                          //console.log(number);
-                        },
-                        error: function(error) {
-                          console.log(error);
-                        }
-                      });
-                      break;
-                  } else if (BVBC_NOIDUNG === null) {
-                      //console.log("Người dùng đã hủy.");
-                      break;
-                  } else {
-                      alert("Vui lòng nhập nội dung báo cáo!"); 
-                  }
-              }
+                        window.location.href = '{{URL::to('/trang-chu')}}';
+                        //console.log(number);
+                      },
+                      error: function(error) {
+                        console.log(error);
+                      }
+                    }); 
+                }
+                else{
+                  $('input[name="BC_NOIDUNG"]').css('border-color', '#FA896B');
+                }
+              });
             });
           <?php } ?>
           //|*****************************************************
@@ -2232,55 +2267,48 @@
           //|*****************************************************
           <?php if($userLog) { ?>
             $(document).on('click', '.report-comment', function() {
-              var BLBC_NOIDUNG;
+              $('input[name="BC_NOIDUNG"]').css('border-color', '');
+              $('#reportmodal').modal('show');
+              var $element = $(this);
+              var BL_MA = $(this).data('comment-id-value');
+              var _token = $('meta[name="csrf-token"]').attr('content');
 
-              while (true) {
-                  BLBC_NOIDUNG = prompt("Nội dung báo cáo:");
+              $('#report-btn').click(function(e) {
+                var BLBC_NOIDUNG = $('input[name="BC_NOIDUNG"]').val();
+                if (BLBC_NOIDUNG !== null && BLBC_NOIDUNG.trim() !== "") {
+                    $.ajax({
+                      url: '{{URL::to('/bao-cao-binh-luan/')}}' +'/'+ BL_MA,
+                      type: 'POST',
+                      data: {
+                        BLBC_NOIDUNG: BLBC_NOIDUNG,
+                        _token: _token // Include the CSRF token in the data
+                      },
+                      success: function(response) {
+                        //Notification start
+                        $.ajax({
+                            url: '{{URL::to('/thong-bao-bao-cao-binh-luan/')}}' +'/'+ BL_MA,
+                            type: 'GET',
+                            success: function(response2) {
+                              //console.log('ok');
+                            },
+                            error: function(error2) {
+                              console.log(error);
+                            }
+                        });
+                        //Notification end
 
-                  if (BLBC_NOIDUNG !== null && BLBC_NOIDUNG.trim() !== "") {
-                      //Báo cáo hơp lệ có nội dung
-                      //console.log("Giá trị đã nhập: " + BLBC_NOIDUNG);
-                      // Truy cập giá trị của tham số từ thuộc tính dữ liệu
-                      var $element = $(this);
-                      var BL_MA = $(this).data('comment-id-value');
-                      var _token = $('meta[name="csrf-token"]').attr('content');
-
-                      $.ajax({
-                        url: '{{URL::to('/bao-cao-binh-luan/')}}' +'/'+ BL_MA,
-                        type: 'POST',
-                        data: {
-                          BLBC_NOIDUNG: BLBC_NOIDUNG,
-                          _token: _token // Include the CSRF token in the data
-                        },
-                        success: function(response) {
-                          //Notification start
-                          $.ajax({
-                              url: '{{URL::to('/thong-bao-bao-cao-binh-luan/')}}' +'/'+ BL_MA,
-                              type: 'GET',
-                              success: function(response2) {
-                                //console.log('ok');
-                              },
-                              error: function(error2) {
-                                console.log(error);
-                              }
-                          });
-                          //Notification end
-
-                          window.location.href = '{{URL::to('/bai-dang/'.$BV_MA)}}';
-                          //console.log(number);
-                        },
-                        error: function(error) {
-                          console.log(error);
-                        }
-                      });
-                      break;
-                  } else if (BLBC_NOIDUNG === null) {
-                      //console.log("Người dùng đã hủy.");
-                      break;
-                  } else {
-                      alert("Vui lòng nhập nội dung báo cáo!"); 
-                  }
-              }
+                        window.location.href = '{{URL::to('/bai-dang/'.$BV_MA)}}';
+                        //console.log(number);
+                      },
+                      error: function(error) {
+                        console.log(error);
+                      }
+                    }); 
+                }
+                else{
+                  $('input[name="BC_NOIDUNG"]').css('border-color', '#FA896B');
+                }
+              });
             });
           <?php } ?>
           //|*****************************************************
