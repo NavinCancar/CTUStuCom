@@ -7,8 +7,8 @@
         <div class="col-lg-12">
             <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
             <h5 class="card-title fw-semibold">Quản lý tài khoản người dùng</h5>
-            <a class="btn btn-primary" href="{{URL::to('/vai-tro/create')}}">
-                <i class="fas fa-plus"></i> Thêm tài khoản người dùng
+            <a class="btn btn-primary" href="javascript:void(0)">
+                <i class="fas fa-user"></i> Tài khoản cần xem xét
             </a>
             </div>
             <hr>

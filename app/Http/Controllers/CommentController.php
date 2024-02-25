@@ -368,17 +368,55 @@ class CommentController extends Controller
 
         $userLog = Session::get('userLog');
         
-        //Xử lý đường dẫn: http://localhost/ctustucom/binh-luan?binh-luan={binh_luan}
+        //FOCUS: http://localhost/ctustucom/binh-luan?binh-luan={binh_luan}
         $binhLuanMa = request()->query('binh-luan');
         if($binhLuanMa) Session::put('BL_MA_Focus', $binhLuanMa);
         $binhLuanMa = null;
 
+        //-----------------------------------------------------------------
+        //MAIN
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
         $binh_luan = DB::table('binh_luan')
             ->orderBy('BL_THOIGIANTAO', 'desc')
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(10);
 
         $binhluan_baocao_noget = DB::table('binhluan_baocao');
+
+        //-----------------------------------------------------------------
+        //BÁO CÁO: http://localhost/ctustucom/binh-luan?bao-cao={nhieu-nhat/gan-nhat}
+        $filterReport = request()->query('bao-cao');
+        if($filterReport == 'nhieu-nhat') {
+            $binh_luan = DB::table('binh_luan')
+            ->select('binh_luan.*', DB::raw('COUNT(binhluan_baocao.BL_MA) AS COUNT_BC'))
+            ->leftJoin('binhluan_baocao', 'binh_luan.BL_MA', '=', 'binhluan_baocao.BL_MA')
+            ->whereNotIn('binh_luan.ND_MA', $nguoi_dung_not_in3)
+            ->groupBy('binh_luan.BL_MA', 
+            'binh_luan.BV_MA', 'binh_luan.ND_MA', 'binh_luan.BL_NOIDUNG', 'binh_luan.BL_TRALOI_MA', 'binh_luan.BL_TRANGTHAI', 'binh_luan.BL_THOIGIANTAO')
+            ->orderBy('COUNT_BC', 'desc')->paginate(10);
+        }
+        else if($filterReport == 'gan-nhat') {
+            $binh_luan = DB::table('binh_luan')
+            ->select('binh_luan.*')
+            ->leftJoin('binhluan_baocao', 'binh_luan.BL_MA', '=', 'binhluan_baocao.BL_MA')
+            ->whereNotIn('binh_luan.ND_MA', $nguoi_dung_not_in3)
+            ->orderBy('BLBC_THOIDIEM', 'desc')->distinct()->paginate(10);
+        }
+        $filterReport = null;
+
+        //TRẠNG THÁI: http://localhost/ctustucom/binh-luan?trang-thai={trang-thai}
+        $filterState = request()->query('trang-thai');
+        if($filterState) {
+            $state = '';
+            if($filterState == 'dang-hien-thi') $state = 'Đang hiển thị';
+            else if($filterState == 'vi-pham-tieu-chuan') $state = 'Vi phạm tiêu chuẩn';
+            else if($filterState == 'da-xoa') $state = 'Đã xoá';
+
+            $binh_luan = DB::table('binh_luan')
+            ->where('BL_TRANGTHAI', 'LIKE', $state.'%')
+            ->orderBy('BL_THOIGIANTAO', 'desc')
+            ->whereNotIn('ND_MA', $nguoi_dung_not_in3)->paginate(10);
+        }
+        $filterState = null;
 
         return view('main_content.comment.all_comment')
         ->with('binh_luan', $binh_luan)->with('binhluan_baocao_noget', $binhluan_baocao_noget);

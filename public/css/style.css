@@ -123,6 +123,11 @@
 
 .friend-chat{
   background-color: #f5f6f7;
+  word-break: break-all;
+}
+
+.chat{
+  word-break: break-all;
 }
 
 
@@ -313,4 +318,11 @@
   white-space: nowrap;
   max-width: 85%;
   display: inline-block;
+}
+
+.icon-lightgrey{
+  color: var(--bs-gray-400);
+}
+.icon-lightgrey :hover{
+  color: var(--bs-gray-500);
 }

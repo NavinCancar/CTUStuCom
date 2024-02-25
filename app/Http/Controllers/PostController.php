@@ -212,7 +212,7 @@ class PostController extends Controller
      * Xem chi tiết bài đăng
      */
     public function show(Post $bai_dang){ ///
-        //Xử lý đường dẫn: http://localhost/ctustucom/bai-dang/{bai_dang}?binh-luan={binh_luan}
+        //FOCUS: http://localhost/ctustucom/bai-dang/{bai_dang}?binh-luan={binh_luan}
         $binhLuanMa = request()->query('binh-luan');
         if($binhLuanMa) Session::put('BL_MA_Focus', $binhLuanMa);
         $binhLuanMa = null;
@@ -556,18 +556,57 @@ class PostController extends Controller
 
         $userLog = Session::get('userLog');
 
-        //Xử lý đường dẫn: http://localhost/ctustucom/bai-dang?bai-dang={bai_viet}
+        //FOCUS: http://localhost/ctustucom/bai-dang?bai-dang={bai_viet}
         $baivietMa = request()->query('bai-dang');
         if($baivietMa) Session::put('BV_MA_Focus', $baivietMa);
         $baivietMa = null;
 
-
+        //-----------------------------------------------------------------
+        //MAIN
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
         $bai_viet = DB::table('bai_viet')
             ->orderBy('BV_THOIGIANTAO', 'desc')
             ->whereNotIn('ND_MA', $nguoi_dung_not_in3)->paginate(10);
 
         $baiviet_baocao_noget = DB::table('baiviet_baocao');
+
+        //-----------------------------------------------------------------
+        //BÁO CÁO: http://localhost/ctustucom/bai-dang?bao-cao={nhieu-nhat/gan-nhat}
+        $filterReport = request()->query('bao-cao');
+        if($filterReport == 'nhieu-nhat') {
+            $bai_viet = DB::table('bai_viet')
+            ->select('bai_viet.*', DB::raw('COUNT(baiviet_baocao.BV_MA) AS COUNT_BC'))
+            ->leftJoin('baiviet_baocao', 'bai_viet.BV_MA', '=', 'baiviet_baocao.BV_MA')
+            ->whereNotIn('bai_viet.ND_MA', $nguoi_dung_not_in3)
+            ->groupBy('bai_viet.BV_MA', 
+            'bai_viet.ND_MA', 'bai_viet.HP_MA', 'bai_viet.BV_TIEUDE', 'bai_viet.BV_NOIDUNG', 'bai_viet.BV_TRANGTHAI', 'bai_viet.BV_THOIGIANTAO', 'bai_viet.BV_THOIGIANDANG', 'bai_viet.BV_LUOTXEM')
+            ->orderBy('COUNT_BC', 'desc')->paginate(10);
+        }
+        else if($filterReport == 'gan-nhat') {
+            $bai_viet = DB::table('bai_viet')
+            ->select('bai_viet.*')
+            ->leftJoin('baiviet_baocao', 'bai_viet.BV_MA', '=', 'baiviet_baocao.BV_MA')
+            ->whereNotIn('bai_viet.ND_MA', $nguoi_dung_not_in3)
+            ->orderBy('BVBC_THOIDIEM', 'desc')->distinct()->paginate(10);
+        }
+        $filterReport = null;
+
+        //TRẠNG THÁI: http://localhost/ctustucom/bai-dang?trang-thai={trang-thai}
+        $filterState = request()->query('trang-thai');
+        if($filterState) {
+            $state = '';
+            if($filterState == 'chua-duyet') $state = 'Chưa duyệt';
+            else if($filterState == 'da-duyet') $state = 'Đã duyệt';
+            else if($filterState == 'yeu-cau-chinh-sua') $state = 'Yêu cầu chỉnh sửa';
+            else if($filterState == 'vi-pham-tieu-chuan') $state = 'Vi phạm tiêu chuẩn';
+            else if($filterState == 'da-xoa') $state = 'Đã xoá';
+
+            $bai_viet = DB::table('bai_viet')
+            ->where('BV_TRANGTHAI', 'LIKE', $state.'%')
+            ->orderBy('BV_THOIGIANTAO', 'desc')
+            ->whereNotIn('ND_MA', $nguoi_dung_not_in3)->paginate(10);
+        }
+        $filterState = null;
 
         return view('main_content.post.all_post')
         ->with('bai_viet', $bai_viet)->with('baiviet_baocao_noget', $baiviet_baocao_noget);

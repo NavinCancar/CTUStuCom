@@ -56,14 +56,31 @@
                             <!--Content-->
                             <div class="col-12">
                             <div class="table-responsive">
-                                <table class="table bg-white rounded shadow-sm  table-hover">
+                                <table id="data-table" class="table bg-white rounded shadow-sm  table-hover">
                                     <thead>
                                         <tr>
                                             <th scope="col">Mã</th>
                                             <th scope="col" width="500">Nội dung bình luận</th>
-                                            <th scope="col" width="150">Trạng thái</th>
+                                            <th scope="col" width="150">
+                                                <div class="dropdown dropdown-sm" style ="position: static;">
+                                                    <span class="dropdown-toggle" data-bs-toggle="dropdown">Trạng thái</span>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a href="{{URL::to('/binh-luan/?trang-thai=dang-hien-thi')}}" class="dropdown-item">Đang hiển thị</a></li>
+                                                        <li><a href="{{URL::to('/binh-luan/?trang-thai=vi-pham-tieu-chuan')}}" class="dropdown-item">Vi phạm tiêu chuẩn</a></li>
+                                                        <li><a href="{{URL::to('/binh-luan/?trang-thai=da-xoa')}}" class="dropdown-item">Đã xoá</a></li>
+                                                    </ul>
+                                                </div>
+                                            </th>
                                             <th scope="col">Ngày tạo</th>
-                                            <th scope="col">Báo cáo</th>
+                                            <th scope="col">
+                                                <div class="dropdown dropdown-sm" style ="position: static;">
+                                                    <span class="dropdown-toggle" data-bs-toggle="dropdown">Báo cáo</span>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a href="{{URL::to('/binh-luan/?bao-cao=nhieu-nhat')}}" class="dropdown-item">Nhiều nhất</a></li>
+                                                        <li><a href="{{URL::to('/binh-luan/?bao-cao=gan-nhat')}}" class="dropdown-item">Gần nhất</a></li>
+                                                    </ul>
+                                                </div>
+                                            </th>
                                             <th scope="col" width="70"></th>
                                         </tr>
                                     </thead>
@@ -180,6 +197,7 @@
         //***********************************************************************************
         //***********************************************************************************
 
+        $(document).ready(function() {
         //|-----------------------------------------------------
         //|FOCUS BÌNH LUẬN NẾU CÓ
         //|-----------------------------------------------------
@@ -198,6 +216,28 @@
                     behavior: 'smooth',
                     block: 'center', // Hoặc 'center', 'end', 'nearest'
                 });
+            }
+            else{
+                //|-----------------------------------------------------
+                //|KIỂM TRA NẾU CÓ CHUYỂN PAGE
+                //|-----------------------------------------------------
+                const currentURL = window.location.href;
+                if (currentURL.includes('?binh-luan=')) {
+                    for (let i = 2; i <= <?php echo $binh_luan->lastPage(); ?>; i++) {
+                        var newURL = currentURL + `&page=${i}`;
+                        var trToFocus = document.querySelector(`tr[data-comment-id-value="${commentIdValue}"]`);
+                        if (trToFocus) {
+                            trToFocus.style.background = 'linear-gradient(to right, #ffffff00, #ffff0038, #ffff0038, #ffff0038, #ffffff00)';
+                            trToFocus.tabIndex = 0;
+                            trToFocus.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center', // Hoặc 'center', 'end', 'nearest'
+                            });
+                            break;
+                        }
+                    }
+                    window.location.href = newURL;
+                }
             }
         <?php 
             Session::put('BL_MA_Focus',null);
@@ -568,5 +608,6 @@
         //|*****************************************************
         //|LƯU FILE END
         //|*****************************************************
+        })
     </script>
 @endsection

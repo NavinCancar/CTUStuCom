@@ -148,14 +148,33 @@
                             <!--Content-->
                             <div class="col-12">
                             <div class="table-responsive">
-                                <table class="table bg-white rounded shadow-sm  table-hover">
+                                <table id="data-table" class="table bg-white rounded shadow-sm  table-hover">
                                     <thead>
                                         <tr>
                                             <th scope="col">Mã</th>
                                             <th scope="col" width="500">Tiêu đề bài viết</th>
-                                            <th scope="col" width="150">Trạng thái</th>
+                                            <th scope="col" width="150">
+                                                <div class="dropdown dropdown-sm" style ="position: static;">
+                                                    <span class="dropdown-toggle" data-bs-toggle="dropdown">Trạng thái</span>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a href="{{URL::to('/bai-dang/?trang-thai=chua-duyet')}}" class="dropdown-item">Chưa duyệt</a></li>
+                                                        <li><a href="{{URL::to('/bai-dang/?trang-thai=da-duyet')}}" class="dropdown-item">Đã duyệt</a></li>
+                                                        <li><a href="{{URL::to('/bai-dang/?trang-thai=yeu-cau-chinh-sua')}}" class="dropdown-item">Yêu cầu chỉnh sửa</a></li>
+                                                        <li><a href="{{URL::to('/bai-dang/?trang-thai=vi-pham-tieu-chuan')}}" class="dropdown-item">Vi phạm tiêu chuẩn</a></li>
+                                                        <li><a href="{{URL::to('/bai-dang/?trang-thai=da-xoa')}}" class="dropdown-item">Đã xoá</a></li>
+                                                    </ul>
+                                                </div>
+                                            </th>
                                             <th scope="col">Ngày tạo</th>
-                                            <th scope="col">Báo cáo</th>
+                                            <th scope="col">
+                                                <div class="dropdown dropdown-sm" style ="position: static;">
+                                                    <span class="dropdown-toggle" data-bs-toggle="dropdown">Báo cáo</span>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a href="{{URL::to('/bai-dang/?bao-cao=nhieu-nhat')}}" class="dropdown-item">Nhiều nhất</a></li>
+                                                        <li><a href="{{URL::to('/bai-dang/?bao-cao=gan-nhat')}}" class="dropdown-item">Gần nhất</a></li>
+                                                    </ul>
+                                                </div>
+                                            </th>
                                             <th scope="col" width="70"></th>
                                         </tr>
                                     </thead>
@@ -273,6 +292,7 @@
         //***********************************************************************************
         //***********************************************************************************
         
+        $(document).ready(function() {
         //|-----------------------------------------------------
         //|FOCUS BÌNH LUẬN NẾU CÓ
         //|-----------------------------------------------------
@@ -291,6 +311,27 @@
                     behavior: 'smooth',
                     block: 'center', // Hoặc 'center', 'end', 'nearest'
                 });
+            }
+            else{
+                //|-----------------------------------------------------
+                //|KIỂM TRA NẾU CÓ CHUYỂN PAGE
+                //|-----------------------------------------------------
+                const currentURL = window.location.href;
+                if (currentURL.includes('?bai-dang=')) {
+                    for (let i = 2; i <= <?php echo $bai_viet->lastPage(); ?>; i++) {
+                        var newURL = currentURL + `&page=${i}`;
+                        var trToFocus = document.querySelector(`tr[data-post-id-value="${postIdValue}"]`);
+                        if (trToFocus) {
+                            trToFocus.style.background = 'linear-gradient(to right, #ffffff00, #ffff0038, #ffff0038, #ffff0038, #ffffff00)';
+                            trToFocus.tabIndex = 0;
+                            trToFocus.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center', // Hoặc 'center', 'end', 'nearest'
+                            });
+                        }
+                    }
+                    window.location.href = newURL;
+                }
             }
         <?php 
             Session::put('BV_MA_Focus',null);
@@ -767,5 +808,6 @@
         //|*****************************************************
         //|LƯU FILE END
         //|*****************************************************
+        })
     </script>
 @endsection
