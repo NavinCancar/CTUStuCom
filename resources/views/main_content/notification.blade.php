@@ -75,64 +75,8 @@
               var notiFormList = [];
               var justLoad = new Date();
               //|-----------------------------------------------------
-              //|HIỆN CÁC THÔNG BÁO CHAT GẦN NHẤT
+              //|HIỆN CÁC THÔNG BÁO CHAT GẦN NHẤT -> XOÁ
               //|-----------------------------------------------------
-              (async () => {
-                const qnoti = query(
-                  collection(db, "THONG_BAO"), 
-                  where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
-                  orderBy("TB_REALTIME", "desc")
-                );
-
-                const querySnapshotnoti = await getDocs(qnoti);
-                
-                //KHÔNG TỒN TẠI THÔNG BÁO CŨ
-                if (querySnapshotnoti.empty) {
-                    //console.log('no data');
-                    var divData = `<h4 class="text-center p-2 m-5 p-5">Bạn chưa có thông báo nào trước đây!</h4>`;
-                    var khungnotilon = document.getElementById('khungnotilon');
-                    khungnotilon.insertAdjacentHTML('beforebegin', divData);
-                    khungnotilon.style.display = "none";
-                }
-                //TỒN TẠI THÔNG BÁO CŨ
-                else{
-                  //console.log('have data');
-
-                  querySnapshotnoti.forEach((doc) => {
-                      //doc.data() is never undefined for query doc snapshots
-                      //console.log(doc.id, " => ", doc.data());
-
-                      //|-----------------------------------------------------
-                      //|LẤY 5 NGƯỜI NHẮN GẦN NHẤT
-                      //|-----------------------------------------------------
-                      
-                      //checkNoti chưa tồn tại trong mảng
-                      if (notiFormList.indexOf(doc.id) === -1) {
-                          notiFormList.push(doc.id);
-
-                          var divData = 
-                            '    <a data-value="'+doc.id+'" data-href="'+doc.data().TB_DUONGDAN+'" class="p-3 noti-item cursor-pointer d-flex align-items-center gap-2 text-muted mt-1 mb-2 noti-href"' +
-                            '    style="flex-wrap: wrap;">' +
-                            '   <img src="'+ (doc.data().TB_ANHDINHKEM != null ? doc.data().TB_ANHDINHKEM : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
-                            '        class="rounded-circle">' +
-                            '    <p class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">' +
-                            doc.data().TB_NOIDUNG +
-                            '    </p>' +
-                            (doc.data().TB_TRANGTHAI==0 ? '<div class="notification bg-primary rounded-circle"></div>' : '') +
-                            '    </a>' ;
-
-                          var listnoti = document.getElementById('list-noti-lon');
-                          listnoti.insertAdjacentHTML('beforeend', divData);
-                      }
-                      else{}
-                  });
-                }
-
-              })().catch((error) => {
-                  console.error("Error in script: ", error);
-              });
-
-
               //|-----------------------------------------------------
               //|BẮT SỰ KIỆN REALTIME
               //|-----------------------------------------------------
@@ -141,24 +85,50 @@
               const qrealnoti = query(
                   collection(db, "THONG_BAO"), 
                   where('ND_NHAN_MA', '==', <?php echo $userLog->ND_MA; ?>),
-                  where("TB_REALTIME", ">", justLoad),
                   orderBy("TB_REALTIME", "desc")
               );
 
               //console.log("Before onSnapshot");
               const unsubscriberealnoti = onSnapshot(qrealnoti, (querySnapshot) => {
-                  //console.log("Snapshot event received");
-                  //console.log(notiFormList);
+                //console.log("Snapshot event received");
+                //console.log(notiFormList);
+
+                //KHÔNG TỒN TẠI THÔNG BÁO CŨ
+                if (querySnapshot.empty) {
+                    //console.log('no data');
+                    var divData = `<h4 class="text-center p-2 m-5 p-5">Bạn chưa có thông báo nào trước đây!</h4>`;
+                    var khungnotilon = document.getElementById('khungnotilon');
+                    khungnotilon.insertAdjacentHTML('beforebegin', divData);
+                    khungnotilon.style.display = "none";
+                }
+                //TỒN TẠI THÔNG BÁO CŨ
+                else{
                   querySnapshot.docChanges().forEach((change) => {
                       
                       const iddata = change.doc.id;
                       const data = change.doc.data(); // Cũng có thể dùng change.doc.id / change.doc.data().TN_REALTIME
+                      var checkRealtimeNoti = justLoad;
+                      if (data.TB_REALTIME != null){
+                        checkRealtimeNoti = new Date(data.TB_REALTIME.seconds * 1000);
+                      }
                       // Kiểm tra loại thay đổi
                       if (change.type === "added" || change.type === "modified") { //Tương tự có thể dùng modified hoặc removed
-                          //console.log("ID Document added:", iddata);
-                          //console.log("Document added:", data);
-                          //console.log("Ori ",notiFormList);
-
+                        //console.log("ID Document added:", iddata);
+                        //console.log("Document added:", data);
+                        //console.log("Ori ",notiFormList);
+                        
+                        //|-----------------------------------------------------
+                        //|LẤY 5 NGƯỜI NHẮN GẦN NHẤT
+                        //|-----------------------------------------------------
+                        if (checkRealtimeNoti < justLoad) {
+                            //checkNoti chưa tồn tại trong mảng
+                            if (notiFormList.indexOf(iddata) === -1) {
+                                notiFormList.push(iddata);
+                                AddListNoti();
+                            }
+                            else{}
+                        }
+                        else {
                           //Người vừa nhắn tin chưa tồn tại trong mảng
                           if (notiFormList.indexOf(iddata) === -1) {
                             if (notiFormList.length >= 5) {
@@ -175,8 +145,11 @@
                           else{
                               removeAByValueNoti(iddata);
                           }
+                          AddListNoti();
                           //console.log("New ",notiFormList);
+                        }
 
+                        function AddListNoti(){
                             var divData = 
                                 '    <a data-value="'+iddata+'" data-href="'+data.TB_DUONGDAN+'" class="p-3 noti-item cursor-pointer d-flex align-items-center gap-2 text-muted mt-1 mb-2 noti-href"' +
                                 '    style="flex-wrap: wrap;">' +
@@ -188,14 +161,14 @@
                                 (data.TB_TRANGTHAI==0 ? '<div class="notification bg-primary rounded-circle"></div>' : '') +
                                 '    </a>';
 
-                          var listnoti = document.getElementById('list-noti-lon');
-                          listnoti.insertAdjacentHTML('beforeend', divData);
-
-                          var listnoti = document.getElementById('list-noti-lon');
-                          listnoti.insertAdjacentHTML('afterbegin', divData);
+                            var listnoti = document.getElementById('list-noti-lon');
+                            if (checkRealtimeNoti < justLoad) listnoti.insertAdjacentHTML('beforeend', divData);
+                            else listnoti.insertAdjacentHTML('afterbegin', divData);
+                        }
                       }
                   });
                   //console.log("Current data: ", messages.join(", "));
+                }
               });
 
               //|-----------------------------------------------------
