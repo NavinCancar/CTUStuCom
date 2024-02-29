@@ -326,3 +326,48 @@
 .icon-lightgrey :hover{
   color: var(--bs-gray-500);
 }
+
+/* POPOVER 
+.bs-popover-auto{
+  border-color: var(--bs-gray-300);
+}
+
+.popover-body{
+  padding: 10px;
+  padding-left: 45px;
+  font-size: 0.9rem;
+  color: var(--bs-danger);
+}
+
+.popover-body::before {
+  content: "\f057";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 400;
+  font-size: 24px;
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--bs-white);
+}*/
+
+.footer-slideshow{
+  display: flex; 
+  overflow-x: auto; 
+  justify-content: start;
+  flex-wrap: nowrap;
+}
+
+.img-selected-border{
+  width: 120px;
+  height: 120px;
+  border-style: dashed;
+  border-color: var(--bs-primary);
+  padding: 5px;
+}

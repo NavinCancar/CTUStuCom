@@ -73,7 +73,7 @@
                     </div>
 
                     <!-- Images Container -->
-                    <div id="images-container" class="m-2 mt-3 mb-3 position-relative">
+                    <div id="images-container" class="m-2 mt-3 mb-3 position-relative" data-post-id-value="{{$bv->BV_MA}}" data-comment-id-value="">
                       <!--<span data-value="1" class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">    
                         <a target="_blank" href="https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/files%2F1706752716087_ldm1.png?alt=media&amp;token=0af3fc1b-79fa-480a-b8bc-63977782e1bc" previewlistener="true">
                           <img src="https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/files%2F1706752716087_ldm1.png?alt=media&token=0af3fc1b-79fa-480a-b8bc-63977782e1bc" width="100px" height="100px" alt="Banner Image" class="d-block mx-auto">    
@@ -142,7 +142,7 @@
 
             
             <div class="mb-3 mb-sm-0">
-              <h5 class="card-title fw-semibold">Trả lời bài viết</h5>
+              <h5 class="card-title fw-semibold">Bình luận bài viết</h5>
             </div>
             <hr>
             @if($userLog)  
@@ -216,7 +216,7 @@
                                   <span class="text-muted">{!! nl2br(e($blg->BL_NOIDUNG)) !!}</span>
 
                                   <!-- Images Container -->
-                                  <div id="images-container-{{$blg->BL_MA}}" class="mt-3 mb-3 position-relative"></div>
+                                  <div id="images-container-{{$blg->BL_MA}}" class="mt-3 mb-3 position-relative" data-post-id-value="" data-comment-id-value="{{$blg->BL_MA}}"></div>
                                   <!-- File Container -->
                                   <div id="files-container-{{$blg->BL_MA}}" class="mt-3"></div>
 
@@ -298,7 +298,7 @@
                                       <span class="text-muted">{!! nl2br(e($bltl->BL_NOIDUNG)) !!}</span>
 
                                       <!-- Images Container -->
-                                      <div id="images-container-{{$bltl->BL_MA}}" class="mt-3 mb-3 position-relative"></div>
+                                      <div id="images-container-{{$bltl->BL_MA}}" class="mt-3 mb-3 position-relative" data-post-id-value="" data-comment-id-value="{{$bltl->BL_MA}}"></div>
                                       <!-- File Container -->
                                       <div id="files-container-{{$bltl->BL_MA}}" class="mt-3"></div>
 
@@ -517,6 +517,7 @@
       </div>
     </div>
     <!-- MODAL BÌNH LUẬN END -->
+
     <!-- MODAL REPORT START -->
     <div class="modal" id="reportmodal">
       <div class="modal-dialog modal-lg">
@@ -553,6 +554,25 @@
       </div>
     </div>
     <!-- MODAL REPORT END -->
+
+    <!-- Modal Image Start-->   
+    <div class="modal" id="img-modal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content px-3">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="btn-close ms-5" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body pt-0 pb-0 mx-2 d-flex justify-content-between align-items-center"></div>
+                <!-- Modal footer -->
+                <div class="modal-footer footer-slideshow">
+                    <!--<img src="..." width="100px" height="100px" class="mx-2">-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Image End-->
     @endif
 
     @if($isBlock != 1)
@@ -703,6 +723,7 @@
         const filesContainer = document.getElementById('files-container');
         const imagesContainer = document.getElementById('images-container');
         var fileSaved = [];
+        var imgListModal = [];
 
         const ufilesContainer = document.getElementById('u-files-container');
         const uimagesContainer = document.getElementById('u-images-container');
@@ -1002,6 +1023,8 @@
                   if (!querySnapshotfileC.empty) {
                     var oldFDKC = document.getElementById('old-FDK-c');
                     oldFDKC.style.display = 'block';
+                    uimagesContainerC.innerHTML = '';
+                    ufilesContainerC.innerHTML = '';
                   }
                   querySnapshotfileC.forEach((doc) => {
                       const fileName = doc.data().FDK_TEN;
@@ -1012,14 +1035,14 @@
                           // Image
                           var divData =
                             '<span class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
-                            '  <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
+                            '  <a class="modal-img" data-img-id-value="'+doc.id+'" previewlistener="true">' +
                             '    <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                             '  </a>' +
                             '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn delete-file-c" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' +
                             '    <i class="fas fa-times"></i>'
                             '  </button>' +
                             '</span>';
-                          uimagesContainerC.insertAdjacentHTML('afterbegin', divData);
+                          uimagesContainerC.insertAdjacentHTML('beforeend', divData);
                       }
                       else{
                           var divData =
@@ -1048,7 +1071,7 @@
                             '    <i class="fas fa-times"></i>'
                             '  </button>' +
                             '</span>';
-                          uimagesContainerC.insertAdjacentHTML('afterbegin', divData);
+                          ufilesContainerC.insertAdjacentHTML('beforeend', divData);
                       } 
                   });
                 })().catch((error) => {
@@ -1312,7 +1335,7 @@
                     // Image
                     var divData =
                       '<span class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
-                      '  <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
+                      '  <a class="modal-img" data-img-id-value="'+doc.id+'" previewlistener="true">' +
                       '    <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                       '  </a>' ;
                     
@@ -1323,7 +1346,7 @@
                     divDataShow += 
                       '  </button>' +
                       '</span>';
-                    imagesContainer.insertAdjacentHTML('afterbegin', divDataShow);
+                    imagesContainer.insertAdjacentHTML('beforeend', divDataShow);
 
 
                     var divDataUpdate = divData +
@@ -1332,7 +1355,9 @@
                       '    <i class="fas fa-times"></i>'
                       '  </button>' +
                       '</span>';
-                    uimagesContainer.insertAdjacentHTML('afterbegin', divDataUpdate);
+                    uimagesContainer.insertAdjacentHTML('beforeend', divDataUpdate);
+
+                    imgListModal.push({ docid: doc.id, fileName: fileName, fileLink: fileLink, BV_MA: <?php echo $BV_MA; ?> , BL_MA: 0 });
                 }
                 else{
                     var divData =
@@ -1364,7 +1389,7 @@
                     divDataShow += 
                         '  </button>' +
                         '</span>';
-                    filesContainer.insertAdjacentHTML('afterbegin', divDataShow);
+                    filesContainer.insertAdjacentHTML('beforeend', divDataShow);
 
 
                     var divDataUpdate = divData +
@@ -1373,7 +1398,7 @@
                       '    <i class="fas fa-times"></i>'
                       '  </button>' +
                       '</span>';
-                    uimagesContainer.insertAdjacentHTML('afterbegin', divDataUpdate);
+                    ufilesContainer.insertAdjacentHTML('beforeend', divDataUpdate);
                 } 
             });
           })().catch((error) => {
@@ -1411,7 +1436,7 @@
                     // Image
                     var divData =
                       '<span class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
-                      '  <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
+                      '  <a class="modal-img" data-img-id-value="'+doc.id+'" previewlistener="true">' +
                       '    <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                       '  </a>' +
                       '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
@@ -1420,7 +1445,9 @@
                     divData += 
                       '  </button>' +
                       '</span>';
-                    imagesContainercmt.insertAdjacentHTML('afterbegin', divData);
+                    imagesContainercmt.insertAdjacentHTML('beforeend', divData);
+
+                    imgListModal.push({ docid: doc.id, fileName: fileName, fileLink: fileLink, BV_MA: 0 , BL_MA: BL_MA });
                 }
                 else{
                     var divData =
@@ -1451,7 +1478,7 @@
                     divData += 
                         '  </button>' +
                         '</span>';
-                    filesContainercmt.insertAdjacentHTML('afterbegin', divData);
+                    filesContainercmt.insertAdjacentHTML('beforeend', divData);
                 } 
               }
             });
@@ -1474,6 +1501,9 @@
               var form0 = $(this).closest('form');
               var BL_NOIDUNG0 = form0.find('textarea[name="BL_NOIDUNG0"]').val();
 
+              const BL_NOIDUNG0_Element = form0.find('textarea[name="BL_NOIDUNG0"]');
+              BL_NOIDUNG0_Element.removeClass('border-danger');
+              BL_NOIDUNG0_Element.addClass('border-secondary');
               //|-----------------------------------------------------
               //|XỬ LÝ LINK FILE
               //|-----------------------------------------------------
@@ -1482,12 +1512,12 @@
               var urlFile0 = [];
               var TN_FDK0 = fileInput0.files;
 
-              if(TN_FDK0.length > 0 && TN_FDK0.length > dontUse0.length && BL_NOIDUNG0 != ""){//Gửi có file
-                //Cho nút gửi xoay
-                replyBtn.classList.add('disabled-mess');
-                replyBtn.querySelector('i').classList.remove('fas', 'fa-paper-plane');
-                replyBtn.querySelector('i').classList.add('spinner-border', 'spinner-border-sm');
+              //Cho nút gửi xoay
+              replyBtn.classList.add('disabled-mess');
+              replyBtn.querySelector('i').classList.remove('fas', 'fa-paper-plane');
+              replyBtn.querySelector('i').classList.add('spinner-border', 'spinner-border-sm');
 
+              if(TN_FDK0.length > 0 && TN_FDK0.length > dontUse0.length && BL_NOIDUNG0 != ""){//Gửi có file
                   (async () => {
                       for (var i = 0; i < TN_FDK0.length; i++) {
                           //console.log("Selected File " + (i) + ": " + TN_FDK[i].name);
@@ -1526,6 +1556,14 @@
               }
               else if (BL_NOIDUNG0 != ""){ //Gửi không có file
                 Upload0 ()
+              }
+              else if (BL_NOIDUNG0 == ""){
+                replyBtn.classList.remove('disabled-mess');
+                replyBtn.querySelector('i').classList.remove('spinner-border', 'spinner-border-sm');
+                replyBtn.querySelector('i').classList.add('fas', 'fa-paper-plane');
+
+                BL_NOIDUNG0_Element.removeClass('border-secondary');
+                BL_NOIDUNG0_Element.addClass('border-danger');
               }
     
               function Upload0 (){
@@ -1692,6 +1730,9 @@
                   var form1 = $(this).closest('form');
                   var BL_NOIDUNG1 = form1.find('textarea[name="BL_NOIDUNG1"]').val();
 
+                  const BL_NOIDUNG1_Element = form1.find('textarea[name="BL_NOIDUNG1"]');
+                  BL_NOIDUNG1_Element.removeClass('border-danger');
+                  BL_NOIDUNG1_Element.addClass('border-secondary');
                   //|-----------------------------------------------------
                   //|XỬ LÝ LINK FILE
                   //|-----------------------------------------------------
@@ -1700,12 +1741,12 @@
                   var urlFile1 = [];
                   var TN_FDK1 = fileInput1.files;
 
-                  if(TN_FDK1.length > 0 && TN_FDK1.length > dontUse1.length && BL_NOIDUNG1 != ""){//Gửi có file
-                    //Cho nút gửi xoay
+                  //Cho nút gửi xoay
                     replyBtn.classList.add('disabled-mess');
                     replyBtn.querySelector('i').classList.remove('fas', 'fa-paper-plane');
                     replyBtn.querySelector('i').classList.add('spinner-border', 'spinner-border-sm');
 
+                  if(TN_FDK1.length > 0 && TN_FDK1.length > dontUse1.length && BL_NOIDUNG1 != ""){//Gửi có file
                       (async () => {
                           for (var i = 0; i < TN_FDK1.length; i++) {
                               //console.log("Selected File " + (i) + ": " + TN_FDK[i].name);
@@ -1745,7 +1786,15 @@
                   else if (BL_NOIDUNG1 != ""){ //Gửi không có file
                     Upload1 ()
                   }
-        
+                  else if (BL_NOIDUNG1 == ""){
+                    replyBtn.classList.remove('disabled-mess');
+                    replyBtn.querySelector('i').classList.remove('spinner-border', 'spinner-border-sm');
+                    replyBtn.querySelector('i').classList.add('fas', 'fa-paper-plane');
+
+                    BL_NOIDUNG1_Element.removeClass('border-secondary');
+                    BL_NOIDUNG1_Element.addClass('border-danger');
+                  }
+
                   function Upload1 (){
 
                     //|-----------------------------------------------------
@@ -1894,73 +1943,92 @@
           ?>
 
           //|*****************************************************
-          //|LƯU FILE START
+          //|LƯU FILE START + WITH UPDATE
           //|*****************************************************
           <?php if($userLog) { ?>
-            $(document).on('click', '.bookmark-file', function() {
-                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
-                var FDK_MA = $(this).data('fdk-id-value');
-                var _token = $('meta[name="csrf-token"]').attr('content');
-                const iconElement = $(this).find('i');
-                iconElement.removeClass('fa fa-bookmark');
-                iconElement.removeClass('fa fa-vote-yea');
-                iconElement.removeClass('fa-exclamation-circle text-danger');
-                iconElement.addClass('spinner-border text-light spinner-border-sm');
+              $(document).on('click', '.bookmark-file', function() {
+                  // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                  var FDK_MA = $(this).data('fdk-id-value');
+                  var _token = $('meta[name="csrf-token"]').attr('content');
+                  const iconElement = $(this).find('i');
+                  iconElement.removeClass('fa fa-bookmark');
+                  iconElement.removeClass('fa fa-vote-yea');
+                  iconElement.removeClass('fa-exclamation-circle text-danger');
+                  iconElement.addClass('spinner-border text-light spinner-border-sm');
 
-                (async () => {
-                    const qbookmarkfile = query(
-                    collection(db, "DANH_DAU_FILE"), 
-                    where('FDK_MA', '==', FDK_MA),
-                    where('ND_MA', '==', <?php echo $userLog->ND_MA; ?>)
-                    );
-                    
-                    const querySnapshotbookmarkfile = await getDocs(qbookmarkfile);
-                    
-                    if (querySnapshotbookmarkfile.empty) {
-                        //Lưu file
-                        $.ajax({
+                  (async () => {
+                      const qbookmarkfile = query(
+                      collection(db, "DANH_DAU_FILE"), 
+                      where('FDK_MA', '==', FDK_MA),
+                      where('ND_MA', '==', <?php echo $userLog->ND_MA; ?>)
+                      );
+                      
+                      const querySnapshotbookmarkfile = await getDocs(qbookmarkfile);
+                      
+                      if (querySnapshotbookmarkfile.empty) {
+                          //Lưu file
+                          $.ajax({
                           url: '{{URL::to('/danh-dau-file')}}',
                           type: 'POST',
                           data: {
-                            FDK_MA: FDK_MA,
-                            _token: _token // Include the CSRF token in the data
+                              FDK_MA: FDK_MA,
+                              _token: _token // Include the CSRF token in the data
                           },
                           success: function(response) {
-                              iconElement.removeClass('spinner-border text-light spinner-border-sm');
-                              iconElement.addClass('fa-vote-yea');
+                              //iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                              //iconElement.addClass('fa-vote-yea');
                               //console.log('Thành công');
+                              fileSaved.push(FDK_MA);
+                              var fdkElement = $('button[data-fdk-id-value="'+ FDK_MA +'"]').find('i');
+                              fdkElement.removeClass('fa fa-bookmark');
+                              fdkElement.removeClass('fa fa-vote-yea');
+                              fdkElement.removeClass('fa-exclamation-circle text-danger');
+                              fdkElement.removeClass('spinner-border text-light spinner-border-sm');
+                              fdkElement.addClass('fa-vote-yea');
                           },
                           error: function(error) {
                               iconElement.removeClass('spinner-border text-light spinner-border-sm');
                               iconElement.addClass('fa-exclamation-circle text-danger');
                               console.log(error);
                           }
-                        });
-                    }
-                    else{
-                      //Xoá file
-                      querySnapshotbookmarkfile.forEach((doc2) => {
-                         (async () => {
-                            await deleteDoc(doc(db, "DANH_DAU_FILE", doc2.id));
+                          });
+                      }
+                      else{
+                          //Xoá file
+                          querySnapshotbookmarkfile.forEach((doc2) => {
+                              (async () => {
+                                  await deleteDoc(doc(db, "DANH_DAU_FILE", doc2.id));
 
-                            iconElement.removeClass('spinner-border text-light spinner-border-sm');
-                                iconElement.addClass('fa-bookmark');
-                        })().catch((error) => {
-                            iconElement.removeClass('spinner-border text-light spinner-border-sm');
-                            iconElement.addClass('fa-exclamation-circle text-danger');
-                            console.error("Error in delete script: ", error);
-                        });
-                      });
-                    }
-                })().catch((error) => {
-                    console.error("Error in script: ", error);
-                });
-                // Thực hiện các xử lý khác với tham số đã truyền
-                //console.log("Additional Parameter: " + FDK_MA);
-            });
+                                  //iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                  //iconElement.addClass('fa-bookmark');
+                                  
+                                  var index = fileSaved.indexOf(FDK_MA);
+                                  if (index !== -1) {
+                                      fileSaved.splice(index, 1);
+                                  }
+                                  
+                                  var fdkElement = $('button[data-fdk-id-value="'+ FDK_MA +'"]').find('i');
+                                  fdkElement.removeClass('fa fa-bookmark');
+                                  fdkElement.removeClass('fa fa-vote-yea');
+                                  fdkElement.removeClass('fa-exclamation-circle text-danger');
+                                  fdkElement.removeClass('spinner-border text-light spinner-border-sm');
+                                  fdkElement.addClass('fa-bookmark');
+                              })().catch((error) => {
+                                  iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                  iconElement.addClass('fa-exclamation-circle text-danger');
+                                  console.error("Error in delete script: ", error);
+                              });
+                          });
+                      }
+                  })().catch((error) => {
+                      console.error("Error in script: ", error);
+                  });
+                  // Thực hiện các xử lý khác với tham số đã truyền
+                  //console.log("Additional Parameter: " + FDK_MA);
+              });
           <?php } ?>
           //|*****************************************************
-          //|LƯU FILE END
+          //|LƯU FILE END + WITH UPDATE
           //|*****************************************************
           //|*****************************************************
           //|LƯU BÀI VIẾT START
@@ -2446,6 +2514,85 @@
           <?php } ?>
           //|*****************************************************
           //|XOÁ BÌNH LUẬN END
+          //|*****************************************************
+
+          //|*****************************************************
+          //|MODAL ẢNH START
+          //|*****************************************************
+
+          $(document).on('click', '.modal-img', function() {
+              ShowImgModal($(this).data('img-id-value'));
+          });
+
+          $(document).on('click', '.imgOther', function() {
+              ShowImgModal($(this).data('img-id-value'));
+          });
+
+          $(document).on('click', '.footer-slideshow img', function() {
+              ShowImgModal($(this).data('img-id-value'));
+          });
+
+          function ShowImgModal(idImg){
+              $('#img-modal').find('.modal-header').find('.btn').remove();
+              $('#img-modal').find('.modal-header').find('div').remove();
+              //$('#img-modal').find('.modal-footer').html('');
+              $('#img-modal').find('.modal-body').html('');
+
+              //|-----------------------------------------------------
+              //|HIỆN ẢNH
+              //|-----------------------------------------------------
+              //imgListModal.push({ docid: doc.id, fileName: fileName, fileLink: fileLink, type: type, url: url });
+
+              var index = imgListModal.findIndex(function(item) {
+                  return item.docid === idImg;
+              });
+
+              var bv = 0;
+              var bl = 0;
+              if (index !== -1) {//Có trong mảng
+                  bv = imgListModal[index].BV_MA;
+                  bl = imgListModal[index].BL_MA;
+                  //LẤY BUTTON
+                  var btnImg = 
+                      '<button class="btn btn-secondary btn-sm start-100 bookmark-file mx-2 fs-4" data-fdk-id-value="'+imgListModal[index].docid+'">';
+                  if (fileSaved.includes(imgListModal[index].docid)) btnImg += '    <i class="fas fa-vote-yea mx-2 fs-4"></i></button>';
+                  else  btnImg += '    <i class="fas fa-bookmark mx-2 fs-4"></i></button>';
+                  btnImg +=
+                  '<div style="margin-left: auto;"><p class="fw-bold mb-0">'+imgListModal[index].fileName+'</p><p class="small text-muted float-end mb-0"><i> </i><i></i></div>';
+                  
+                  //LẤY ẢNH
+                  var bodyElement = '';
+                  //Nút Previous: Kiểm tra phần tử đầu
+                  if (index === 0 || ((bv != 0 && imgListModal[index-1].BV_MA != bv) || (bl != 0 && imgListModal[index-1].BL_MA != bl))) 
+                  bodyElement += '<button type="button" disabled class="btn btn-link btn-lg pe-4" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
+                  else bodyElement += '<button type="button" class="btn btn-link btn-lg pe-4 imgOther" data-img-id-value="'+imgListModal[index-1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
+                  
+                  //Main content
+                  bodyElement += 
+                  '<a class="" data-img-id-value="'+imgListModal[index].docid+'" previewlistener="true" target="_blank" href="'+imgListModal[index].fileLink+'">'+   
+                  '    <img src="'+imgListModal[index].fileLink+'" alt="'+imgListModal[index].fileName+'" class="d-block mx-auto" style="width: 100%; height: auto; max-height: 340px;">'+    
+                  '</a>';
+
+                  //Nút Next: Kiểm tra phần tử cuối
+                  if ((index === imgListModal.length - 1) || ((bv != 0 && imgListModal[index+1].BV_MA != bv) || (bl != 0 && imgListModal[index+1].BL_MA != bl))) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg ps-4" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+                  else bodyElement += '<button type="button" class="btn btn-link btn-lg ps-4 imgOther" data-img-id-value="'+imgListModal[index+1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+
+                  $('#img-modal').find('.modal-header').prepend(btnImg);
+                  $('#img-modal').find('.modal-body').html(bodyElement);
+              }
+
+              $('.footer-slideshow').html('');
+              for (var index = 0; index < imgListModal.length; index++) {
+                if((bv != 0 && imgListModal[index].BV_MA == bv) || (bl != 0 && imgListModal[index].BL_MA == bl))
+                  $('<img src="'+imgListModal[index].fileLink+'"  data-img-id-value="'+imgListModal[index].docid+'" width="100px" height="100px" alt="'+imgListModal[index].fileName+'" class="mx-2 cursor-pointer">').appendTo('.footer-slideshow');
+              }
+              $('.footer-slideshow').find('img[data-img-id-value="'+idImg+'"]').addClass('img-selected-border');
+
+
+              $('#img-modal').modal('show');
+          }
+          //|*****************************************************
+          //|MODAL ẢNH END
           //|*****************************************************
         });
     </script>

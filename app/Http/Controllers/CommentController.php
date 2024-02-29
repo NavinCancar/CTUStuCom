@@ -182,6 +182,15 @@ class CommentController extends Controller
             }
         }
         
+
+        //Điểm cống hiến
+        $userDCH = DB::table('nguoi_dung')->where('ND_MA', $userLog->ND_MA)->first();
+        $DCH = $userDCH->ND_DIEMCONGHIEN + 1;
+        DB::table('nguoi_dung')->where('ND_MA', $userDCH->ND_MA)
+        ->update([
+            'ND_DIEMCONGHIEN' => $DCH
+        ]);
+
         Session::put('BL_MA_Focus',$binh_luan->BL_MA);
         return Redirect::to('thong-bao-binh-luan/'.$binh_luan->BL_MA);
         //return response()->json(['BL_MA' => $binh_luan->BL_MA]);

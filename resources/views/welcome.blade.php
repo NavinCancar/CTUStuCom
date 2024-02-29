@@ -16,6 +16,7 @@
 
   <!-- js -->
   <script src="{{asset('public/jquery/dist/jquery.min.js')}}"></script>
+  <!--<script src="{{asset('public/js/jquerycall.js')}}"></script>-->
 
   <!-- fontawesome -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"

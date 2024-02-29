@@ -47,7 +47,7 @@
                                                 <b class="fs-6"><?php if($bai_viet_count) echo $bai_viet_count; else echo '0'; ?></b><br> Bài đăng
                                             </a>
                                             <a href="javascript:void(0)" class="col-lg-3 col-md-3 col-sm-6 text-muted ml-3">
-                                                <b class="fs-6">111</b><br> Điểm cống hiến
+                                                <b class="fs-6">{{$info->ND_DIEMCONGHIEN}}</b><br> Điểm cống hiến
                                             </a>
                                         </div>
                                         @if($info->ND_MOTA != null)

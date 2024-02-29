@@ -218,8 +218,25 @@
         </div>
     </div>
 
+    <!-- Modal Image Start-->   
+    <div class="modal" id="img-modal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content px-3">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="btn-close ms-5" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body pt-0 pb-0 mx-2 d-flex justify-content-between align-items-center"></div>
+                <!-- Modal footer -->
+                <div class="modal-footer footer-slideshow">
+                    <!--<img src="..." width="100px" height="100px" class="mx-2">-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Image End-->
 
-    
     <script type="module">
         //|-----------------------------------------------------
         //|KHAI BÁO FIRESTORE
@@ -256,7 +273,9 @@
         const selectedImagesContainer = document.getElementById('selected-images-container');
         var dontUse = [];
         var fileSaved = [];
-
+        var imgListModal = [];
+        var fileList = [];
+        var linkList = [];
         $(document).ready(function() {
             //|-----------------------------------------------------
             //|DANH SÁCH FILE NGƯỜI DÙNG ĐÃ LƯU
@@ -352,18 +371,21 @@
                     var thoigiangui = formatDate(now);
 
                     if(TN_NOIDUNG!="" && TN_FDK.length == 0){//Thuần gửi tin nhắn thôi
+                        //Cho nút gửi xoay
+                        const messageBtn = document.getElementById('message-btn');
+                        messageBtn.classList.add('disabled-mess');
+                        messageBtn.querySelector('i').classList.remove('fas', 'fa-paper-plane');
+                        messageBtn.querySelector('i').classList.add('spinner-border', 'spinner-border-sm');
                         SendMessage();
                     }
 
                     if(TN_FDK.length > 0 && TN_FDK.length > dontUse.length){//Gửi có file
+                        //Cho nút gửi xoay
+                        const messageBtn = document.getElementById('message-btn');
+                        messageBtn.classList.add('disabled-mess');
+                        messageBtn.querySelector('i').classList.remove('fas', 'fa-paper-plane');
+                        messageBtn.querySelector('i').classList.add('spinner-border', 'spinner-border-sm');
                         (async () => {
-                            //Cho nút gửi xoay
-                            const messageBtn = document.getElementById('message-btn');
-                            messageBtn.classList.add('disabled-mess');
-                            messageBtn.querySelector('i').classList.remove('fas', 'fa-paper-plane');
-                            messageBtn.querySelector('i').classList.add('spinner-border', 'spinner-border-sm');
-                            //Dùng realtime bắt sự kiện mới hiện lại nút gửi
-
                             //FIRESTORE----------------------------------------
 
                             for (var i = 0; i < TN_FDK.length; i++) {
@@ -430,6 +452,11 @@
                         }).then(function(docRef) {
                             //console.log('Message đã gửi with ID: ', docRef.id);
                             messForm.querySelector('textarea[name="TN_NOIDUNG"]').value = "";
+                            //Cho nút gửi xoay mất đi
+                            const messageBtn = document.getElementById('message-btn');
+                            messageBtn.classList.remove('disabled-mess');
+                            messageBtn.querySelector('i').classList.remove('spinner-border', 'spinner-border-sm');
+                            messageBtn.querySelector('i').classList.add('fas', 'fa-paper-plane');
                         }).catch(function(error) {
                             console.error('Error adding document: ', error);
                         });
@@ -440,35 +467,38 @@
                 //|XOÁ TIN NHẮN
                 //|-----------------------------------------------------
                 $(document).on("click", ".delete-chat", function(e) {
-                    const element = $(this);
-                    const idChat = element.data('chat-id-value');
-                    var arrayIdFile = element.data('file-id-value');
-                    //Xoá chat
-                    (async () => {
-                        await deleteDoc(doc(db, "TIN_NHAN", idChat));
-                        //console.log('ID của chat:', idChat);
+                    var confirmed = confirm("Bạn có chắc chắn muốn xoá tin nhắn này?");
+                    if (confirmed) {
+                        const element = $(this);
+                        const idChat = element.data('chat-id-value');
+                        var arrayIdFile = element.data('file-id-value');
+                        //Xoá chat
+                        (async () => {
+                            await deleteDoc(doc(db, "TIN_NHAN", idChat));
+                            //console.log('ID của chat:', idChat);
 
-                        //Có file
-                        if(arrayIdFile != ''){
-                            //Loại bỏ dấu phẩy cuối cùng
-                            if (arrayIdFile.endsWith(',')) {
-                                arrayIdFile = arrayIdFile.slice(0, -1);
-                            }
-                            
-                            var array = arrayIdFile.split(',');
-                            array.forEach(function(element) {
-                                //Xoá file
-                                (async () => {
-                                    await deleteDoc(doc(db, "FILE_DINH_KEM", element));
-                                })().catch((error) => {
-                                    console.error("Error in delete script: ", error);
+                            //Có file
+                            if(arrayIdFile != ''){
+                                //Loại bỏ dấu phẩy cuối cùng
+                                if (arrayIdFile.endsWith(',')) {
+                                    arrayIdFile = arrayIdFile.slice(0, -1);
+                                }
+                                
+                                var array = arrayIdFile.split(',');
+                                array.forEach(function(element) {
+                                    //Xoá file
+                                    (async () => {
+                                        await deleteDoc(doc(db, "FILE_DINH_KEM", element));
+                                    })().catch((error) => {
+                                        console.error("Error in delete script: ", error);
+                                    });
+                                    //console.log(element);
                                 });
-                                //console.log(element);
-                            });
-                        }
-                    })().catch((error) => {
-                        console.error("Error in delete script: ", error);
-                    });
+                            }
+                        })().catch((error) => {
+                            console.error("Error in delete script: ", error);
+                        });
+                    }
                 });
 
                 //|-----------------------------------------------------
@@ -578,27 +608,42 @@
                                         }
                                         //Tin nhắn file
                                         else{
-                                            //Cho nút gửi xoay mất đi
-                                            const messageBtn = document.getElementById('message-btn');
-                                            messageBtn.classList.remove('disabled-mess');
-                                            messageBtn.querySelector('i').classList.remove('spinner-border', 'spinner-border-sm');
-                                            messageBtn.querySelector('i').classList.add('fas', 'fa-paper-plane');
-
                                             var divData = 
                                                 '<div class="d-flex flex-row justify-content-end">'+
                                                 '    <div class="ms-5">'+
                                                 ((data.TN_NOIDUNG=="")?'<p data-chat-id-value="'+idChat+'"></p>':'<p class="fs-3 p-2 me-3 mb-1 text-white rounded-3 bg-primary chat" data-chat-id-value="'+idChat+'">'+data.TN_NOIDUNG+'</p>');
 
+                                            var divDataImg = "";
+                                            var divDataFile = "";
                                             var fileArrayId = "";
+                                            var imgListModalTemp = [];
+                                            var fileListTemp = [];
                                             querySnapshotfile.forEach((doc2) => {
                                                 const fileName = doc2.data().FDK_TEN;
                                                 const fileLink = doc2.data().FDK_DUONGDAN;
-                                                fileArrayId += doc2.id + ","
+                                                fileArrayId += doc2.id + ",";
 
-                                                divData += '<div class="d-flex flex-row justify-content-end me-3">' + showFileMessage(fileName, fileLink, '', doc2.id) + '</div>';
+                                                var showFileMessageDiv = showFileMessage(fileName, fileLink, '', doc2.id);
+                                                if (showFileMessageDiv.indexOf('<img') !== -1) {//Div ảnh
+                                                    divDataImg = '<div class="d-flex flex-row justify-content-end">' + showFileMessageDiv + '</div>' + divDataImg;
+
+                                                    imgListModalTemp.push({ docid: doc2.id, fileName: fileName, fileLink: fileLink, user: '<?php echo $userLog->ND_HOTEN; ?>' });
+                                                } else {//Div file
+                                                    divDataFile = '<div class="d-flex flex-row justify-content-end me-3">' + showFileMessageDiv + '</div>' + divDataFile;
+
+                                                    fileListTemp.push({ docid: doc2.id, fileName: fileName, fileLink: fileLink, user: '<?php echo $userLog->ND_HOTEN; ?>' });
+                                                }
                                             });
+                                            if (checkRealtime >= justLoad){
+                                                imgListModal.unshift(...imgListModalTemp);
+                                                fileList.unshift(...fileListTemp);
+                                            } 
+                                            else{
+                                                imgListModal.push(...imgListModalTemp);
+                                                fileList.push(...fileListTemp);
+                                            } 
 
-                                            divData +=
+                                            divData += '<div style="display: flex; flex-wrap: wrap; justify-content: end;">'+ divDataImg + '</div>'+ divDataFile +
                                                 '        <p class="fs-2 me-3 mb-3 rounded-3 text-muted">'+ secondsDifferenceResult +
                                                 '           <span class="float-end ms-3 icon-lightgrey cursor-pointer">'+
                                                 '               <i class="fas fa-undo delete-chat" data-chat-id-value="'+idChat+'" data-file-id-value="'+fileArrayId+'"></i>'+
@@ -611,6 +656,23 @@
                                             if (checkRealtime >= justLoad) chatbox.insertAdjacentHTML('beforeend', divData); //Thêm cuối
                                             else chatbox.insertAdjacentHTML('afterbegin', divData); //Thêm đầu
                                         }
+
+                                        // Biểu thức chính quy để tìm kiếm liên kết trong chuỗi
+                                        const linkRegex = /https?:\/\/[^\s]+/g;
+
+                                        // Sử dụng match để lấy tất cả các liên kết từ chuỗi
+                                        const links = (data.TN_NOIDUNG).match(linkRegex);
+                                        if (links && Array.isArray(links)) {
+                                            links.forEach((link) => {
+                                                if (checkRealtime >= justLoad) linkList.unshift({ link: link, idChat: idChat, user: '<?php echo $userLog->ND_HOTEN; ?>' });
+                                                else linkList.push({ link: link, idChat: idChat, user: '<?php echo $userLog->ND_HOTEN; ?>' });
+                                            })
+                                            
+                                            //Tắt khung kho lưu trữ
+                                            $('#kholuutru').offcanvas('hide');
+                                            $('#kholuutrudetail').offcanvas('hide');
+                                        }
+
                                         messDiv.scrollTop(messDiv[0].scrollHeight);
                                     }
 
@@ -618,17 +680,6 @@
                                     if(data.ND_GUI_MA == <?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>){
                                         //Tin nhắn văn bản
                                         if(querySnapshotfile.empty){
-                                            // Biểu thức chính quy để tìm kiếm liên kết trong chuỗi
-                                            const linkRegex = /https?:\/\/[^\s]+/g;
-
-                                            // Sử dụng match để lấy tất cả các liên kết từ chuỗi
-                                            const links = (data.TN_NOIDUNG).match(linkRegex);
-                                            if (links && Array.isArray(links)) {
-                                                //Tắt khung kho lưu trữ
-                                                $('#kholuutru').offcanvas('hide');
-                                                $('#kholuutrudetail').offcanvas('hide');
-                                            }
-
                                             var divData = 
                                                 '<div class="d-flex flex-row justify-content-start">'+
                                                 '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76';}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
@@ -653,14 +704,36 @@
                                                 '    <div class="me-5">'+
                                                 ((data.TN_NOIDUNG=="")?'<p data-chat-id-value="'+idChat+'"></p>':'<p class="fs-3 p-2 ms-1 mb-1 rounded-3 friend-chat" data-chat-id-value="'+idChat+'">'+data.TN_NOIDUNG+'</p>');
 
+                                            var divDataImg = "";
+                                            var divDataFile = "";
+                                            var fileArrayId = "";
+                                            var imgListModalTemp = [];
+                                            var fileListTemp = [];
                                             querySnapshotfile.forEach((doc2) => {
                                                 const fileName = doc2.data().FDK_TEN;
                                                 const fileLink = doc2.data().FDK_DUONGDAN;
-                                                
-                                                divData += '<div class="d-flex flex-row justify-content-start">' + showFileMessage(fileName, fileLink, 'friend-chat', doc2.id) + '</div>';
-                                            });
 
-                                            divData +=
+                                                var showFileMessageDiv = showFileMessage(fileName, fileLink, 'friend-chat', doc2.id);
+                                                if (showFileMessageDiv.indexOf('<img') !== -1) {//Div ảnh
+                                                    divDataImg = '<div class="d-flex flex-row justify-content-start">' + showFileMessageDiv + '</div>' + divDataImg;
+                                                    
+                                                    imgListModalTemp.push({ docid: doc2.id, fileName: fileName, fileLink: fileLink, user: '<?php if($userChat) echo $userChat->ND_HOTEN; ?>' });
+                                                } else {//Div file
+                                                    divDataFile = '<div class="d-flex flex-row justify-content-start">' + showFileMessageDiv + '</div>' + divDataFile;
+                                                    
+                                                    fileListTemp.push({ docid: doc2.id, fileName: fileName, fileLink: fileLink, user: '<?php if($userChat) echo $userChat->ND_HOTEN; ?>' });
+                                                }
+                                            });
+                                            if (checkRealtime >= justLoad){
+                                                imgListModal.unshift(...imgListModalTemp);
+                                                fileList.unshift(...fileListTemp);
+                                            } 
+                                            else{
+                                                imgListModal.push(...imgListModalTemp);
+                                                fileList.push(...fileListTemp);
+                                            } 
+                                            
+                                            divData += '<div style="display: flex; flex-wrap: wrap; justify-content: start;">'+ divDataImg + '</div>'+ divDataFile +
                                                 '        <p class="fs-2 ms-3 mb-3 rounded-3 text-muted float-end">'+ secondsDifferenceResult +'</p>'+
                                                 '    </div>'+
                                                 '</div>';
@@ -668,6 +741,23 @@
                                             if (checkRealtime >= justLoad) chatbox.insertAdjacentHTML('beforeend', divData); //Thêm cuối
                                             else chatbox.insertAdjacentHTML('afterbegin', divData); //Thêm đầu
                                         }
+
+                                        // Biểu thức chính quy để tìm kiếm liên kết trong chuỗi
+                                        const linkRegex = /https?:\/\/[^\s]+/g;
+
+                                        // Sử dụng match để lấy tất cả các liên kết từ chuỗi
+                                        const links = (data.TN_NOIDUNG).match(linkRegex);
+                                        if (links && Array.isArray(links)) {
+                                            links.forEach((link) => {
+                                                if (checkRealtime >= justLoad) linkList.unshift({ link: link, idChat: idChat, user: '<?php if($userChat) echo $userChat->ND_HOTEN; else echo ''; ?>' });
+                                                else linkList.push({ link: link, idChat: idChat, user: '<?php echo $userLog->ND_HOTEN; ?>' });
+                                            })
+                                            
+                                            //Tắt khung kho lưu trữ
+                                            $('#kholuutru').offcanvas('hide');
+                                            $('#kholuutrudetail').offcanvas('hide');
+                                        }
+
                                         messDiv.scrollTop(messDiv[0].scrollHeight);
                                         seenChat(<?php if($userChat) echo $userChat->ND_MA; else echo 0; ?>);
                                     }
@@ -782,11 +872,41 @@
                             else if (change.type === "removed") { 
                                 //console.log("Document added:", data);
                                 //|-----------------------------------------------------
+                                //|XOÁ PHẦN TỬ KHỎI MẢNG
+                                //|-----------------------------------------------------
+                                $('p[data-chat-id-value="' + idChat + '"]').nextAll('div').each(function() {
+                                    $(this).find('span[data-fdk-id-value]').each(function() {
+                                        //console.log($(this).data('fdk-id-value'));
+                                        var id = $(this).data('fdk-id-value');
+                                        //Xoá ảnh
+                                        var indexi = imgListModal.findIndex(function(item) {
+                                            return item.docid === id;
+                                        });
+                                        if (indexi !== -1) {
+                                            imgListModal.splice(indexi, 1);
+                                        }
+                                        //Xoá file
+                                        var indexf = fileList.findIndex(function(item) {
+                                            return item.docid === id;
+                                        });
+                                        if (indexf !== -1) {
+                                            fileList.splice(indexf, 1);
+                                        }
+                                        //console.log(imgListModal);
+                                    });
+                                });
+
+                                linkList = linkList.filter(function(item) {
+                                    return item.idChat !== idChat;
+                                });
+
+                                //|-----------------------------------------------------
                                 //|XOÁ CHAT
                                 //|-----------------------------------------------------
                                 var element = $('p[data-chat-id-value="' + idChat + '"]');
                                 element.closest('.justify-content-end').remove();
                                 element.closest('.justify-content-start').remove();
+
                                 //|-----------------------------------------------------
                                 //|XOÁ CHAT TRÊN KHUNG LIST FRIEND
                                 //|-----------------------------------------------------
@@ -904,8 +1024,8 @@
                 if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
                     // Image
                     string =
-                        '<span class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block mb-3">' +
-                        '    <a target="_blank" href="'+fileLink+'">' +
+                        '<span data-fdk-id-value="'+docid+'" class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block mb-3">' +
+                        '    <a class="modal-img" data-img-id-value="'+docid+'" previewlistener="true">' +
                         '        <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                         '    </a>' +
                         '    <button class="btn '+btn+' btn-sm position-absolute start-100 translate-middle bookmark-file" data-fdk-id-value="'+docid+'" style="transform: translateX(-50%);">';
@@ -916,7 +1036,7 @@
                 }
                 else{
                     string =
-                        '<span class="badge '+bg+' rounded-3 fw-semiboldms-0 p-1 px-3 mb-2">' +
+                        '<span data-fdk-id-value="'+docid+'" class="badge '+bg+' rounded-3 fw-semiboldms-0 p-1 px-3 mb-2">' +
                         '    <a target="_blank" '+txt+' href="'+fileLink+'">';
 
                     if (['pdf'].includes(fileExtension)){
@@ -1033,49 +1153,11 @@
             //|KHO LƯU TRỮ START
             //|*****************************************************
 
-            const qklt = query(
-                collection(db, "FILE_DINH_KEM"), 
-                where("ND_NHAN_MA", "in", [<?php if($userChat) echo $userChat->ND_MA; ?>, <?php echo $userLog->ND_MA; ?>]),
-                where("ND_GUI_MA", "in", [<?php if($userChat) echo $userChat->ND_MA; ?>, <?php echo $userLog->ND_MA; ?>]),
-                orderBy("TN_REALTIME", "desc")
-            );
-
-            const qlink = query(
-                collection(db, "TIN_NHAN"), 
-                where("ND_NHAN_MA", "in", [<?php if($userChat) echo $userChat->ND_MA; ?>, <?php echo $userLog->ND_MA; ?>]),
-                where("ND_GUI_MA", "in", [<?php if($userChat) echo $userChat->ND_MA; ?>, <?php echo $userLog->ND_MA; ?>]),
-                orderBy("TN_REALTIME", "desc")
-            );
-
             //KHO LƯU TRỮ TỔNG
             $('#kholuutru-btn').on('click', function() {
                 //|-----------------------------------------------------
-                //|DANH SÁCH FILE NGƯỜI DÙNG ĐÃ LƯU
+                //|KHO TỔNG
                 //|-----------------------------------------------------
-                <?php if($userLog) { ?>
-
-                (async () => {
-                    fileSaved = []
-                    const qbookmarkfileSaved = query(
-                    collection(db, "DANH_DAU_FILE"), 
-                    where('ND_MA', '==', <?php if($userLog) echo $userLog->ND_MA; ?>)
-                    );
-                    
-                    const querySnapshotbookmarkfileSaved = await getDocs(qbookmarkfileSaved);
-                    
-                    querySnapshotbookmarkfileSaved.forEach((doc) => {
-                        fileSaved.push(doc.data().FDK_MA);
-                    });
-                })().catch((error) => {
-                    console.error("Error in script: ", error);
-                });
-
-                <?php } ?>
-                (async () => {
-
-                    const querySnapshotklt = await getDocs(qklt);
-                    const querySnapshotlink = await getDocs(qlink);
-
                     var imagecount = 0;
                     var documentcount = 0;
                     var linkcount = 0;
@@ -1087,18 +1169,19 @@
                     listdocuments.innerHTML = '';
                     listlinks.innerHTML = '';
 
-                    querySnapshotklt.forEach((doc) => {
-                        const fileName = doc.data().FDK_TEN;
-                        const fileLink = doc.data().FDK_DUONGDAN;
-                        const fileExtension = fileName.split('.').pop().toLowerCase();
-                        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension) && imagecount < 5) {
+                    //ẢNH: imgListModal.push({ docid: docid, fileName: fileName, fileLink: fileLink, user: user });
+                    imgListModal.forEach(function(data) {
+                        var fileName = data.fileName;
+                        var fileLink = data.fileLink;
+                        var fileExtension = fileName.split('.').pop().toLowerCase();
+                        if (imagecount < 5) {
                             var divData = 
                                 '<span class="col-md-3 col-sm-4 rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block mb-3">' +
-                                '    <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
+                                '    <a class="modal-img" data-img-id-value="'+data.docid+'" previewlistener="true">' +
                                 '        <img src="'+fileLink+'"  width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                                 '    </a>' +
-                                '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
-                            if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
+                                '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle bookmark-file" data-fdk-id-value="'+data.docid+'" style="transform: translateX(-50%);">' ;
+                            if (fileSaved.includes(data.docid)) divData += '    <i class="fas fa-vote-yea"></i>';
                             else  divData += '    <i class="fas fa-bookmark"></i>';
                             divData += 
                                 '    </button>' +
@@ -1106,7 +1189,15 @@
                             listimages.insertAdjacentHTML('beforeend', divData);
                             imagecount++;
                         }
-                        else if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension) && documentcount < 5){
+                        else return;
+                    });
+
+                    //FILE: fileList.push({ docid: docid, fileName: fileName, fileLink: fileLink, user: user });
+                    fileList.forEach(function(data) {
+                        var fileName = data.fileName;
+                        var fileLink = data.fileLink;
+                        var fileExtension = fileName.split('.').pop().toLowerCase();
+                        if (documentcount < 5){
                             var divData =
                                 '<li class="p-2 border-bottom d-flex justify-content-between">' +
                                 '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between w-75">' +
@@ -1133,14 +1224,13 @@
                                 '            </div>' +
                                 '            <div class="pt-1">' +
                                 '                <p class="fw-bold mb-0">'+fileName+'</p>' +
-                                '                <p class="small text-muted"><i>Từ: </i><i>' + 
-                                ((doc.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php if($userChat) echo $userChat->ND_HOTEN; else echo 0?>') +
+                                '                <p class="small text-muted"><i>Từ: </i><i>' + data.user +
                                 '                   </i></p>' +
                                 '            </div>' +
                                 '        </div>' +
                                 '    </a>' +
-                                '    <button class="btn btn-secondary btn-sm bookmark-file" data-fdk-id-value="'+doc.id+'" style="height: 28px !important;">';
-                            if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
+                                '    <button class="btn btn-secondary btn-sm bookmark-file" data-fdk-id-value="'+data.docid+'" style="height: 28px !important;">';
+                            if (fileSaved.includes(data.docid)) divData += '    <i class="fas fa-vote-yea"></i>';
                             else  divData += '    <i class="fas fa-bookmark"></i>';
                             divData += 
                                 '</li>';
@@ -1148,42 +1238,32 @@
                             listdocuments.insertAdjacentHTML('beforeend', divData);
                             documentcount++;
                         }
-                        else if (imagecount >= 5 && documentcount >= 5 ) return;
-                        else{}
+                        else return;
                     });
 
-                    querySnapshotlink.forEach((doc2) => {
-                        // Biểu thức chính quy để tìm kiếm liên kết trong chuỗi
-                        const linkRegex = /https?:\/\/[^\s]+/g;
+                    //LINK: linkList.push({ link: link, idChat: idChat, user: user });
+                    linkList.forEach(function(data) {
+                        if (linkcount < 5){
+                            var divData =
+                                '<li data-value="4" class="p-2 border-bottom">'+
+                                '    <a href="'+data.link+'" target="_blank" class="d-flex justify-content-between">'+
+                                '        <div class="d-flex flex-row" style="max-width:100%">'+
+                                '            <div>'+
+                                '                <i class="fas fa-link me-2 document-icon"></i>'+
+                                '            </div>'+
+                                '            <div class="pt-1" style="overflow: hidden;">'+
+                                '                <p class="fw-bold mb-0">'+data.link+'</p>'+
+                                '                <p class="small text-muted"><i>Từ: </i><i>' + data.user +
+                                '                   </i></p>' +
+                                '            </div>'+
+                                '        </div>'+
+                                '    </a>'+
+                                '</li>';
 
-                        // Sử dụng match để lấy tất cả các liên kết từ chuỗi
-                        const links = (doc2.data().TN_NOIDUNG).match(linkRegex);
-                        if (links && Array.isArray(links)) {
-                            links.forEach((link) => {
-                                if (linkcount < 5){
-                                    var divData =
-                                        '<li data-value="4" class="p-2 border-bottom">'+
-                                        '    <a href="'+link+'" target="_blank" class="d-flex justify-content-between">'+
-                                        '        <div class="d-flex flex-row" style="max-width:100%">'+
-                                        '            <div>'+
-                                        '                <i class="fas fa-link me-2 document-icon"></i>'+
-                                        '            </div>'+
-                                        '            <div class="pt-1" style="overflow: hidden;">'+
-                                        '                <p class="fw-bold mb-0">'+link+'</p>'+
-                                        '                <p class="small text-muted"><i>Từ: </i><i>' + 
-                                        ((doc2.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php if($userChat) echo $userChat->ND_HOTEN; else echo 0?>') +
-                                        '                   </i></p>' +
-                                        '            </div>'+
-                                        '        </div>'+
-                                        '    </a>'+
-                                        '</li>';
-
-                                    listlinks.insertAdjacentHTML('beforeend', divData);
-                                    linkcount++;
-                                }
-                                else return;
-                            });
+                            listlinks.insertAdjacentHTML('beforeend', divData);
+                            linkcount++;
                         }
+                        else return;
                     });
 
                     if(imagecount >= 5){
@@ -1208,187 +1288,122 @@
                         listlinks.insertAdjacentHTML('beforeend', divData);
                     }
 
-                    //KHO LƯU TRỮ ẢNH
-                    $('#kholuutruimages-btn').on('click', function() {
-                        <?php if($userLog) { ?>
+                //|-----------------------------------------------------
+                //|KHO ẢNH
+                //|-----------------------------------------------------
+                $('#kholuutruimages-btn').on('click', function() {
 
-                        (async () => {
-                            fileSaved = []
-                            const qbookmarkfileSaved = query(
-                            collection(db, "DANH_DAU_FILE"), 
-                            where('ND_MA', '==', <?php if($userLog) echo $userLog->ND_MA; ?>)
-                            );
-                            
-                            const querySnapshotbookmarkfileSaved = await getDocs(qbookmarkfileSaved);
-                            
-                            querySnapshotbookmarkfileSaved.forEach((doc) => {
-                                fileSaved.push(doc.data().FDK_MA);
-                            });
-                        })().catch((error) => {
-                            console.error("Error in script: ", error);
-                        });
+                    var detailtitle = document.getElementById('detail-title');
+                    var detailbody = document.getElementById('detail-body');
+                    
+                    detailtitle.innerHTML = 'Ảnh';
+                    detailbody.innerHTML = '';
 
-                        <?php } ?>
-                        (async () => {
-                            const querySnapshotklt = await getDocs(qklt);
-
-                            var detailtitle = document.getElementById('detail-title');
-                            var detailbody = document.getElementById('detail-body');
-                            
-                            detailtitle.innerHTML = 'Ảnh';
-                            detailbody.innerHTML = '';
-
-                            querySnapshotklt.forEach((doc) => {
-                                const fileName = doc.data().FDK_TEN;
-                                const fileLink = doc.data().FDK_DUONGDAN;
-                                const fileExtension = fileName.split('.').pop().toLowerCase();
-                                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                                    var divData = 
-                                        '<span class="col-md-3 col-sm-4 rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block mb-3">' +
-                                        '    <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
-                                        '        <img src="'+fileLink+'"  width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
-                                        '    </a>' +
-                                        '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
-                                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
-                                    else  divData += '    <i class="fas fa-bookmark"></i>';
-                                    divData += 
-                                        '    </button>' +
-                                        '</span>';
-                                        detailbody.insertAdjacentHTML('beforeend', divData);
-                                }
-                            })
-                        })().catch((error) => {
-                            console.error("Error in script: ", error);
-                        });
+                    //ẢNH: imgListModal.push({ docid: docid, fileName: fileName, fileLink: fileLink, user: user });
+                    imgListModal.forEach(function(data) {
+                        var fileName = data.fileName;
+                        var fileLink = data.fileLink;
+                        var fileExtension = fileName.split('.').pop().toLowerCase();
+                        var divData = 
+                            '<span class="col-md-3 col-sm-4 rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block mb-3">' +
+                            '    <a class="modal-img" data-img-id-value="'+data.docid+'" previewlistener="true">' +
+                            '        <img src="'+fileLink+'"  width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
+                            '    </a>' +
+                            '    <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle bookmark-file" data-fdk-id-value="'+data.docid+'" style="transform: translateX(-50%);">' ;
+                        if (fileSaved.includes(data.docid)) divData += '    <i class="fas fa-vote-yea"></i>';
+                        else  divData += '    <i class="fas fa-bookmark"></i>';
+                        divData += 
+                            '    </button>' +
+                            '</span>';
+                        detailbody.insertAdjacentHTML('beforeend', divData);
                     });
+                });
 
-                    //KHO LƯU TRỮ FILE
-                    $('#kholuutrudocuments-btn').on('click', function() {
-                        <?php if($userLog) { ?>
+                //|-----------------------------------------------------
+                //|KHO FILE
+                //|-----------------------------------------------------
+                $('#kholuutrudocuments-btn').on('click', function() {
+                    var detailtitle = document.getElementById('detail-title');
+                    var detailbody = document.getElementById('detail-body');
+                    
+                    detailtitle.innerHTML = 'File';
+                    detailbody.innerHTML = '';
 
-                        (async () => {
-                            fileSaved = []
-                            const qbookmarkfileSaved = query(
-                            collection(db, "DANH_DAU_FILE"), 
-                            where('ND_MA', '==', <?php if($userLog) echo $userLog->ND_MA; ?>)
-                            );
-                            
-                            const querySnapshotbookmarkfileSaved = await getDocs(qbookmarkfileSaved);
-                            
-                            querySnapshotbookmarkfileSaved.forEach((doc) => {
-                                fileSaved.push(doc.data().FDK_MA);
-                            });
-                        })().catch((error) => {
-                            console.error("Error in script: ", error);
-                        });
+                    //FILE: fileList.push({ docid: docid, fileName: fileName, fileLink: fileLink, user: user });
+                    fileList.forEach(function(data) {
+                        var fileName = data.fileName;
+                        var fileLink = data.fileLink;
+                        var fileExtension = fileName.split('.').pop().toLowerCase();
+                        var divData =
+                            '<li class="p-2 border-bottom d-flex justify-content-between">' +
+                            '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between w-75">' +
+                            '        <div class="d-flex flex-row" style="max-width:100%">' +
+                            '            <div>';
 
-                        <?php } ?>
-                        (async () => {
-                            const querySnapshotklt = await getDocs(qklt);
+                        if (['pdf'].includes(fileExtension)){
+                            divData += '    <i class="fas fa-file-pdf me-2 document-icon"></i> ';
+                        }
+                        else if (['docx', 'doc'].includes(fileExtension)) {
+                            divData += '    <i class="fas fa-file-word me-2 document-icon"></i> ';
+                        }
+                        else if (['xlsx', 'xls'].includes(fileExtension)) {
+                            divData += '    <i class="fas fa-file-excel me-2 document-icon"></i> ';
+                        }
+                        else if (['ppt', 'pptx'].includes(fileExtension)) {
+                            divData += '    <i class="fas fa-file-powerpoint me-2 document-icon"></i> ';
+                        }
+                        else {
+                            divData += '    <i class="fas fa-file me-2 document-icon"></i> ';
+                        }
 
-                            var detailtitle = document.getElementById('detail-title');
-                            var detailbody = document.getElementById('detail-body');
-                            
-                            detailtitle.innerHTML = 'File';
-                            detailbody.innerHTML = '';
+                        divData +=
+                            '            </div>' +
+                            '            <div class="pt-1">' +
+                            '                <p class="fw-bold mb-0">'+fileName+'</p>' +
+                            '                <p class="small text-muted"><i>Từ: </i><i>' + data.user +
+                            '                   </i></p>' +
+                            '            </div>' +
+                            '        </div>' +
+                            '    </a>' +
+                            '    <button class="btn btn-secondary btn-sm bookmark-file" data-fdk-id-value="'+data.docid+'" style="height: 28px !important;">';
+                        if (fileSaved.includes(data.docid)) divData += '    <i class="fas fa-vote-yea"></i>';
+                        else  divData += '    <i class="fas fa-bookmark"></i>';
+                        divData += 
+                            '</li>';
 
-                            querySnapshotklt.forEach((doc) => {
-                                const fileName = doc.data().FDK_TEN;
-                                const fileLink = doc.data().FDK_DUONGDAN;
-                                const fileExtension = fileName.split('.').pop().toLowerCase();
-                                if (!['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                                    var divData =
-                                        '<li class="p-2 border-bottom d-flex justify-content-between">' +
-                                        '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between w-75">' +
-                                        '        <div class="d-flex flex-row" style="max-width:100%">' +
-                                        '            <div>';
-
-                                    if (['pdf'].includes(fileExtension)){
-                                        divData += '    <i class="fas fa-file-pdf me-2 document-icon"></i> ';
-                                    }
-                                    else if (['docx', 'doc'].includes(fileExtension)) {
-                                        divData += '    <i class="fas fa-file-word me-2 document-icon"></i> ';
-                                    }
-                                    else if (['xlsx', 'xls'].includes(fileExtension)) {
-                                        divData += '    <i class="fas fa-file-excel me-2 document-icon"></i> ';
-                                    }
-                                    else if (['ppt', 'pptx'].includes(fileExtension)) {
-                                        divData += '    <i class="fas fa-file-powerpoint me-2 document-icon"></i> ';
-                                    }
-                                    else {
-                                        divData += '    <i class="fas fa-file me-2 document-icon"></i> ';
-                                    }
-
-                                    divData +=
-                                        '            </div>' +
-                                        '            <div class="pt-1">' +
-                                        '                <p class="fw-bold mb-0">'+fileName+'</p>' +
-                                        '                <p class="small text-muted"><i>Từ: </i><i>' + 
-                                        ((doc.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php if($userChat) echo $userChat->ND_HOTEN; else echo 0?>') +
-                                        '                   </i></p>' +
-                                        '            </div>' +
-                                        '        </div>' +
-                                        '    </a>' +
-                                        '    <button class="btn btn-secondary btn-sm bookmark-file" data-fdk-id-value="'+doc.id+'" style="height: 28px !important;">';
-                                    if (fileSaved.includes(doc.id)) divData += '    <i class="fas fa-vote-yea"></i>';
-                                    else  divData += '    <i class="fas fa-bookmark"></i>';
-                                    divData += 
-                                        '</li>';
-
-                                    detailbody.insertAdjacentHTML('beforeend', divData);
-                                }
-                            })
-                        })().catch((error) => {
-                            console.error("Error in script: ", error);
-                        });
+                        detailbody.insertAdjacentHTML('beforeend', divData);
                     });
+                });
 
-                    $('#kholuutrulinks-btn').on('click', function() {
-                        (async () => {
-                            const querySnapshotlink = await getDocs(qlink);
+                //|-----------------------------------------------------
+                //|KHO LINK
+                //|-----------------------------------------------------
+                $('#kholuutrulinks-btn').on('click', function() {
+                    var detailtitle = document.getElementById('detail-title');
+                    var detailbody = document.getElementById('detail-body');
+                    
+                    detailtitle.innerHTML = 'Link';
+                    detailbody.innerHTML = '';
 
-                            var detailtitle = document.getElementById('detail-title');
-                            var detailbody = document.getElementById('detail-body');
-                            
-                            detailtitle.innerHTML = 'Link';
-                            detailbody.innerHTML = '';
-
-                            querySnapshotlink.forEach((doc2) => {
-                                // Biểu thức chính quy để tìm kiếm liên kết trong chuỗi
-                                const linkRegex = /https?:\/\/[^\s]+/g;
-
-                                // Sử dụng match để lấy tất cả các liên kết từ chuỗi
-                                const links = (doc2.data().TN_NOIDUNG).match(linkRegex);
-                                if (links && Array.isArray(links)) {
-                                    links.forEach((link) => {
-                                        var divData =
-                                            '<li data-value="4" class="p-2 border-bottom">'+
-                                            '    <a href="'+link+'" target="_blank" class="d-flex justify-content-between">'+
-                                            '        <div class="d-flex flex-row" style="max-width:100%">'+
-                                            '            <div>'+
-                                            '                <i class="fas fa-link me-2 document-icon"></i>'+
-                                            '            </div>'+
-                                            '            <div class="pt-1" style="overflow: hidden;">'+
-                                            '                <p class="fw-bold mb-0">'+link+'</p>'+
-                                            '                <p class="small text-muted"><i>Từ: </i><i>' + 
-                                            ((doc2.data().ND_GUI_MA == <?php echo $userLog->ND_MA?>)? '<?php echo $userLog->ND_HOTEN?>' : '<?php if($userChat) echo $userChat->ND_HOTEN; else echo 0?>') +
-                                            '                   </i></p>' +
-                                            '            </div>'+
-                                            '        </div>'+
-                                            '    </a>'+
-                                            '</li>';
-
-                                        detailbody.insertAdjacentHTML('beforeend', divData);
-                                    });
-                                }
-                            });
-                        })().catch((error) => {
-                            console.error("Error in script: ", error);
-                        });
+                    //LINK: linkList.push({ link: link, idChat: idChat, user: user });
+                    linkList.forEach(function(data) {
+                        var divData =
+                            '<li data-value="4" class="p-2 border-bottom">'+
+                            '    <a href="'+data.link+'" target="_blank" class="d-flex justify-content-between">'+
+                            '        <div class="d-flex flex-row" style="max-width:100%">'+
+                            '            <div>'+
+                            '                <i class="fas fa-link me-2 document-icon"></i>'+
+                            '            </div>'+
+                            '            <div class="pt-1" style="overflow: hidden;">'+
+                            '                <p class="fw-bold mb-0">'+data.link+'</p>'+
+                            '                <p class="small text-muted"><i>Từ: </i><i>' + data.user +
+                            '                   </i></p>' +
+                            '            </div>'+
+                            '        </div>'+
+                            '    </a>'+
+                            '</li>';
+                        detailbody.insertAdjacentHTML('beforeend', divData);
                     });
-
-                })().catch((error) => {
-                    console.error("Error in script: ", error);
                 });
             });
 
@@ -1421,7 +1436,79 @@
             //|SEARCH FRIEND END
             //|*****************************************************
             //|*****************************************************
-            //|LƯU FILE START
+            //|MODAL ẢNH START
+            //|*****************************************************
+
+            $(document).on('click', '.modal-img', function() {
+                ShowImgModal($(this).data('img-id-value'));
+            });
+
+            $(document).on('click', '.imgOther', function() {
+                ShowImgModal($(this).data('img-id-value'));
+            });
+
+            $(document).on('click', '.footer-slideshow img', function() {
+                ShowImgModal($(this).data('img-id-value'));
+            });
+
+            function ShowImgModal(idImg){
+                $('#img-modal').find('.modal-header').find('.btn').remove();
+                $('#img-modal').find('.modal-header').find('div').remove();
+                //$('#img-modal').find('.modal-footer').html('');
+                $('#img-modal').find('.modal-body').html('');
+
+                //|-----------------------------------------------------
+                //|HIỆN ẢNH
+                //|-----------------------------------------------------
+                //imgListModal.push({ docid: docid, fileName: fileName, fileLink: fileLink, user: user });
+
+                var index = imgListModal.findIndex(function(item) {
+                    return item.docid === idImg;
+                });
+
+                if (index !== -1) {//Có trong mảng
+                    //LẤY BUTTON
+                    var btnImg = 
+                        '<button class="btn btn-secondary btn-sm start-100 bookmark-file mx-2 fs-4" data-fdk-id-value="'+imgListModal[index].docid+'">';
+                    if (fileSaved.includes(imgListModal[index].docid)) btnImg += '    <i class="fas fa-vote-yea mx-2 fs-4"></i></button>';
+                    else  btnImg += '    <i class="fas fa-bookmark mx-2 fs-4"></i></button>';
+                    btnImg +=
+                    '<div style="margin-left: auto;"><p class="fw-bold mb-0">'+imgListModal[index].fileName+'</p><p class="small text-muted float-end mb-0"><i>Từ: </i><i>'+imgListModal[index].user+'</i></div>';
+                    
+                    //LẤY ẢNH
+                    var bodyElement = '';
+                    //Nút Previous: Kiểm tra phần tử đầu
+                    if (index === 0) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg pe-4" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
+                    else bodyElement += '<button type="button" class="btn btn-link btn-lg pe-4 imgOther" data-img-id-value="'+imgListModal[index-1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
+                    
+                    //Main content
+                    bodyElement += 
+                    '<a class="" data-img-id-value="'+imgListModal[index].docid+'" previewlistener="true" target="_blank" href="'+imgListModal[index].fileLink+'">'+   
+                    '    <img src="'+imgListModal[index].fileLink+'" alt="'+imgListModal[index].fileName+'" class="d-block mx-auto" style="width: 100%; height: auto; max-height: 340px;">'+    
+                    '</a>';
+
+                    //Nút Next: Kiểm tra phần tử cuối
+                    if (index === imgListModal.length - 1) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg ps-4" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+                    else bodyElement += '<button type="button" class="btn btn-link btn-lg ps-4 imgOther" data-img-id-value="'+imgListModal[index+1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+
+                    $('#img-modal').find('.modal-header').prepend(btnImg);
+                    $('#img-modal').find('.modal-body').html(bodyElement);
+                }
+
+                $('.footer-slideshow').html('');
+                for (var index = 0; index < imgListModal.length; index++) {
+                    $('<img src="'+imgListModal[index].fileLink+'"  data-img-id-value="'+imgListModal[index].docid+'" width="100px" height="100px" alt="'+imgListModal[index].fileName+'" class="mx-2 cursor-pointer">').appendTo('.footer-slideshow');
+                }
+                $('.footer-slideshow').find('img[data-img-id-value="'+idImg+'"]').addClass('img-selected-border');
+
+
+                $('#img-modal').modal('show');
+            }
+            //|*****************************************************
+            //|MODAL ẢNH END
+            //|*****************************************************
+            //|*****************************************************
+            //|LƯU FILE START + WITH UPDATE
             //|*****************************************************
             <?php if($userLog) { ?>
                 $(document).on('click', '.bookmark-file', function() {
@@ -1453,9 +1540,16 @@
                                 _token: _token // Include the CSRF token in the data
                             },
                             success: function(response) {
-                                iconElement.removeClass('spinner-border text-light spinner-border-sm');
-                                iconElement.addClass('fa-vote-yea');
+                                //iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                //iconElement.addClass('fa-vote-yea');
                                 //console.log('Thành công');
+                                fileSaved.push(FDK_MA);
+                                var fdkElement = $('button[data-fdk-id-value="'+ FDK_MA +'"]').find('i');
+                                fdkElement.removeClass('fa fa-bookmark');
+                                fdkElement.removeClass('fa fa-vote-yea');
+                                fdkElement.removeClass('fa-exclamation-circle text-danger');
+                                fdkElement.removeClass('spinner-border text-light spinner-border-sm');
+                                fdkElement.addClass('fa-vote-yea');
                             },
                             error: function(error) {
                                 iconElement.removeClass('spinner-border text-light spinner-border-sm');
@@ -1465,19 +1559,31 @@
                             });
                         }
                         else{
-                        //Xoá file
-                        querySnapshotbookmarkfile.forEach((doc2) => {
-                            (async () => {
-                                await deleteDoc(doc(db, "DANH_DAU_FILE", doc2.id));
+                            //Xoá file
+                            querySnapshotbookmarkfile.forEach((doc2) => {
+                                (async () => {
+                                    await deleteDoc(doc(db, "DANH_DAU_FILE", doc2.id));
 
-                                iconElement.removeClass('spinner-border text-light spinner-border-sm');
-                                    iconElement.addClass('fa-bookmark');
-                            })().catch((error) => {
-                                iconElement.removeClass('spinner-border text-light spinner-border-sm');
-                                iconElement.addClass('fa-exclamation-circle text-danger');
-                                console.error("Error in delete script: ", error);
+                                    //iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                    //iconElement.addClass('fa-bookmark');
+                                    
+                                    var index = fileSaved.indexOf(FDK_MA);
+                                    if (index !== -1) {
+                                        fileSaved.splice(index, 1);
+                                    }
+                                    
+                                    var fdkElement = $('button[data-fdk-id-value="'+ FDK_MA +'"]').find('i');
+                                    fdkElement.removeClass('fa fa-bookmark');
+                                    fdkElement.removeClass('fa fa-vote-yea');
+                                    fdkElement.removeClass('fa-exclamation-circle text-danger');
+                                    fdkElement.removeClass('spinner-border text-light spinner-border-sm');
+                                    fdkElement.addClass('fa-bookmark');
+                                })().catch((error) => {
+                                    iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                    iconElement.addClass('fa-exclamation-circle text-danger');
+                                    console.error("Error in delete script: ", error);
+                                });
                             });
-                        });
                         }
                     })().catch((error) => {
                         console.error("Error in script: ", error);
@@ -1487,7 +1593,7 @@
                 });
             <?php } ?>
             //|*****************************************************
-            //|LƯU FILE END
+            //|LƯU FILE END + WITH UPDATE
             //|*****************************************************
         });
     </script>

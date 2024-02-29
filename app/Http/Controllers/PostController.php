@@ -186,7 +186,7 @@ class PostController extends Controller
             foreach ($linkFile as $file) {
                 $this->firestoreClient->addDocument($collection, [
                     'BV_MA' =>  $bai_viet->BV_MA,  
-                    'VMA' =>  0,
+                    'BL_MA' =>  0,
                     'FDK_DUONGDAN'=> $file['link'],
                     'FDK_TEN' => $file['name'],
                     'ND_GUI_MA' => 0,
@@ -198,6 +198,15 @@ class PostController extends Controller
             }
         }
         
+
+        //Điểm cống hiến
+        $userDCH = DB::table('nguoi_dung')->where('ND_MA', $userLog->ND_MA)->first();
+        $DCH = $userDCH->ND_DIEMCONGHIEN + 1;
+        DB::table('nguoi_dung')->where('ND_MA', $userDCH->ND_MA)
+        ->update([
+            'ND_DIEMCONGHIEN' => $DCH
+        ]);
+
         //return Redirect::to('trang-chu');
         return;
 
@@ -433,6 +442,16 @@ class PostController extends Controller
         ->update([ 
             'BV_TRANGTHAI' => 'Đã xoá'
         ]);
+
+        $bv = DB::table('bai_viet')->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA)->first();
+        //Điểm cống hiến
+        $userDCH = DB::table('nguoi_dung')->where('ND_MA', $bv->ND_MA)->first();
+        $DCH = $userDCH->ND_DIEMCONGHIEN - 1;
+        DB::table('nguoi_dung')->where('ND_MA', $userDCH->ND_MA)
+        ->update([
+            'ND_DIEMCONGHIEN' => $DCH
+        ]);
+        
 
         Session::put('alert', ['type' => 'success', 'content' => 'Xoá bài viết thành công!']);
         return;
@@ -985,6 +1004,24 @@ class PostController extends Controller
         if($request->BV_TRANGTHAI == 'Đã duyệt'){
             $thoiGianGui = ' đã đăng vào '. date('H:i', strtotime($bv->BV_THOIGIANDANG)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANDANG));
         }
+
+        //Điểm cống hiến
+        $userDCH = DB::table('nguoi_dung')->where('ND_MA', $bv->ND_MA)->first();
+        if($bv->BV_TRANGTHAI == 'Đã duyệt'){
+            $DCH = $userDCH->ND_DIEMCONGHIEN + 2;
+            DB::table('nguoi_dung')->where('ND_MA', $userDCH->ND_MA)
+            ->update([
+                'ND_DIEMCONGHIEN' => $DCH
+            ]);
+        }
+        else if(trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn'){
+            $DCH = $userDCH->ND_DIEMCONGHIEN - 3;
+            DB::table('nguoi_dung')->where('ND_MA', $userDCH->ND_MA)
+            ->update([
+                'ND_DIEMCONGHIEN' => $DCH
+            ]);
+        }
+
         return Response()->json(['output' => $output, 'thoiGianGui' => $thoiGianGui]);
     }
 

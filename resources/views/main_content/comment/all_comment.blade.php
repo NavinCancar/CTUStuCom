@@ -34,6 +34,26 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal Image Start-->   
+            <div class="modal" id="img-modal">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content px-3">
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <button type="button" class="btn-close ms-5" data-bs-dismiss="modal"></button>
+                        </div>
+                        <!-- Modal body -->
+                        <div class="modal-body pt-0 pb-0 mx-2 d-flex justify-content-between align-items-center"></div>
+                        <!-- Modal footer -->
+                        <div class="modal-footer footer-slideshow">
+                            <!--<img src="..." width="100px" height="100px" class="mx-2">-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Image End-->
+
             <div class="card">
                 <div class="card-body p-4">
                     <div class="mb-3 mb-sm-0">
@@ -253,6 +273,8 @@
             //|DANH SÁCH FILE NGƯỜI DÙNG ĐÃ LƯU
             //|-----------------------------------------------------
             var fileSaved = [];
+            var imgListModal = [];
+            
             (async () => {
                 const qbookmarkfileSaved = query(
                 collection(db, "DANH_DAU_FILE"), 
@@ -271,6 +293,7 @@
             $(document).on('click', '.show-detail', function(e) {
                 e.preventDefault();
                 $('#modal-content').html('');
+                imgListModal = [];
 
                 // Truy cập giá trị của tham số từ thuộc tính dữ liệu
                 var element = $(this);
@@ -309,7 +332,7 @@
                                     // Image
                                     var divData =
                                     '<span class="rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block file-item">' +
-                                    '  <a target="_blank" href="'+fileLink+'" previewlistener="true">' +
+                                    '  <a class="modal-img" data-img-id-value="'+doc.id+'" previewlistener="true">' +
                                     '    <img src="'+fileLink+'" width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
                                     '  </a>' +
                                     '  <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle file-item-btn bookmark-file" data-fdk-id-value="'+doc.id+'" style="transform: translateX(-50%);">' ;
@@ -318,7 +341,9 @@
                                     divData += 
                                     '  </button>' +
                                     '</span>';
-                                    imagesContainer.insertAdjacentHTML('afterbegin', divData);
+                                    imagesContainer.insertAdjacentHTML('beforeend', divData);
+
+                                    imgListModal.push({ docid: doc.id, fileName: fileName, fileLink: fileLink });
                                 }
                                 else{
                                     var divData =
@@ -349,7 +374,7 @@
                                     divData += 
                                         '  </button>' +
                                         '</span>';
-                                    filesContainer.insertAdjacentHTML('afterbegin', divData);
+                                    filesContainer.insertAdjacentHTML('beforeend', divData);
                                 } 
                             });
                         })().catch((error) => {
@@ -540,73 +565,165 @@
         //|*****************************************************
 
         //|*****************************************************
-        //|LƯU FILE START
+        //|MODAL ẢNH START
+        //|*****************************************************
+
+        $(document).on('click', '.modal-img', function() {
+            ShowImgModal($(this).data('img-id-value'));
+        });
+
+        $(document).on('click', '.imgOther', function() {
+            ShowImgModal($(this).data('img-id-value'));
+        });
+
+        $(document).on('click', '.footer-slideshow img', function() {
+            ShowImgModal($(this).data('img-id-value'));
+        });
+
+        function ShowImgModal(idImg){
+            $('#img-modal').find('.modal-header').find('.btn').remove();
+            $('#img-modal').find('.modal-header').find('div').remove();
+            //$('#img-modal').find('.modal-footer').html('');
+            $('#img-modal').find('.modal-body').html('');
+
+            //|-----------------------------------------------------
+            //|HIỆN ẢNH
+            //|-----------------------------------------------------
+            //imgListModal.push({ docid: doc.id, fileName: fileName, fileLink: fileLink, type: type, url: url });
+
+            var index = imgListModal.findIndex(function(item) {
+                return item.docid === idImg;
+            });
+
+            if (index !== -1) {//Có trong mảng
+                //LẤY BUTTON
+                var btnImg = 
+                    '<button class="btn btn-secondary btn-sm start-100 bookmark-file mx-2 fs-4" data-fdk-id-value="'+imgListModal[index].docid+'">';
+                if (fileSaved.includes(imgListModal[index].docid)) btnImg += '    <i class="fas fa-vote-yea mx-2 fs-4"></i></button>';
+                else  btnImg += '    <i class="fas fa-bookmark mx-2 fs-4"></i></button>';
+                btnImg +=
+                '<div style="margin-left: auto;"><p class="fw-bold mb-0">'+imgListModal[index].fileName+'</p><p class="small text-muted float-end mb-0"><i> </i><i></i></div>';
+                
+                //LẤY ẢNH
+                var bodyElement = '';
+                //Nút Previous: Kiểm tra phần tử đầu
+                if (index === 0) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg pe-4" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
+                else bodyElement += '<button type="button" class="btn btn-link btn-lg pe-4 imgOther" data-img-id-value="'+imgListModal[index-1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
+                
+                //Main content
+                bodyElement += 
+                '<a class="" data-img-id-value="'+imgListModal[index].docid+'" previewlistener="true" target="_blank" href="'+imgListModal[index].fileLink+'">'+   
+                '    <img src="'+imgListModal[index].fileLink+'" alt="'+imgListModal[index].fileName+'" class="d-block mx-auto" style="width: 100%; height: auto; max-height: 340px;">'+    
+                '</a>';
+
+                //Nút Next: Kiểm tra phần tử cuối
+                if (index === imgListModal.length - 1) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg ps-4" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+                else bodyElement += '<button type="button" class="btn btn-link btn-lg ps-4 imgOther" data-img-id-value="'+imgListModal[index+1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+
+                $('#img-modal').find('.modal-header').prepend(btnImg);
+                $('#img-modal').find('.modal-body').html(bodyElement);
+            }
+
+            $('.footer-slideshow').html('');
+            for (var index = 0; index < imgListModal.length; index++) {
+                $('<img src="'+imgListModal[index].fileLink+'"  data-img-id-value="'+imgListModal[index].docid+'" width="100px" height="100px" alt="'+imgListModal[index].fileName+'" class="mx-2 cursor-pointer">').appendTo('.footer-slideshow');
+            }
+            $('.footer-slideshow').find('img[data-img-id-value="'+idImg+'"]').addClass('img-selected-border');
+
+
+            $('#img-modal').modal('show');
+        }
+        //|*****************************************************
+        //|MODAL ẢNH END
+        //|*****************************************************
+
+        //|*****************************************************
+        //|LƯU FILE START + WITH UPDATE
         //|*****************************************************
         <?php if($userLog) { ?>
-        $(document).on('click', '.bookmark-file', function() {
-            // Truy cập giá trị của tham số từ thuộc tính dữ liệu
-            var FDK_MA = $(this).data('fdk-id-value');
-            var _token = $('meta[name="csrf-token"]').attr('content');
-            const iconElement = $(this).find('i');
-            iconElement.removeClass('fa fa-bookmark');
-            iconElement.removeClass('fa fa-vote-yea');
-            iconElement.removeClass('fa-exclamation-circle text-danger');
-            iconElement.addClass('spinner-border text-light spinner-border-sm');
+            $(document).on('click', '.bookmark-file', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var FDK_MA = $(this).data('fdk-id-value');
+                var _token = $('meta[name="csrf-token"]').attr('content');
+                const iconElement = $(this).find('i');
+                iconElement.removeClass('fa fa-bookmark');
+                iconElement.removeClass('fa fa-vote-yea');
+                iconElement.removeClass('fa-exclamation-circle text-danger');
+                iconElement.addClass('spinner-border text-light spinner-border-sm');
 
-            (async () => {
-                const qbookmarkfile = query(
-                collection(db, "DANH_DAU_FILE"), 
-                where('FDK_MA', '==', FDK_MA),
-                where('ND_MA', '==', <?php echo $userLog->ND_MA; ?>)
-                );
-                
-                const querySnapshotbookmarkfile = await getDocs(qbookmarkfile);
-                
-                if (querySnapshotbookmarkfile.empty) {
-                    //Lưu file
-                    $.ajax({
+                (async () => {
+                    const qbookmarkfile = query(
+                    collection(db, "DANH_DAU_FILE"), 
+                    where('FDK_MA', '==', FDK_MA),
+                    where('ND_MA', '==', <?php echo $userLog->ND_MA; ?>)
+                    );
+                    
+                    const querySnapshotbookmarkfile = await getDocs(qbookmarkfile);
+                    
+                    if (querySnapshotbookmarkfile.empty) {
+                        //Lưu file
+                        $.ajax({
                         url: '{{URL::to('/danh-dau-file')}}',
                         type: 'POST',
                         data: {
-                        FDK_MA: FDK_MA,
-                        _token: _token // Include the CSRF token in the data
+                            FDK_MA: FDK_MA,
+                            _token: _token // Include the CSRF token in the data
                         },
                         success: function(response) {
-                            iconElement.removeClass('spinner-border text-light spinner-border-sm');
-                            iconElement.addClass('fa-vote-yea');
+                            //iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                            //iconElement.addClass('fa-vote-yea');
                             //console.log('Thành công');
+                            fileSaved.push(FDK_MA);
+                            var fdkElement = $('button[data-fdk-id-value="'+ FDK_MA +'"]').find('i');
+                            fdkElement.removeClass('fa fa-bookmark');
+                            fdkElement.removeClass('fa fa-vote-yea');
+                            fdkElement.removeClass('fa-exclamation-circle text-danger');
+                            fdkElement.removeClass('spinner-border text-light spinner-border-sm');
+                            fdkElement.addClass('fa-vote-yea');
                         },
                         error: function(error) {
                             iconElement.removeClass('spinner-border text-light spinner-border-sm');
                             iconElement.addClass('fa-exclamation-circle text-danger');
                             console.log(error);
                         }
-                    });
-                }
-                else{
-                    //Xoá file
-                    querySnapshotbookmarkfile.forEach((doc2) => {
-                        (async () => {
-                        await deleteDoc(doc(db, "DANH_DAU_FILE", doc2.id));
+                        });
+                    }
+                    else{
+                        //Xoá file
+                        querySnapshotbookmarkfile.forEach((doc2) => {
+                            (async () => {
+                                await deleteDoc(doc(db, "DANH_DAU_FILE", doc2.id));
 
-                        iconElement.removeClass('spinner-border text-light spinner-border-sm');
-                            iconElement.addClass('fa-bookmark');
-                    })().catch((error) => {
-                        iconElement.removeClass('spinner-border text-light spinner-border-sm');
-                        iconElement.addClass('fa-exclamation-circle text-danger');
-                        console.error("Error in delete script: ", error);
-                    });
-                    });
-                }
-            })().catch((error) => {
-                console.error("Error in script: ", error);
+                                //iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                //iconElement.addClass('fa-bookmark');
+                                
+                                var index = fileSaved.indexOf(FDK_MA);
+                                if (index !== -1) {
+                                    fileSaved.splice(index, 1);
+                                }
+                                
+                                var fdkElement = $('button[data-fdk-id-value="'+ FDK_MA +'"]').find('i');
+                                fdkElement.removeClass('fa fa-bookmark');
+                                fdkElement.removeClass('fa fa-vote-yea');
+                                fdkElement.removeClass('fa-exclamation-circle text-danger');
+                                fdkElement.removeClass('spinner-border text-light spinner-border-sm');
+                                fdkElement.addClass('fa-bookmark');
+                            })().catch((error) => {
+                                iconElement.removeClass('spinner-border text-light spinner-border-sm');
+                                iconElement.addClass('fa-exclamation-circle text-danger');
+                                console.error("Error in delete script: ", error);
+                            });
+                        });
+                    }
+                })().catch((error) => {
+                    console.error("Error in script: ", error);
+                });
+                // Thực hiện các xử lý khác với tham số đã truyền
+                //console.log("Additional Parameter: " + FDK_MA);
             });
-            // Thực hiện các xử lý khác với tham số đã truyền
-            //console.log("Additional Parameter: " + FDK_MA);
-        });
         <?php } ?>
         //|*****************************************************
-        //|LƯU FILE END
+        //|LƯU FILE END + WITH UPDATE
         //|*****************************************************
         })
     </script>
