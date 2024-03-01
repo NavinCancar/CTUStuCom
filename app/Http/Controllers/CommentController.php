@@ -387,7 +387,7 @@ class CommentController extends Controller
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
         $binh_luan = DB::table('binh_luan')
             ->orderBy('BL_THOIGIANTAO', 'desc')
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(10);
+            ->whereNotIn('binh_luan.ND_MA', $nguoi_dung_not_in3)->paginate(10);
 
         $binhluan_baocao_noget = DB::table('binhluan_baocao');
 

@@ -3,6 +3,7 @@
 <?php 
     $userLog= Session::get('userLog'); 
     $userChat= Session::get('userChat'); 
+    $uSysAvatar= Session::get('uSysAvatar');
 ?>
     
     <!-- Content Start -->
@@ -46,6 +47,16 @@
                         </div>
                         <!--Chat End-->
                         <div>
+                            @if($isInactive)
+                                <div class="text-muted pe-3 pt-4 mt-2 text-center"><hr><i>Người dùng này đã vô hiệu hoá tài khoản!</i></div>
+                            @elseif($isBlock)
+                                <div class="text-muted pe-3 pt-4 mt-2 text-center"><hr>
+                                    <i>Bạn đã chặn người dùng này!</i>
+                                    <button class="btn btn-muted ms-2 unblock btn-sm" data-user-id-value="<?php echo $userChat->ND_MA;?>" type="button"><i class="fas fa-ban"></i> Bỏ chặn</button>
+                                </div>
+                            @elseif($isBlocked)
+                                <div class="text-muted pe-3 pt-4 mt-2 text-center"><hr><i>Bạn đã bị chặn khỏi cuộc trò chuyện!</i></div>
+                            @else
                             <form id="message-form" class="text-muted d-flex justify-content-start align-items-center pe-3 pt-3 mt-2">
                                 <textarea name="TN_NOIDUNG" class="form-control border-secondary ms-3" placeholder="Nhập tin nhắn" rows="1" style="resize: none;"></textarea>
                                 
@@ -75,6 +86,7 @@
                                     <button class="btn btn-secondary btn-sm position-absolute start-100 translate-middle" style="transform: translateX(-50%);"><i class="fas fa-bookmark"></i></button>
                                 </span>-->
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -594,11 +606,11 @@
                                                 '<div class="d-flex flex-row justify-content-end">'+
                                                 '    <div class="ms-5">'+
                                                 '        <p class="fs-3 p-2 me-3 mb-1 text-white rounded-3 bg-primary chat" data-chat-id-value="'+idChat+'">'+data.TN_NOIDUNG+'</p>'+
-                                                '        <p class="fs-2 me-3 mb-3 rounded-3 text-muted">'+ secondsDifferenceResult +
-                                                '           <span class="float-end ms-3 icon-lightgrey cursor-pointer">'+
+                                                '        <p class="fs-2 me-3 mb-3 rounded-3 text-muted float-end">'+ 
+                                                '           <span class="ms-3 icon-lightgrey cursor-pointer">'+
                                                 '               <i class="fas fa-undo delete-chat" data-chat-id-value="'+idChat+'" data-file-id-value=""></i>'+
-                                                '               <i class="fas fa-copy ms-2" onclick="navigator.clipboard.writeText(`'+data.TN_NOIDUNG.replace(/<br>/g, '\n')+'`)"></i>'+
-                                                '           </span></p>'+
+                                                '               <i class="fas fa-copy ms-2" onclick="navigator.clipboard.writeText(`'+data.TN_NOIDUNG.replace(/<br>/g, '\n')+'`).then(() => { this.style.color = \'var(--bs-success)\'; setTimeout(() => { this.style.color = \'var(--bs-gray-400)\'; }, 500); }).catch(console.error);"></i>'+
+                                                '           </span>' + '<b class="mx-3">|</b>' + secondsDifferenceResult + '</p>'+
                                                 '    </div>'+
                                                 '    <img src="<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
                                                 '</div>';
@@ -644,11 +656,11 @@
                                             } 
 
                                             divData += '<div style="display: flex; flex-wrap: wrap; justify-content: end;">'+ divDataImg + '</div>'+ divDataFile +
-                                                '        <p class="fs-2 me-3 mb-3 rounded-3 text-muted">'+ secondsDifferenceResult +
-                                                '           <span class="float-end ms-3 icon-lightgrey cursor-pointer">'+
+                                                '        <p class="fs-2 me-3 mb-3 rounded-3 text-muted float-end">' +
+                                                '           <span class="ms-3 icon-lightgrey cursor-pointer">' +
                                                 '               <i class="fas fa-undo delete-chat" data-chat-id-value="'+idChat+'" data-file-id-value="'+fileArrayId+'"></i>'+
-                                                '               <i class="fas fa-copy ms-2" onclick="navigator.clipboard.writeText(`'+data.TN_NOIDUNG.replace(/<br>/g, '\n')+'`)"></i>'+
-                                                '           </span></p>'+
+                                                '               <i class="fas fa-copy ms-2" onclick="navigator.clipboard.writeText(`'+data.TN_NOIDUNG.replace(/<br>/g, '\n')+'`).then(() => { this.style.color = \'var(--bs-success)\'; setTimeout(() => { this.style.color = \'var(--bs-gray-400)\'; }, 500); }).catch(console.error);"></i>'+
+                                                '           </span>' + '<b class="mx-3">|</b>' + secondsDifferenceResult + '</p>'+
                                                 '    </div>'+
                                                 '    <img src="<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
                                                 '</div>';
@@ -685,7 +697,10 @@
                                                 '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76';}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
                                                 '    <div class="me-5">'+
                                                 '        <p class="fs-3 p-2 ms-1 mb-1 rounded-3 friend-chat" data-chat-id-value="'+idChat+'">'+data.TN_NOIDUNG+'</p>'+
-                                                '        <p class="fs-2 ms-3 mb-3 rounded-3 text-muted float-end">'+ secondsDifferenceResult +'</p>'+
+                                                '        <p class="fs-2 ms-3 mb-3 rounded-3 text-muted">'+ secondsDifferenceResult + '<b class="mx-3">|</b>' +
+                                                '           <span class="me-3 icon-lightgrey cursor-pointer">' +
+                                                '               <i class="fas fa-copy me-2" onclick="navigator.clipboard.writeText(`'+data.TN_NOIDUNG.replace(/<br>/g, '\n')+'`).then(() => { this.style.color = \'var(--bs-success)\'; setTimeout(() => { this.style.color = \'var(--bs-gray-400)\'; }, 500); }).catch(console.error);"></i>'+
+                                                '           </span></p>'+
                                                 '    </div>'+
                                                 '</div>';
 
@@ -734,7 +749,10 @@
                                             } 
                                             
                                             divData += '<div style="display: flex; flex-wrap: wrap; justify-content: start;">'+ divDataImg + '</div>'+ divDataFile +
-                                                '        <p class="fs-2 ms-3 mb-3 rounded-3 text-muted float-end">'+ secondsDifferenceResult +'</p>'+
+                                                '        <p class="fs-2 ms-3 mb-3 rounded-3 text-muted">'+ secondsDifferenceResult + '<b class="mx-3">|</b>' +
+                                                '           <span class="me-3 icon-lightgrey cursor-pointer">' +
+                                                '               <i class="fas fa-copy me-2" onclick="navigator.clipboard.writeText(`'+data.TN_NOIDUNG.replace(/<br>/g, '\n')+'`).then(() => { this.style.color = \'var(--bs-success)\'; setTimeout(() => { this.style.color = \'var(--bs-gray-400)\'; }, 500); }).catch(console.error);"></i>'+
+                                                '           </span></p>'+
                                                 '    </div>'+
                                                 '</div>';
 
@@ -814,17 +832,18 @@
                                 function AddListFriend(){
                                     (async () => {
                                         //Lấy tên và ảnh người dùng
-                                        const qfriend = query(
-                                            collection(db, "ANH_DAI_DIEN"), 
-                                            where('ND_MA', '==', checkUser)
-                                        );
+                                        <?php if ($uSysAvatar) { ?>
+                                            var uSysAvatar = <?php echo json_encode($uSysAvatar); ?>;
+                                            uSysAvatar.forEach(function(ava) {
+                                                if (ava.ND_MA == checkUser) {
+                                                    if(ava.ND_ANHDAIDIEN != null) ND_ANHDAIDIEN2 = ava.ND_ANHDAIDIEN;
+                                                    else ND_ANHDAIDIEN2 = '';
+                                                    ND_HOTEN2 = ava.ND_HOTEN;
+                                                    return;
+                                                }
+                                            });
+                                        <?php } ?>
 
-                                        const querySnapshotfriend = await getDocs(qfriend);
-                                    
-                                        querySnapshotfriend.forEach((doc) => {
-                                            ND_ANHDAIDIEN2 = doc.data().ND_ANHDAIDIEN;
-                                            ND_HOTEN2 = doc.data().ND_HOTEN;
-                                        });
 
                                         //Đếm số lượng tin nhắn chưa xem
                                         const qnocheck = query(
@@ -1594,6 +1613,61 @@
             <?php } ?>
             //|*****************************************************
             //|LƯU FILE END + WITH UPDATE
+            //|*****************************************************
+            //|*****************************************************
+            //|CHẶN START
+            //|*****************************************************
+            <?php if($userLog) { ?>
+            $(document).on('click', '.block', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var ND_MA = $(this).data('user-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $element.removeClass('btn-muted');
+
+                $element.html('<div class="spinner-border text-primary spinner-border-sm"></div>');
+
+                $.ajax({
+                    url: '{{URL::to('/chan/')}}' +'/'+ ND_MA,
+                    type: 'GET',
+                    success: function(response) {
+                        window.location.href = '{{URL::to('/trang-chu')}}';
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    }
+                });
+                    
+            });
+            $(document).on('click', '.unblock', function() {
+                // Truy cập giá trị của tham số từ thuộc tính dữ liệu
+                var $element = $(this);
+                var ND_MA = $(this).data('user-id-value');
+                //var _token = $('meta[name="csrf-token"]').attr('content');
+
+                $element.removeClass('btn-muted');
+
+                $element.html('<div class="spinner-border text-primary spinner-border-sm"></div>');
+
+                $.ajax({
+                    url: '{{URL::to('/bo-chan/')}}' +'/'+ ND_MA,
+                    type: 'GET',
+                    success: function(response) {
+                    $element.removeClass('unblock');
+                    $element.addClass('block btn-muted');
+
+                    $element.html('<i class="fas fa-ban"></i> Chặn');
+                    window.location.reload();
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    }
+                });
+            });
+            <?php } ?>
+            //|*****************************************************
+            //|CHẶN END
             //|*****************************************************
         });
     </script>

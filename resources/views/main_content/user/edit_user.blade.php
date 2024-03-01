@@ -196,75 +196,51 @@
             var isConfirmed = window.confirm('Bạn có chắc chắn muốn vô hiệu hoá tài khoản này không?');
 
             if (isConfirmed) {
-                //|-----------------------------------------------------
-                //|LẤY ID
-                //|-----------------------------------------------------
-                (async () => {
-                    const quser = query(
-                      collection(db, "ANH_DAI_DIEN"), 
-                      where('ND_MA', '==', <?php echo $userAcc; ?>)
-                    );
-
-                    const querySnapshotuser = await getDocs(quser);
-                    querySnapshotuser.forEach((doc) => {
-                      //console.log(doc.id, " => ", doc.data());
+                $.ajax({
+                  url: '{{URL::to('/tai-khoan/'.$userAcc)}}',
+                  type: 'DELETE',
+                  data: {
+                    _token: '{{ csrf_token() }}'
+                  },
+                  success: function(response) {
+                      $('#form')[0].reset();
+                      for (var i = 0; i < elements.length; i++) {
+                          elements[i].disabled = true;
+                      }
                       
-                      $.ajax({
-                        url: '{{URL::to('/tai-khoan/'.$userAcc)}}',
-                        type: 'DELETE',
-                        data: {
-                          idFirestore: doc.id,
-                          _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            $('#form')[0].reset();
-                            for (var i = 0; i < elements.length; i++) {
-                                elements[i].disabled = true;
-                            }
-                            
-                            $('#block-account').show();
-                            $('#non-disabled').show();
-                            $('#submit-form').hide();
-                            $('#spinner').hide();
+                      $('#block-account').show();
+                      $('#non-disabled').show();
+                      $('#submit-form').hide();
+                      $('#spinner').hide();
 
-                            //console.log('Thành công');
-                            //console.log(response.message);
-                            <?php if($userAcc != $userLog->ND_MA) { ?>
-                              window.location.href = '{{URL::to('/tai-khoan')}}';
-                            <?php } 
-                            else {  ?>
-                              window.location.href = '{{URL::to('/trang-chu')}}';
-                            <?php } ?>
-                        },
-                        error: function(error) {
-                            // Handle errors here
-                            $('#form')[0].reset();
-                            for (var i = 0; i < elements.length; i++) {
-                                elements[i].disabled = true;
-                            }
-                            
-                            $('#block-account').show();
-                            $('#non-disabled').show();
-                            $('#submit-form').hide();
-                            $('#spinner').hide();
+                      //console.log('Thành công');
+                      //console.log(response.message);
+                      <?php if($userAcc != $userLog->ND_MA) { ?>
+                        window.location.href = '{{URL::to('/tai-khoan')}}';
+                      <?php } 
+                      else {  ?>
+                        window.location.href = '{{URL::to('/trang-chu')}}';
+                      <?php } ?>
+                  },
+                  error: function(error) {
+                      // Handle errors here
+                      $('#form')[0].reset();
+                      for (var i = 0; i < elements.length; i++) {
+                          elements[i].disabled = true;
+                      }
+                      
+                      $('#block-account').show();
+                      $('#non-disabled').show();
+                      $('#submit-form').hide();
+                      $('#spinner').hide();
 
-                            $('#alert-danger span').html('Vô hiệu hoá tài khoản thất bại');
-                            $('html, body').animate({
-                                scrollTop: $('#alert-danger').offset().top
-                            });
-                            document.getElementById('alert-danger').style.display = 'block';
-                            console.log(error);
-                        }
+                      $('#alert-danger span').html('Vô hiệu hoá tài khoản thất bại');
+                      $('html, body').animate({
+                          scrollTop: $('#alert-danger').offset().top
                       });
-
-                    });
-                })().catch((error) => {
-                    $('#alert-danger span').html('Vô hiệu hoá tài khoản thất bại');
-                    $('html, body').animate({
-                        scrollTop: $('#alert-danger').offset().top
-                    });
-                    document.getElementById('alert-danger').style.display = 'block';
-                    console.error("Error in script: ", error);
+                      document.getElementById('alert-danger').style.display = 'block';
+                      console.log(error);
+                  }
                 });
                 //alert('Tài khoản đã được vô hiệu hoá!');
             } else {
@@ -354,90 +330,59 @@
   
             function UpdateAndForm (downloadURL){
               //|-----------------------------------------------------
-              //|LẤY ID
+              //|GỬI FORM
               //|-----------------------------------------------------
-              (async () => {
-                  const quser = query(
-                    collection(db, "ANH_DAI_DIEN"), 
-                    where('ND_MA', '==', <?php echo $userAcc; ?>)
-                  );
-
-                  const querySnapshotuser = await getDocs(quser);
-                  querySnapshotuser.forEach((doc) => {
-                    //console.log(doc.id, " => ", doc.data());
-
-                    //|-----------------------------------------------------
-                    //|GỬI FORM
-                    //|-----------------------------------------------------
-                    /*console.log(ND_HOTEN);
-                    console.log(ND_EMAIL);
-                    console.log(ND_MOTA);
-                    console.log(ND_ANHDAIDIEN);
-                    console.log(name);
-                    console.log(downloadURL);*/
+              $.ajax({
+                url: '{{URL::to('/tai-khoan/'.$userAcc)}}',
+                type: 'PUT',
+                data: {
+                  ND_HOTEN: ND_HOTEN,
+                  ND_EMAIL: ND_EMAIL,
+                  KT_MA: KT_MA,
+                  ND_MOTA: ND_MOTA,
+                  VT_MA: VT_MA,
+                  downloadURL: downloadURL,
+                  _token: _token // Include the CSRF token in the data
+                },
+                success: function(response) {
+                    $('#form')[0].reset();
+                    for (var i = 0; i < elements.length; i++) {
+                        elements[i].disabled = true;
+                    }
                     
-                    $.ajax({
-                      url: '{{URL::to('/tai-khoan/'.$userAcc)}}',
-                      type: 'PUT',
-                      data: {
-                        ND_HOTEN: ND_HOTEN,
-                        ND_EMAIL: ND_EMAIL,
-                        KT_MA: KT_MA,
-                        ND_MOTA: ND_MOTA,
-                        VT_MA: VT_MA,
-                        downloadURL: downloadURL,
-                        idFirestore: doc.id,
-                        _token: _token // Include the CSRF token in the data
-                      },
-                      success: function(response) {
-                          $('#form')[0].reset();
-                          for (var i = 0; i < elements.length; i++) {
-                              elements[i].disabled = true;
-                          }
-                          
-                          $('#block-account').show();
-                          $('#non-disabled').show();
-                          $('#submit-form').hide();
-                          $('#spinner').hide();
+                    $('#block-account').show();
+                    $('#non-disabled').show();
+                    $('#submit-form').hide();
+                    $('#spinner').hide();
 
-                          form.find('input[name="ND_HOTEN"]').css('border-color', '');
-                          form.find('input[name="ND_EMAIL"]').css('border-color', '');
-                          //console.log('Thành công');
-                          //console.log(response.message);
-                          window.location.href = '{{URL::to('/tai-khoan/'.$userAcc.'/edit')}}';
-                      },
-                      error: function(error) {
-                          // Handle errors here
-                          $('#form')[0].reset();
-                          for (var i = 0; i < elements.length; i++) {
-                              elements[i].disabled = true;
-                          }
-                          
-                          $('#block-account').show();
-                          $('#non-disabled').show();
-                          $('#submit-form').hide();
-                          $('#spinner').hide();
+                    form.find('input[name="ND_HOTEN"]').css('border-color', '');
+                    form.find('input[name="ND_EMAIL"]').css('border-color', '');
+                    //console.log('Thành công');
+                    //console.log(response.message);
+                    window.location.href = '{{URL::to('/tai-khoan/'.$userAcc.'/edit')}}';
+                },
+                error: function(error) {
+                    // Handle errors here
+                    $('#form')[0].reset();
+                    for (var i = 0; i < elements.length; i++) {
+                        elements[i].disabled = true;
+                    }
+                    
+                    $('#block-account').show();
+                    $('#non-disabled').show();
+                    $('#submit-form').hide();
+                    $('#spinner').hide();
 
-                          form.find('input[name="ND_HOTEN"]').css('border-color', '');
-                          form.find('input[name="ND_EMAIL"]').css('border-color', '');
+                    form.find('input[name="ND_HOTEN"]').css('border-color', '');
+                    form.find('input[name="ND_EMAIL"]').css('border-color', '');
 
-                          $('#alert-danger span').html('Cập nhật tài khoản thất bại');
-                          $('html, body').animate({
-                              scrollTop: $('#alert-danger').offset().top
-                          });
-                          document.getElementById('alert-danger').style.display = 'block';
-                          console.log(error);
-                      }
+                    $('#alert-danger span').html('Cập nhật tài khoản thất bại');
+                    $('html, body').animate({
+                        scrollTop: $('#alert-danger').offset().top
                     });
-
-                  });
-              })().catch((error) => {
-                  $('#alert-danger span').html('Cập nhật tài khoản thất bại');
-                  $('html, body').animate({
-                      scrollTop: $('#alert-danger').offset().top
-                  });
-                  document.getElementById('alert-danger').style.display = 'block';
-                  console.error("Error in script: ", error);
+                    document.getElementById('alert-danger').style.display = 'block';
+                    console.log(error);
+                }
               });
             }
           }

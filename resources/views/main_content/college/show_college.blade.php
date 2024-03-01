@@ -14,8 +14,10 @@
         <div class="d-block">
           <a href="{{URL::to('/danh-sach-khoa-truong')}}" class="btn btn-primary me-2 mb-3">
               <i class="fas fa-stream"></i> Danh sách các khoa trường</a>
+          @if ($bai_viet->total() > 0)
           <button class="btn btn-outline-primary me-2 mb-3" data-bs-toggle="collapse" data-bs-target="#loc"><i
               class="fa fa-filter"></i> Lọc bài viết</button>
+          @endif
         </div>
         <!-- Lọc Start -->
         <div id="loc" class="collapse">
@@ -102,17 +104,21 @@
         </div>
         <!-- Lọc End -->
 
-        <div id="post_container">
-          @include('main_component.post_loadmore')
-        </div>
+        @if ($bai_viet->total() > 0)
+          <div id="post_container">
+            @include('main_component.post_loadmore')
+          </div>
 
-        <div class="text-center">
-            <button class="btn btn-primary load-more-data"><i class="fa fa-refresh"></i> Xem thêm</button>
-        </div>
-        <!-- Data Loader -->
-        <div class="auto-load text-center" style="display: none;">
-            <div class="spinner-border text-primary"></div>
-        </div>
+          <div class="text-center">
+              <button class="btn btn-primary load-more-data"><i class="fa fa-refresh"></i> Xem thêm</button>
+          </div>
+          <!-- Data Loader -->
+          <div class="auto-load text-center" style="display: none;">
+              <div class="spinner-border text-primary"></div>
+          </div>
+        @else
+          <div class="text-center">Rất tiếc! Không có nội dung để hiển thị :(</div>
+        @endif
     </div>
 
     <div class="col-lg-4">
@@ -272,9 +278,17 @@
   <!--XỬ LÝ HASHTAG END-->
 
   <!--XỬ LÝ LOAD MORE START-->
+  @if($bai_viet->total() > 0)
   <script>
       var ENDPOINT = "{{ URL::to('/khoa-truong/'.$college->KT_MA) }}"
       var page = 1;
+      var maxPage = <?php echo  $bai_viet->lastPage(); ?>;
+
+      if(page >= maxPage){
+          $('.auto-load').html("Rất tiếc! Không còn bài viết để hiển thị :(");
+          $('.auto-load').show();
+          $('.load-more-data').hide();
+      }
 
       //Load thêm bài: 2 cách
       //Cách 1: Nhấn nút
@@ -323,6 +337,7 @@
               });
       }
   </script>
+  @endif
   <!--XỬ LÝ LOAD MORE END-->
 
   <!-- MAIN START -->

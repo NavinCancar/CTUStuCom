@@ -123,6 +123,10 @@ class UserSysController extends Controller
         if($userLog){
             if($userLog->ND_TRANGTHAI==1){
                 Session::put('userLog',$userLog);
+
+                $uSysAvatar = DB::table('nguoi_dung')->select('ND_MA', 'ND_HOTEN', 'ND_ANHDAIDIEN')->get();
+                Session::put('uSysAvatar',$uSysAvatar->toArray());
+
                 return Redirect::to('/trang-chu');
             }
             else{
@@ -142,6 +146,7 @@ class UserSysController extends Controller
     public function logout(){ ///
         $this->AuthLogin_ND();
         Session::put('userLog',null);
+        Session::put('uSysAvatar',null);
         return Redirect::to('/trang-chu');
     }
     
@@ -190,18 +195,12 @@ class UserSysController extends Controller
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('ND_EMAIL', $request->ND_EMAIL)->where('ND_MATKHAU', md5($request->ND_MATKHAU))
             ->first();
-
-
-        //FIRESTORE
-        $collection = 'ANH_DAI_DIEN';
-        $this->firestoreClient->addDocument($collection, [
-            'ND_MA' => $userLog->ND_MA,
-            'ND_HOTEN' => $request->ND_HOTEN,  
-            'ND_ANHDAIDIEN' =>  '',
-            'ND_TRANGTHAI' =>  1,
-        ]);
             
         Session::put('userLog',$userLog);
+
+        $uSysAvatar = DB::table('nguoi_dung')->select('ND_MA', 'ND_HOTEN', 'ND_ANHDAIDIEN')->get();
+        Session::put('uSysAvatar',$uSysAvatar->toArray());
+
         return Redirect::to('/tai-khoan/'.$userLog->ND_MA.'/edit');
     }
 
@@ -216,8 +215,9 @@ class UserSysController extends Controller
         if($userLog){
             $checkBlockND = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->where('ND_BICHAN_MA', '=', $tai_khoan->ND_MA)->exists(); 
             $checkBlockND2 = DB::table('chan')->where('ND_CHAN_MA', $tai_khoan->ND_MA)->where('ND_BICHAN_MA', '=', $userLog->ND_MA)->exists(); 
-            $checkBlockND3 = DB::table('nguoi_dung')->where('ND_MA', $tai_khoan->ND_MA)->where('ND_TRANGTHAI', 0)->exists(); 
         }
+        $checkBlockND3 = DB::table('nguoi_dung')->where('ND_MA', $tai_khoan->ND_MA)->where('ND_TRANGTHAI', 0)->exists(); 
+        
         $account_info = DB::table('nguoi_dung')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('ND_MA', $tai_khoan->ND_MA)->get();
@@ -316,24 +316,12 @@ class UserSysController extends Controller
             ]);
         }
 
-        //FIRESTORE
-        $documentPath = 'ANH_DAI_DIEN/' . $request->idFirestore;
-        $this->firestoreClient->updateDocument($documentPath, [
-            'ND_HOTEN' => $request->ND_HOTEN
-        ], true);
-        //$responseData = ['message' => $documentPath];
-
         if($request->downloadURL != ''){
             DB::table('nguoi_dung')
                 ->where('ND_MA', $tai_khoan->ND_MA)
                 ->update([ 
                     'ND_ANHDAIDIEN' => $request->downloadURL
                 ]);
-
-            //FIRESTORE
-            $this->firestoreClient->updateDocument($documentPath, [
-                'ND_ANHDAIDIEN' => $request->downloadURL
-            ], true);
         }
 
         if($request->KT_MA != ''){
@@ -344,6 +332,14 @@ class UserSysController extends Controller
                 ]);
         }
 
+        if ($tai_khoan->ND_MA == $userLog->ND_MA){
+            $userLogUpdate = DB::table('nguoi_dung')
+                ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+                ->where('ND_MA', $userLog->ND_MA)->first();
+                
+            Session::put('userLog',$userLogUpdate);
+        }
+        
         Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật tài khoản thành công!']);
         //return response()->json(['ND_MA' => $tai_khoan->ND_MA], 200);
         //return response()->json($responseData);
@@ -363,14 +359,8 @@ class UserSysController extends Controller
             'ND_TRANGTHAI' => 0
         ]);
 
-        //FIRESTORE
-        $idFirestore = request('idFirestore');
-        $documentPath = 'ANH_DAI_DIEN/' . $idFirestore;
-        $this->firestoreClient->updateDocument($documentPath, [
-            'ND_TRANGTHAI' => 0
-        ], true);
         Session::put('alert', ['type' => 'success', 'content' => 'Tài khoản bị vô hiệu hoá thành công!']);
-        if ($tai_khoan->ND_MA == $userLog->ND_MA) {Session::put('userLog',null);}
+        if ($tai_khoan->ND_MA == $userLog->ND_MA) {Session::put('userLog',null); Session::put('uSysAvatar',null);}
         return;
     }
 

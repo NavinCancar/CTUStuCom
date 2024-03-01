@@ -50,7 +50,7 @@
                                         <tr>
                                             <th scope="col">Mã khoa/trường</th>
                                             <th scope="col">Tên khoa/trường</th>
-                                            <th scope="col" width="70"></th>
+                                            <th scope="col" width="100"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -60,6 +60,7 @@
                                             <td>{{$item->KT_TEN}}</td>
                                             <td>
                                                 <div class="d-flex justify-content-between">
+                                                    <a href="{{URL::to('/khoa-truong/'.$item -> KT_MA)}}" previewlistener="true"><i class="fas fa-info-circle text-primary"></i></a>
                                                     <a href="{{URL::to('/khoa-truong/'.$item -> KT_MA.'/edit')}}"><i class="far fa-edit text-success"></i></a>
                                                     <form role="form" action="{{URL::to('/khoa-truong/'.$item -> KT_MA)}}" method="POST" class="delete-form">
                                                         @method('DELETE')

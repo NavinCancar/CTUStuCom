@@ -24,8 +24,10 @@
               <button class="btn btn-primary me-2 mb-3" data-bs-toggle="collapse" data-bs-target="#thembaiviet"><i
                   class="fas fa-plus"></i> Thêm bài viết</button>
               @endif
+              @if ($bai_viet->total() > 0)
               <button class="btn btn-outline-primary me-2 mb-3" data-bs-toggle="collapse" data-bs-target="#loc"><i
                   class="fa fa-filter"></i> Lọc bài viết</button>
+              @endif
             </div>
 
             <div class="text-notice text-notice-success alert alert-success" id="alert-success" style="display: none">
@@ -184,18 +186,22 @@
             </div>
             <!-- Lọc End -->
 
-            <!--  Bài viết  -->
-            <div id="post_container">
-              @include('main_component.post_loadmore')
-            </div>
+            @if ($bai_viet->total() > 0)
+              <!--  Bài viết  -->
+              <div id="post_container">
+                @include('main_component.post_loadmore')
+              </div>
 
-            <div class="text-center">
-                <button class="btn btn-primary load-more-data"><i class="fa fa-refresh"></i> Xem thêm</button>
-            </div>
-            <!-- Data Loader -->
-            <div class="auto-load text-center" style="display: none;">
-                <div class="spinner-border text-primary"></div>
-            </div>
+              <div class="text-center">
+                  <button class="btn btn-primary load-more-data"><i class="fa fa-refresh"></i> Xem thêm</button>
+              </div>
+              <!-- Data Loader -->
+              <div class="auto-load text-center" style="display: none;">
+                  <div class="spinner-border text-primary"></div>
+              </div>
+          @else
+            <div class="text-center">Rất tiếc! Không có nội dung để hiển thị :(</div>
+          @endif
           </div>
 
           <div class="col-lg-4">
@@ -461,9 +467,17 @@
   <!--XỬ LÝ HASHTAG END-->
 
   <!--XỬ LÝ LOAD MORE START-->
+  @if($bai_viet->total() > 0)
   <script>
       var ENDPOINT = "{{ URL::to('/') }}"
       var page = 1;
+      var maxPage = <?php echo  $bai_viet->lastPage(); ?>;
+
+      if(page >= maxPage){
+          $('.auto-load').html("Rất tiếc! Không còn bài viết để hiển thị :(");
+          $('.auto-load').show();
+          $('.load-more-data').hide();
+      }
 
       //Load thêm bài: 2 cách
       //Cách 1: Nhấn nút
@@ -512,6 +526,7 @@
               });
       }
   </script>
+  @endif
   <!--XỬ LÝ LOAD MORE END-->
 
   <!-- MAIN START-->

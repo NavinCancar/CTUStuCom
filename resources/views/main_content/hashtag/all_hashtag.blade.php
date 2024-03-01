@@ -49,15 +49,26 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">Hashtag</th>
-                                            <th scope="col" width="70"></th>
+                                            <th scope="col">Số bài đính kèm</th>
+                                            <th scope="col">Số người theo dõi</th>
+                                            <th scope="col" width="100"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($all_hashtag as $key => $item)
                                         <tr>
                                             <td>{{$item->H_HASHTAG}}</td>
+                                            <td><?php 
+                                                $sldk = $count_dinh_kem_noget->clone()->where('H_HASHTAG', DB::raw("'" . $item->H_HASHTAG . "'"))->first(); 
+                                                if($sldk) echo $sldk->count; 
+                                            ?></td>
+                                            <td><?php 
+                                                $sltd = $count_theo_doi_noget->clone()->where('H_HASHTAG', DB::raw("'" . $item->H_HASHTAG . "'"))->first(); 
+                                                if($sltd) echo $sltd->count; 
+                                            ?></td>
                                             <td>
                                                 <div class="d-flex justify-content-between">
+                                                    <a href="{{URL::to('/hashtag/'.$item -> H_HASHTAG)}}" previewlistener="true"><i class="fas fa-info-circle text-primary"></i></a>
                                                     <a href="{{URL::to('/hashtag/'.$item -> H_HASHTAG.'/edit')}}"><i class="far fa-edit text-success"></i></a>
                                                     <form hashtag="form" action="{{URL::to('/hashtag/'.$item -> H_HASHTAG)}}" method="POST" class="delete-form">
                                                         @method('DELETE')

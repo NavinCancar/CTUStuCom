@@ -104,6 +104,9 @@ class HomeController extends Controller
         }
         //Bài viết End
 
+        $uSysAvatar = DB::table('nguoi_dung')->select('ND_MA', 'ND_HOTEN', 'ND_ANHDAIDIEN')->get();
+        Session::put('uSysAvatar',$uSysAvatar->toArray());
+        
         return view('main_content.home')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
         ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)

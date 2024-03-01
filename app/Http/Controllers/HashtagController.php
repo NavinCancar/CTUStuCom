@@ -231,7 +231,14 @@ class HashtagController extends Controller
     public function index(){ ///
         $this->AuthLogin_KDV();
         $all_hashtag = DB::table('hashtag')->paginate(10);
-        return view('main_content.hashtag.all_hashtag')->with('all_hashtag', $all_hashtag);
+        $count_dinh_kem_noget = DB::table('cua_bai_viet')
+        ->join('bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+        ->select(DB::raw('count(*) as count, H_HASHTAG'))->groupBy('H_HASHTAG');
+        $count_theo_doi_noget = DB::table('theo_doi_boi')->select(DB::raw('count(*) as count, H_HASHTAG'))->groupBy('H_HASHTAG');
+
+        return view('main_content.hashtag.all_hashtag')->with('all_hashtag', $all_hashtag)
+        ->with('count_dinh_kem_noget', $count_dinh_kem_noget)->with('count_theo_doi_noget', $count_theo_doi_noget);
     }
 
 

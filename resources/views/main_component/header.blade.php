@@ -1,4 +1,7 @@
-  <?php $userLog= Session::get('userLog'); ?>
+  <?php 
+    $userLog= Session::get('userLog'); 
+    $uSysAvatar= Session::get('uSysAvatar');
+  ?>
     <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
           <ul class="navbar-nav">
@@ -269,19 +272,20 @@
                                   AddListFriendHeader();
                               }
                           function AddListFriendHeader(){
+                            
                             (async () => {
                                 //Lấy tên và ảnh người dùng
-                                const qfriend = query(
-                                    collection(db, "ANH_DAI_DIEN"), 
-                                    where('ND_MA', '==', checkUser)
-                                );
-
-                                const querySnapshotfriend = await getDocs(qfriend);
-                            
-                                querySnapshotfriend.forEach((doc) => {
-                                    ND_ANHDAIDIEN2 = doc.data().ND_ANHDAIDIEN;
-                                    ND_HOTEN2 = doc.data().ND_HOTEN;
-                                });
+                                <?php if ($uSysAvatar) { ?>
+                                  var uSysAvatar = <?php echo json_encode($uSysAvatar); ?>;
+                                  uSysAvatar.forEach(function(ava) {
+                                      if (ava.ND_MA == checkUser) {
+                                          if(ava.ND_ANHDAIDIEN != null) ND_ANHDAIDIEN2 = ava.ND_ANHDAIDIEN;
+                                          else ND_ANHDAIDIEN2 = '';
+                                          ND_HOTEN2 = ava.ND_HOTEN;
+                                          return;
+                                      }
+                                  });
+                                <?php } ?>
 
                                 //Đếm số lượng tin nhắn chưa xem
                                 const qnocheck = query(

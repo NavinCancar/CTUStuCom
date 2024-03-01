@@ -10,6 +10,7 @@
         </div>
         <hr>
         <div>
+          @if ($binh_luan->total() > 0)
             <!--  Bình luận  -->
             <div id="comment_container">
               @include('main_component.comment_loadmore')
@@ -22,15 +23,26 @@
             <div class="auto-load text-center" style="display: none;">
                 <div class="spinner-border text-primary"></div>
             </div>
+          @else
+            <div class="text-center">Rất tiếc! Không có nội dung để hiển thị :(</div>
+          @endif
         </div>
     </div>
   </div>
 </div>
 
 <!--XỬ LÝ LOAD MORE START-->
+@if($binh_luan->total() > 0)
     <script>
         var ENDPOINT = "{{ URL::to('/kho-binh-luan') }}"
         var page = 1;
+        var maxPage = <?php echo  $binh_luan->lastPage(); ?>;
+
+        if(page >= maxPage){
+            $('.auto-load').html("Rất tiếc! Không còn bình luận để hiển thị :(");
+            $('.auto-load').show();
+            $('.load-more-data').hide();
+        }
 
         //Load thêm bài: 2 cách
         //Cách 1: Nhấn nút
@@ -55,7 +67,7 @@
         --------------------------------------------
         --------------------------------------------*/
         function infinteLoadMore(page) {
-                console.log(ENDPOINT + "?page=" + page);
+            //console.log(ENDPOINT + "?page=" + page);
             $.ajax({
                 url: ENDPOINT + "?page=" + page,
                 datatype: "html",
@@ -80,6 +92,7 @@
                 });
         }
     </script>
+@endif
 <!--XỬ LÝ LOAD MORE END-->
 
     <script>

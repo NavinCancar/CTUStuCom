@@ -2,8 +2,8 @@
 @section('content')
 <?php $userLog= Session::get('userLog'); ?>
     <!-- Content Start -->
-    @if(!$checkBlockND && !$checkBlockND2 && !$checkBlockND3)
-        @foreach($account_info as $key => $info)
+    @foreach($account_info as $key => $info)
+        @if(!$checkBlockND && !$checkBlockND2 && !$checkBlockND3)
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">
@@ -192,20 +192,28 @@
                 </div>
             </div>
         </div>
-        @endforeach
-    @else
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="text-center text-muted">
-                    <h4>Người dùng này đã bị ẩn đến bạn!</h4>
+        
+        @else
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-center text-muted">
+                        @if($checkBlockND)
+                            <h4>Người dùng này đã bị ẩn đến bạn!</h4>
+                            <button class="btn btn-muted ms-2 unblock" data-user-id-value="<?php echo $info->ND_MA;?>" type="button"><i class="fas fa-ban"></i> Bỏ chặn</button>
+                        @elseif($checkBlockND3)
+                            <h4>Người dùng này đã vô hiệu hoá tài khoản!</h4>
+                        @else
+                            <h4>Bạn không thể xem trang cá nhân người dùng này!</h4>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    @endif
+        @endif
+    @endforeach
 
-    @if(!$checkBlockND && !$checkBlockND2 && !$checkBlockND3)
+    @if((!$checkBlockND && !$checkBlockND2 && !$checkBlockND3)||$checkBlockND)
   <script>
     $(document).ready(function() {
 
@@ -395,7 +403,7 @@
                 $element.addClass('block btn-muted');
 
                 $element.html('<i class="fas fa-ban"></i> Chặn');
-                
+                window.location.reload();
                 },
                 error: function(error) {
                 console.log(error);

@@ -16,6 +16,12 @@
               <span>{{date('H:i', strtotime($bl->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($bl->BL_THOIGIANTAO))}}</span>
           </div>
           <div class="col-sm-6 d-flex mt-2 justify-content-end">
+              <a class="ms-3 text-muted cursor-pointer">
+                  <span  onclick="navigator.clipboard.writeText('{{URL::to('/bai-dang/'.$bl->BV_MA.'/?binh-luan='.$bl->BL_MA)}}').then(() => { this.style.color = 'var(--bs-success)'; setTimeout(() => { this.style.color = '#5A6A85'; }, 500); }).catch(console.error);">
+                      <i class="fas fa-link"></i> Chia sẻ 
+                  </span>
+              </a>
+
               <a class="ms-3 cursor-pointer <?php 
                   if($userLog){
                       $check_bl_thich0 = $binh_luan_thich_no_get->clone()

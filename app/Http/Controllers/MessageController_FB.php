@@ -50,17 +50,39 @@ class MessageController_FB extends Controller
 
     public function index(){ ///
         $this->AuthLogin_ND();
-        return view('main_content.message');
+        return view('main_content.message')
+        ->with('isInactive', 0)->with('isBlock', 0);
     }
 
     public function show(string $id){ ///
         $this->AuthLogin_ND();
-        
+        $userLog = Session::get('userLog');
+
         $userChat = DB::table('nguoi_dung')
         ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
         ->where('ND_MA', $id)->first();
 
+        $isInactive = DB::table('nguoi_dung')->where('ND_MA', $id)->where('ND_TRANGTHAI', 0)->exists(); 
+        /*$isBlock = DB::table('chan') 
+        ->orWhere(function ( $query) use ($userChat, $userLog) { //Trong and
+            $query->where('ND_CHAN_MA', $userChat->ND_MA)
+                  ->where('ND_BICHAN_MA', $userLog->ND_MA);
+        })
+        ->orWhere(function ( $query) use ($userChat, $userLog) { //Trong and
+            $query->where('ND_CHAN_MA', $userLog->ND_MA)
+                  ->where('ND_BICHAN_MA', $userChat->ND_MA);
+        })->exists();*/
+
+        $isBlocked = DB::table('chan') 
+        ->where('ND_CHAN_MA', $userChat->ND_MA)
+        ->where('ND_BICHAN_MA', $userLog->ND_MA)->exists();
+        
+        $isBlock = DB::table('chan') 
+        ->where('ND_CHAN_MA', $userLog->ND_MA)
+        ->where('ND_BICHAN_MA', $userChat->ND_MA)->exists();
+
         Session::put('userChat',$userChat);
-        return view('main_content.message');
+        return view('main_content.message')->with('isInactive', $isInactive)
+        ->with('isBlocked', $isBlocked)->with('isBlock', $isBlock);
     }
 }

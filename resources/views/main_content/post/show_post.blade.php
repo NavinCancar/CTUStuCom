@@ -108,6 +108,12 @@
                     <div class="row">
                       <div class="col-sm-6 d-flex mt-2 justify-content-start">
                         <a class="ms-3 text-muted"><i class="fas fa-eye"></i> Lượt xem: <b>{{$bv->BV_LUOTXEM}}</b></a>
+
+                        <a class="ms-3 text-muted cursor-pointer">
+                          <span  onclick="navigator.clipboard.writeText('{{URL::to('/bai-dang/'.$bv->BV_MA)}}').then(() => { this.style.color = 'var(--bs-success)'; setTimeout(() => { this.style.color = '#5A6A85'; }, 500); }).catch(console.error);">
+                            <i class="fas fa-link"></i> Chia sẻ 
+                          </span>
+                        </a>
                       </div>
                       <div class="col-sm-6 d-flex mt-2 justify-content-end">
                         @if($userLog && $userLog->ND_MA != $bv->ND_MA)
@@ -225,6 +231,11 @@
                                       <span>{{date('H:i', strtotime($blg->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($blg->BL_THOIGIANTAO))}}</span>
                                     </div>
                                     <div class="col-sm-6 d-flex mt-2 justify-content-end">
+                                      <a class="ms-3 text-muted cursor-pointer">
+                                          <span  onclick="navigator.clipboard.writeText('{{URL::to('/bai-dang/'.$blg->BV_MA.'/?binh-luan='.$blg->BL_MA)}}').then(() => { this.style.color = 'var(--bs-success)'; setTimeout(() => { this.style.color = '#5A6A85'; }, 500); }).catch(console.error);">
+                                              <i class="fas fa-link"></i> Chia sẻ 
+                                          </span>
+                                      </a>
                                       @if($userLog && $userLog->ND_MA != $blg->ND_MA)
                                       <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$blg->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
                                       @endif
@@ -307,6 +318,12 @@
                                           <span>{{date('H:i', strtotime($bltl->BL_THOIGIANTAO))}} ngày {{date('d/m/Y', strtotime($bltl->BL_THOIGIANTAO))}}</span>
                                         </div>
                                         <div class="col-sm-6 d-flex mt-2 justify-content-end">
+                                          <a class="ms-3 text-muted cursor-pointer">
+                                            <span  onclick="navigator.clipboard.writeText('{{URL::to('/bai-dang/'.$bltl->BV_MA.'/?binh-luan='.$bltl->BL_MA)}}').then(() => { this.style.color = 'var(--bs-success)'; setTimeout(() => { this.style.color = '#5A6A85'; }, 500); }).catch(console.error);">
+                                                <i class="fas fa-link"></i> Chia sẻ 
+                                            </span>
+                                          </a>
+
                                           @if($userLog && $userLog->ND_MA != $bltl->ND_MA)
                                           <a class="ms-3 text-muted cursor-pointer report-comment" data-comment-id-value="{{$bltl->BL_MA}}"><i class="fas fa-flag"></i> Báo cáo</a>
                                           @endif

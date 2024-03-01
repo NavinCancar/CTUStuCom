@@ -10,6 +10,7 @@
         </div>
         <hr>
         <div>
+          @if ($bai_viet->total() > 0)
             <!--  Bài viết  -->
             <div id="post_container">
               @include('main_component.post_loadmore')
@@ -22,15 +23,26 @@
             <div class="auto-load text-center" style="display: none;">
                 <div class="spinner-border text-primary"></div>
             </div>
+          @else
+            <div class="text-center">Rất tiếc! Không có nội dung để hiển thị :(</div>
+          @endif
         </div>
     </div>
   </div>
 </div>
 
 <!--XỬ LÝ LOAD MORE START-->
+@if($bai_viet->total() > 0)
     <script>
         var ENDPOINT = "{{ URL::to('/kho-bai-viet') }}"
         var page = 1;
+        var maxPage = <?php echo  $bai_viet->lastPage(); ?>;
+
+        if(page >= maxPage){
+            $('.auto-load').html("Rất tiếc! Không còn bài viết để hiển thị :(");
+            $('.auto-load').show();
+            $('.load-more-data').hide();
+        }
 
         //Load thêm bài: 2 cách
         //Cách 1: Nhấn nút
@@ -79,6 +91,7 @@
                 });
         }
     </script>
+@endif
 <!--XỬ LÝ LOAD MORE END-->
 
     <script>
