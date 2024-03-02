@@ -458,6 +458,7 @@
                         //|-----------------------------------------------------
                         $('select[name="BL_TRANGTHAI"]').change(function() {
                             $('input[name="BL_NOIDUNG_VIPHAM"]').css('border-color', '');
+                            $('select[name="BL_TRANGTHAI"]').closest('form').find('.temp-notice').remove();
 
                             var selectedValue = $(this).val();
                             if(selectedValue == 'Vi phạm tiêu chuẩn'){
@@ -482,12 +483,16 @@
                         //|*****************************************************
                         $('#update_BL_TRANGTHAI').click(function() {
                             var form = $(this).closest('form');
+                            form.find('.temp-notice').remove();
+                            $('input[name="BL_NOIDUNG_VIPHAM"]').css('border-color', '');
+
                             var BL_TRANGTHAI = form.find('select[name="BL_TRANGTHAI"]').val();
                             var BL_NOIDUNG_VIPHAM = form.find('input[name="BL_NOIDUNG_VIPHAM"]').val();
                             var _token = $('meta[name="csrf-token"]').attr('content');
 
                             if(BL_TRANGTHAI == 'Vi phạm tiêu chuẩn' && BL_NOIDUNG_VIPHAM == ''){
                                 form.find('input[name="BL_NOIDUNG_VIPHAM"]').css('border-color', '#FA896B');
+                                form.append('<b class="text-danger px-0 fs-2 temp-notice" style="margin-left: 12rem;">Trường này không thể rỗng</b>');
                             }
                             else{
                                 if((BL_TRANGTHAI != defaultValue && BL_TRANGTHAI != 'Đã xoá') || BL_TRANGTHAI == 'Vi phạm tiêu chuẩn'){

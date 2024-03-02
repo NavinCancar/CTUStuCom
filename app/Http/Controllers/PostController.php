@@ -677,7 +677,7 @@ class PostController extends Controller
                     <div class="modal-header">
                         <form class="modal-title row" style="width: 95%">
                             <span class="d-flex justify-content-between align-items-center col-sm-9 mb-2">
-                                <b>Trạng thái bài viết:</b>
+                                <b style="width: 12rem;">Trạng thái bài viết:</b>
                                 <select name="BV_TRANGTHAI" ';
                                 if($bv->BV_TRANGTHAI == 'Đã xoá') $output .=' disabled '; 
                                 $output .= 'class="form-select w-75">';
@@ -699,7 +699,7 @@ class PostController extends Controller
                             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                                 <span class="d-flex justify-content-between align-items-center">
-                                    <b>Yêu cầu chỉnh sửa:</b>
+                                    <b style="width: 12rem;">Yêu cầu chỉnh sửa <span class="text-danger">(*)</span>:</b>
                                     <input class="form-control w-75" name="BV_NOIDUNG_TRANGTHAI" value="'. ((trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') ? trim(strstr($bv->BV_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsEdit" placeholder="Chọn hoăc nhập mới...">
                                     <datalist id="datalistOptionsEdit">
                                         <option value="Tiêu đề">
@@ -715,7 +715,7 @@ class PostController extends Controller
                             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                                 <span class="d-flex justify-content-between align-items-center">
-                                    <b>Vi phạm tiêu chuẩn:</b>
+                                    <b style="width: 12rem;">Vi phạm tiêu chuẩn <span class="text-danger">(*)</span>:</b>
                                     <input class="form-control w-75" name="BV_NOIDUNG_VIPHAM" value="'. ((trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') ? trim(strstr($bv->BV_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
                                     <datalist id="datalistOptionsBan">
                                         <option value="Thông tin sai sự thật">
@@ -949,7 +949,7 @@ class PostController extends Controller
         $output = '';
         $output .= 
         '<span class="d-flex justify-content-between align-items-center col-sm-9 mb-2">
-                <b>Trạng thái bài viết:</b>
+                <b style="width: 12rem;">Trạng thái bài viết:</b>
                 <select name="BV_TRANGTHAI" ';
                 if($bv->BV_TRANGTHAI == 'Đã xoá') $output .=' disabled '; 
                 $output .= 'class="form-select w-75">';
@@ -971,7 +971,7 @@ class PostController extends Controller
             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                 <span class="d-flex justify-content-between align-items-center">
-                    <b>Yêu cầu chỉnh sửa:</b>
+                    <b style="width: 12rem;">Yêu cầu chỉnh sửa <span class="text-danger">(*)</span>:</b>
                     <input class="form-control w-75" name="BV_NOIDUNG_TRANGTHAI" value="'. ((trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Yêu cầu chỉnh sửa') ? trim(strstr($bv->BV_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsEdit" placeholder="Chọn hoăc nhập mới...">
                     <datalist id="datalistOptionsEdit">
                         <option value="Tiêu đề">
@@ -987,7 +987,7 @@ class PostController extends Controller
             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                 <span class="d-flex justify-content-between align-items-center">
-                    <b>Vi phạm tiêu chuẩn:</b>
+                    <b style="width: 12rem;">Vi phạm tiêu chuẩn <span class="text-danger">(*)</span>:</b>
                     <input class="form-control w-75" name="BV_NOIDUNG_VIPHAM" value="'. ((trim(strstr($bv->BV_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') ? trim(strstr($bv->BV_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
                     <datalist id="datalistOptionsBan">
                         <option value="Thông tin sai sự thật">

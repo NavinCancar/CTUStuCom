@@ -49,13 +49,15 @@
                     <form id="them" action="{{URL::to('/bai-dang')}}" method="post" enctype="multipart/form-data">
                       {{ csrf_field() }}
                       <div class="mb-3 mt-3">
-                        <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
-                        <input type="text" class="form-control mb-3" placeholder="Nhập tiêu đề" id="title" name="BV_TIEUDE">
-
-                        <label class="form-label">Nội dung <span class="text-danger">(*)</span>:</label>
-                        <textarea class="form-control mb-3" rows="5" id="comment" name="BV_NOIDUNG"
-                          placeholder="Nhập nội dung" id="desc"></textarea>
-
+                        <div class="mb-3">
+                          <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
+                          <input type="text" class="form-control" placeholder="Nhập tiêu đề" id="title" name="BV_TIEUDE">
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Nội dung <span class="text-danger">(*)</span>:</label>
+                          <textarea class="form-control" rows="5" id="comment" name="BV_NOIDUNG"
+                            placeholder="Nhập nội dung" id="desc"></textarea>
+                        </div>
                         <div class="mb-3">
                           <label for="hashtag_input" class="form-label">Hashtag đính kèm <span class="text-danger">(tối đa 5 hashtag *)</span>:</label>
                           <div class="output"></div>
@@ -575,18 +577,19 @@
           var BV_TIEUDE = form.find('input[name="BV_TIEUDE"]').val();
           var BV_NOIDUNG = form.find('textarea[name="BV_NOIDUNG"]').val();
 
+          form.find('.temp-notice').remove();
           form.find('input[name="BV_TIEUDE"]').css('border-color', '');
           form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
           form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
 
           if(BV_TIEUDE == ""){
-            form.find('input[name="BV_TIEUDE"]').css('border-color', '#FA896B');
+            form.find('input[name="BV_TIEUDE"]').css('border-color', '#FA896B').after('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
           }
           else if(BV_NOIDUNG == ""){
-            form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '#FA896B');
+            form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '#FA896B').after('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
           }
           else if(selectedItems.length==0){
-            form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '#FA896B');
+            form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '#FA896B').after('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
           }
           else{
             //|-----------------------------------------------------
@@ -693,6 +696,7 @@
                     form.find('input[name="BV_TIEUDE"]').css('border-color', '');
                     form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
                     form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+                    form.find('.temp-notice').remove();
                     document.getElementById('thembaiviet').classList.remove("show");
 
                     $('#alert-success span').html('Thêm bài viết thành công');

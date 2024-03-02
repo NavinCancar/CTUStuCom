@@ -452,6 +452,7 @@
                         $('select[name="BV_TRANGTHAI"]').change(function() {
                             $('input[name="BV_NOIDUNG_TRANGTHAI"]').css('border-color', '');
                             $('input[name="BV_NOIDUNG_VIPHAM"]').css('border-color', '');
+                            $('select[name="BV_TRANGTHAI"]').closest('form').find('.temp-notice').remove();
 
                             var selectedValue = $(this).val();
                             if(selectedValue == 'Yêu cầu chỉnh sửa'){
@@ -487,6 +488,10 @@
                         //|*****************************************************
                         $('#update_BV_TRANGTHAI').click(function() {
                             var form = $(this).closest('form');
+                            form.find('.temp-notice').remove();
+                            $('input[name="BV_NOIDUNG_TRANGTHAI"]').css('border-color', '');
+                            $('input[name="BV_NOIDUNG_VIPHAM"]').css('border-color', '');
+
                             var BV_TRANGTHAI = form.find('select[name="BV_TRANGTHAI"]').val();
                             var BV_NOIDUNG_TRANGTHAI = form.find('input[name="BV_NOIDUNG_TRANGTHAI"]').val();
                             var BV_NOIDUNG_VIPHAM = form.find('input[name="BV_NOIDUNG_VIPHAM"]').val();
@@ -494,9 +499,11 @@
 
                             if(BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' && BV_NOIDUNG_TRANGTHAI == ''){
                                 form.find('input[name="BV_NOIDUNG_TRANGTHAI"]').css('border-color', '#FA896B');
+                                form.append('<b class="text-danger px-0 fs-2 temp-notice" style="margin-left: 12rem;">Trường này không thể rỗng</b>');
                             }
                             else if(BV_TRANGTHAI == 'Vi phạm tiêu chuẩn' && BV_NOIDUNG_VIPHAM == ''){
                                 form.find('input[name="BV_NOIDUNG_VIPHAM"]').css('border-color', '#FA896B');
+                                form.append('<b class="text-danger px-0 fs-2 temp-notice" style="margin-left: 12rem;">Trường này không thể rỗng</b>');
                             }
                             else{
                                 if((BV_TRANGTHAI != defaultValue && BV_TRANGTHAI != 'Đã xoá') || BV_TRANGTHAI == 'Yêu cầu chỉnh sửa' || BV_TRANGTHAI == 'Vi phạm tiêu chuẩn'){
@@ -578,9 +585,11 @@
                             const selectedItems = instance.getItems();
                             var form = $('#them');
                             form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+                            form.find('.temp-notice').remove();
 
                             if(selectedItems.length==0){
                                 form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '#FA896B');
+                                form.append('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
                             }
                             else{
                                 // Hiển thị thông báo xác nhận
@@ -623,6 +632,7 @@
                                     },
                                     success: function(response) {
                                         form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+                                        form.find('.temp-notice').remove();
 
                                         $('span.listhashtag').html(response.output);
 

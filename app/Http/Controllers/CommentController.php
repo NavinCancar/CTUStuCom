@@ -467,7 +467,7 @@ class CommentController extends Controller
                     <div class="modal-header">
                     <form class="modal-title row" style="width: 95%">
                             <span class="d-flex justify-content-between align-items-center col-sm-9 mb-2">
-                                <b>Trạng thái bài viết:</b>
+                                <b style="width: 12rem;">Trạng thái bài viết:</b>
                                 <select name="BL_TRANGTHAI" ';
                                 if($bl->BL_TRANGTHAI == 'Đã xoá') $output .=' disabled '; 
                                 $output .= 'class="form-select w-75">
@@ -485,7 +485,7 @@ class CommentController extends Controller
                             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                                 <span class="d-flex justify-content-between align-items-center">
-                                    <b>Vi phạm tiêu chuẩn:</b>
+                                    <b style="width: 12rem;">Vi phạm tiêu chuẩn <span class="text-danger">(*)</span>:</b>
                                     <input class="form-control w-75" name="BL_NOIDUNG_VIPHAM" value="'. ((trim(strstr($bl->BL_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') ? trim(strstr($bl->BL_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
                                     <datalist id="datalistOptionsBan">
                                         <option value="Thông tin sai sự thật">
@@ -631,7 +631,7 @@ class CommentController extends Controller
         $output = '';
         $output .= 
                 '<span class="d-flex justify-content-between align-items-center col-sm-9 mb-2">
-                <b>Trạng thái bài viết:</b>
+                <b style="width: 12rem;">Trạng thái bài viết:</b>
                 <select name="BL_TRANGTHAI" ';
                 if($bl->BL_TRANGTHAI == 'Đã xoá') $output .=' disabled '; 
                 $output .= 'class="form-select w-75">
@@ -649,7 +649,7 @@ class CommentController extends Controller
             $output .= ' style="display: none;" '; $output .=' class="col-sm-9">
 
                 <span class="d-flex justify-content-between align-items-center">
-                    <b>Vi phạm tiêu chuẩn:</b>
+                    <b style="width: 12rem;">Vi phạm tiêu chuẩn <span class="text-danger">(*)</span>:</b>
                     <input class="form-control w-75" name="BL_NOIDUNG_VIPHAM" value="'. ((trim(strstr($bl->BL_TRANGTHAI, ':', true)) == 'Vi phạm tiêu chuẩn') ? trim(strstr($bl->BL_TRANGTHAI, ':'), ': '):'') .'" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
                     <datalist id="datalistOptionsBan">
                         <option value="Thông tin sai sự thật">

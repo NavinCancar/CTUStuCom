@@ -281,14 +281,15 @@
 
           form.find('input[name="ND_HOTEN"]').css('border-color', '');
           form.find('input[name="ND_EMAIL"]').css('border-color', '');
+          form.find('.temp-notice').remove();
 
           var emailReg = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
           if(ND_HOTEN == ""){
-            form.find('input[name="ND_HOTEN"]').css('border-color', '#FA896B');
+            form.find('input[name="ND_HOTEN"]').css('border-color', '#FA896B').after('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
           }
           else if(ND_EMAIL == "" || emailReg.test(ND_EMAIL)==false){
-            form.find('input[name="ND_EMAIL"]').css('border-color', '#FA896B');
+            form.find('input[name="ND_EMAIL"]').css('border-color', '#FA896B').after('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
           }
           else{
             //|-----------------------------------------------------
@@ -357,6 +358,7 @@
 
                     form.find('input[name="ND_HOTEN"]').css('border-color', '');
                     form.find('input[name="ND_EMAIL"]').css('border-color', '');
+                    form.find('.temp-notice').remove();
                     //console.log('Thành công');
                     //console.log(response.message);
                     window.location.href = '{{URL::to('/tai-khoan/'.$userAcc.'/edit')}}';
@@ -375,6 +377,7 @@
 
                     form.find('input[name="ND_HOTEN"]').css('border-color', '');
                     form.find('input[name="ND_EMAIL"]').css('border-color', '');
+                    form.find('.temp-notice').remove();
 
                     $('#alert-danger span').html('Cập nhật tài khoản thất bại');
                     $('html, body').animate({

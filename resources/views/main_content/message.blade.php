@@ -1318,12 +1318,41 @@
                     detailtitle.innerHTML = 'Ảnh';
                     detailbody.innerHTML = '';
 
+                    var checkboxDiv = 
+                        '<div class="p-3 d-flex justify-content-between" >' +
+                        '    <div class="form-check">' +
+                        '        <input class="form-check-input" type="checkbox" value="jpg" checked>' +
+                        '        <label class="form-check-label">jpeg / jpg</label>' +
+                        '    </div>' +
+                        '    <div class="form-check">' +
+                        '        <input class="form-check-input" type="checkbox" value="png" checked>' +
+                        '        <label class="form-check-label">png</label>' +
+                        '    </div>' +
+                        '    <div class="form-check">' +
+                        '        <input class="form-check-input" type="checkbox" value="gif" checked>' +
+                        '        <label class="form-check-label">gif</label>' +
+                        '    </div>' +
+                        '</div>';
+                    detailbody.insertAdjacentHTML('beforeend', checkboxDiv);
+
                     //ẢNH: imgListModal.push({ docid: docid, fileName: fileName, fileLink: fileLink, user: user });
                     imgListModal.forEach(function(data) {
                         var fileName = data.fileName;
                         var fileLink = data.fileLink;
                         var fileExtension = fileName.split('.').pop().toLowerCase();
+                        var type = '';
+                        if (['jpg', 'jpeg'].includes(fileExtension)){
+                            type = 'jpg';
+                        }
+                        else if (['png'].includes(fileExtension)) {
+                            type = 'png';
+                        }
+                        else if (['gif'].includes(fileExtension)) {
+                            type = 'gif';
+                        }
+
                         var divData = 
+                            '<li data-type-value="'+type+'"' +
                             '<span class="col-md-3 col-sm-4 rounded-3 fw-semibold me-4 p-1 position-relative d-inline-block mb-3">' +
                             '    <a class="modal-img" data-img-id-value="'+data.docid+'" previewlistener="true">' +
                             '        <img src="'+fileLink+'"  width="100px" height="100px" alt="'+fileName+'" class="d-block mx-auto">' +
@@ -1333,9 +1362,41 @@
                         else  divData += '    <i class="fas fa-bookmark"></i>';
                         divData += 
                             '    </button>' +
-                            '</span>';
+                            '</span></li>';
                         detailbody.insertAdjacentHTML('beforeend', divData);
                     });
+
+                    //|*****************************************************
+                    //|CHECK BOX START
+                    //|*****************************************************
+                    // Lấy tất cả các checkbox
+                    const checkboxes = document.querySelectorAll('.form-check-input');
+
+                    checkboxes.forEach(function(checkbox) {
+                        checkbox.addEventListener('change', function() {
+                            const checkedValue = this.value;
+                            const isChecked = this.checked;
+                            
+                            const listItems = document.querySelectorAll('#detail-body li');
+                            listItems.forEach(function(item) {
+                                const itemType = item.getAttribute('data-type-value');
+                                
+                                if (checkedValue === itemType) {
+                                    // Nếu checkbox được chọn
+                                    if (isChecked) {
+                                        // Hiển thị item
+                                        item.classList.remove('d-none');
+                                    } else {
+                                        // Nếu checkbox không được chọn, ẩn item
+                                        item.classList.add('d-none');
+                                    }
+                                }
+                            });
+                        });
+                    });
+                    //|*****************************************************
+                    //|CHECK BOX END
+                    //|*****************************************************
                 });
 
                 //|-----------------------------------------------------
@@ -1348,13 +1409,48 @@
                     detailtitle.innerHTML = 'File';
                     detailbody.innerHTML = '';
 
+                    var checkboxDiv = 
+                        '<div class="p-3 d-flex justify-content-between" >' +
+                        '    <div class="form-check">' +
+                        '        <input class="form-check-input" type="checkbox" value="pdf" checked>' +
+                        '        <label class="form-check-label">PDF</label>' +
+                        '    </div>' +
+                        '    <div class="form-check">' +
+                        '        <input class="form-check-input" type="checkbox" value="doc" checked>' +
+                        '        <label class="form-check-label">Word</label>' +
+                        '    </div>' +
+                        '    <div class="form-check">' +
+                        '        <input class="form-check-input" type="checkbox" value="xls" checked>' +
+                        '        <label class="form-check-label">Excel</label>' +
+                        '    </div>' +
+                        '    <div class="form-check">' +
+                        '        <input class="form-check-input" type="checkbox" value="ppt" checked>' +
+                        '        <label class="form-check-label">Power point</label>' +
+                        '    </div>' +
+                        '</div>';
+                    detailbody.insertAdjacentHTML('beforeend', checkboxDiv);
+
                     //FILE: fileList.push({ docid: docid, fileName: fileName, fileLink: fileLink, user: user });
                     fileList.forEach(function(data) {
                         var fileName = data.fileName;
                         var fileLink = data.fileLink;
                         var fileExtension = fileName.split('.').pop().toLowerCase();
+                        var type = '';
+                        if (['pdf'].includes(fileExtension)){
+                            type = 'pdf';
+                        }
+                        else if (['docx', 'doc'].includes(fileExtension)) {
+                            type = 'doc';
+                        }
+                        else if (['xlsx', 'xls'].includes(fileExtension)) {
+                            type = 'xls';
+                        }
+                        else if (['ppt', 'pptx'].includes(fileExtension)) {
+                            type = 'ppt';
+                        }
+
                         var divData =
-                            '<li class="p-2 border-bottom d-flex justify-content-between">' +
+                            '<li data-type-value="'+type+'" class="p-2 border-bottom d-flex justify-content-between">' +
                             '    <a href="'+fileLink+'" target="_blank" class="d-flex justify-content-between w-75">' +
                             '        <div class="d-flex flex-row" style="max-width:100%">' +
                             '            <div>';
@@ -1392,6 +1488,38 @@
 
                         detailbody.insertAdjacentHTML('beforeend', divData);
                     });
+
+                    //|*****************************************************
+                    //|CHECK BOX START
+                    //|*****************************************************
+                    // Lấy tất cả các checkbox
+                    const checkboxes = document.querySelectorAll('.form-check-input');
+
+                    checkboxes.forEach(function(checkbox) {
+                        checkbox.addEventListener('change', function() {
+                            const checkedValue = this.value;
+                            const isChecked = this.checked;
+                            
+                            const listItems = document.querySelectorAll('#detail-body li');
+                            listItems.forEach(function(item) {
+                                const itemType = item.getAttribute('data-type-value');
+                                
+                                if (checkedValue === itemType) {
+                                    // Nếu checkbox được chọn
+                                    if (isChecked) {
+                                        // Hiển thị item
+                                        item.classList.remove('d-none');
+                                    } else {
+                                        // Nếu checkbox không được chọn, ẩn item
+                                        item.classList.add('d-none');
+                                    }
+                                }
+                            });
+                        });
+                    });
+                    //|*****************************************************
+                    //|CHECK BOX END
+                    //|*****************************************************
                 });
 
                 //|-----------------------------------------------------
@@ -1455,7 +1583,7 @@
             //|SEARCH FRIEND END
             //|*****************************************************
             //|*****************************************************
-            //|MODAL ẢNH START
+            //|MODAL ẢNH START + WITH CHECKBOX
             //|*****************************************************
 
             $(document).on('click', '.modal-img', function() {
@@ -1481,42 +1609,76 @@
                 //|-----------------------------------------------------
                 //imgListModal.push({ docid: docid, fileName: fileName, fileLink: fileLink, user: user });
 
-                var index = imgListModal.findIndex(function(item) {
+                var checkedImg = [];
+                var imgListModalChecked = [];
+
+                if ($('#kholuutrudetail').hasClass('show')) { //Offcanvas #kholuutrudetail hiển thị
+                    if($('#detail-title').text() == 'Ảnh'){
+                        $('#detail-body input[type="checkbox"]:checked').each(function() {
+                            checkedImg.push($(this).val());
+                        });
+
+                        if (["jpg", "png", "gif"].every(format => checkedImg.includes(format))) imgListModalChecked = imgListModal;
+                        else {
+                            for (var index = 0; index < imgListModal.length; index++) {
+                                var fileExtension = imgListModal[index].fileName.split('.').pop().toLowerCase();
+                                var type = '';
+                                if (['jpg', 'jpeg'].includes(fileExtension)){
+                                    type = 'jpg';
+                                }
+                                else if (['png'].includes(fileExtension)) {
+                                    type = 'png';
+                                }
+                                else if (['gif'].includes(fileExtension)) {
+                                    type = 'gif';
+                                }
+
+                                if(checkedImg.includes(type)){
+                                    imgListModalChecked.push(imgListModal[index]);
+                                }
+                            }
+                        }
+                    }
+                    else imgListModalChecked = imgListModal;
+                }
+                else imgListModalChecked = imgListModal;
+
+                var index = imgListModalChecked.findIndex(function(item) {
                     return item.docid === idImg;
                 });
 
                 if (index !== -1) {//Có trong mảng
                     //LẤY BUTTON
                     var btnImg = 
-                        '<button class="btn btn-secondary btn-sm start-100 bookmark-file mx-2 fs-4" data-fdk-id-value="'+imgListModal[index].docid+'">';
-                    if (fileSaved.includes(imgListModal[index].docid)) btnImg += '    <i class="fas fa-vote-yea mx-2 fs-4"></i></button>';
+                        '<button class="btn btn-secondary btn-sm start-100 bookmark-file mx-2 fs-4" data-fdk-id-value="'+imgListModalChecked[index].docid+'">';
+                    if (fileSaved.includes(imgListModalChecked[index].docid)) btnImg += '    <i class="fas fa-vote-yea mx-2 fs-4"></i></button>';
                     else  btnImg += '    <i class="fas fa-bookmark mx-2 fs-4"></i></button>';
                     btnImg +=
-                    '<div style="margin-left: auto;"><p class="fw-bold mb-0">'+imgListModal[index].fileName+'</p><p class="small text-muted float-end mb-0"><i>Từ: </i><i>'+imgListModal[index].user+'</i></div>';
+                    '<div style="margin-left: auto;"><p class="fw-bold mb-0">'+imgListModalChecked[index].fileName+'</p><p class="small text-muted float-end mb-0"><i>Từ: </i><i>'+imgListModalChecked[index].user+'</i></div>';
                     
                     //LẤY ẢNH
                     var bodyElement = '';
                     //Nút Previous: Kiểm tra phần tử đầu
                     if (index === 0) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg pe-4" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
-                    else bodyElement += '<button type="button" class="btn btn-link btn-lg pe-4 imgOther" data-img-id-value="'+imgListModal[index-1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
+                    else bodyElement += '<button type="button" class="btn btn-link btn-lg pe-4 imgOther" data-img-id-value="'+imgListModalChecked[index-1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
                     
                     //Main content
                     bodyElement += 
-                    '<a class="" data-img-id-value="'+imgListModal[index].docid+'" previewlistener="true" target="_blank" href="'+imgListModal[index].fileLink+'">'+   
-                    '    <img src="'+imgListModal[index].fileLink+'" alt="'+imgListModal[index].fileName+'" class="d-block mx-auto" style="width: 100%; height: auto; max-height: 340px;">'+    
+                    '<a class="" data-img-id-value="'+imgListModalChecked[index].docid+'" previewlistener="true" target="_blank" href="'+imgListModalChecked[index].fileLink+'">'+   
+                    '    <img src="'+imgListModalChecked[index].fileLink+'" alt="'+imgListModalChecked[index].fileName+'" class="d-block mx-auto" style="width: 100%; height: auto; max-height: 340px;">'+    
                     '</a>';
 
                     //Nút Next: Kiểm tra phần tử cuối
-                    if (index === imgListModal.length - 1) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg ps-4" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
-                    else bodyElement += '<button type="button" class="btn btn-link btn-lg ps-4 imgOther" data-img-id-value="'+imgListModal[index+1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+                    if (index === imgListModalChecked.length - 1) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg ps-4" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+                    else bodyElement += '<button type="button" class="btn btn-link btn-lg ps-4 imgOther" data-img-id-value="'+imgListModalChecked[index+1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
 
                     $('#img-modal').find('.modal-header').prepend(btnImg);
                     $('#img-modal').find('.modal-body').html(bodyElement);
                 }
 
                 $('.footer-slideshow').html('');
-                for (var index = 0; index < imgListModal.length; index++) {
-                    $('<img src="'+imgListModal[index].fileLink+'"  data-img-id-value="'+imgListModal[index].docid+'" width="100px" height="100px" alt="'+imgListModal[index].fileName+'" class="mx-2 cursor-pointer">').appendTo('.footer-slideshow');
+                for (var index = 0; index < imgListModalChecked.length; index++) {
+                    $('<img src="'+imgListModalChecked[index].fileLink+'"  data-img-id-value="'+imgListModalChecked[index].docid+'" width="100px" height="100px" alt="'+imgListModalChecked[index].fileName+'" class="mx-2 cursor-pointer">').appendTo('.footer-slideshow');
                 }
                 $('.footer-slideshow').find('img[data-img-id-value="'+idImg+'"]').addClass('img-selected-border');
 
@@ -1524,7 +1686,7 @@
                 $('#img-modal').modal('show');
             }
             //|*****************************************************
-            //|MODAL ẢNH END
+            //|MODAL ẢNH END + WITH CHECKBOX
             //|*****************************************************
             //|*****************************************************
             //|LƯU FILE START + WITH UPDATE

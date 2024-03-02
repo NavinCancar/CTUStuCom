@@ -407,7 +407,7 @@
             //|*****************************************************    
 
             //|*****************************************************
-            //|MODAL ẢNH START
+            //|MODAL ẢNH START + WITH CHECKBOX
             //|*****************************************************
 
             $(document).on('click', '.modal-img', function() {
@@ -431,50 +431,72 @@
                 //|-----------------------------------------------------
                 //|HIỆN ẢNH
                 //|-----------------------------------------------------
-                //imgListModal.push({ docid: doc.id, fileName: fileName, fileLink: fileLink, type: type, url: url });
+                //imgListModal.push({ docid: docid, fileName: fileName, fileLink: fileLink, user: user });
 
-                var index = imgListModal.findIndex(function(item) {
+                var checkedImg = [];
+                var imgListModalChecked = [];
+
+                $('#demoimages input[type="checkbox"]:checked').each(function() {
+                    checkedImg.push($(this).val());
+                });
+
+                if (["jpg", "png", "gif"].every(format => checkedImg.includes(format))) imgListModalChecked = imgListModal;
+                else {
+                    for (var index = 0; index < imgListModal.length; index++) {
+                        var fileExtension = imgListModal[index].fileName.split('.').pop().toLowerCase();
+                        var type = '';
+                        if (['jpg', 'jpeg'].includes(fileExtension)){
+                            type = 'jpg';
+                        }
+                        else if (['png'].includes(fileExtension)) {
+                            type = 'png';
+                        }
+                        else if (['gif'].includes(fileExtension)) {
+                            type = 'gif';
+                        }
+
+                        if(checkedImg.includes(type)){
+                            imgListModalChecked.push(imgListModal[index]);
+                        }
+                    }
+                }
+
+                var index = imgListModalChecked.findIndex(function(item) {
                     return item.docid === idImg;
                 });
+
                 if (index !== -1) {//Có trong mảng
                     //LẤY BUTTON
                     var btnImg = 
-                        '<a href="'+imgListModal[index].url+'" class="btn btn-indigo btn-sm mx-2 fs-4" previewlistener="true"><i class="fas fa-info-circle mx-2 fs-4"></i></a>' +
-                        '<button class="btn btn-secondary btn-sm start-100 bookmark-file mx-2 fs-4" data-fdk-id-value="'+imgListModal[index].docid+'">';
-                    if (fileSaved.includes(imgListModal[index].docid)) btnImg += '    <i class="fas fa-vote-yea mx-2 fs-4"></i></button>';
+                        '<button class="btn btn-secondary btn-sm start-100 bookmark-file mx-2 fs-4" data-fdk-id-value="'+imgListModalChecked[index].docid+'">';
+                    if (fileSaved.includes(imgListModalChecked[index].docid)) btnImg += '    <i class="fas fa-vote-yea mx-2 fs-4"></i></button>';
                     else  btnImg += '    <i class="fas fa-bookmark mx-2 fs-4"></i></button>';
                     btnImg +=
-                    '<div style="margin-left: auto;"><p class="fw-bold mb-0">'+imgListModal[index].fileName+'</p><p class="small text-muted float-end mb-0"><i> </i><i></i></p></div>';
-
+                    '<div style="margin-left: auto;"><p class="fw-bold mb-0">'+imgListModalChecked[index].fileName+'</p><p class="small text-muted float-end mb-0"><i> </i><i></i></div>';
+                    
                     //LẤY ẢNH
                     var bodyElement = '';
                     //Nút Previous: Kiểm tra phần tử đầu
                     if (index === 0) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg pe-4" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
-                    else bodyElement += '<button type="button" class="btn btn-link btn-lg pe-4 imgOther" data-img-id-value="'+imgListModal[index-1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
+                    else bodyElement += '<button type="button" class="btn btn-link btn-lg pe-4 imgOther" data-img-id-value="'+imgListModalChecked[index-1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-left"></i></button>'
                     
                     //Main content
                     bodyElement += 
-                    '<a class="" data-img-id-value="'+imgListModal[index].docid+'" previewlistener="true" target="_blank" href="'+imgListModal[index].fileLink+'">'+   
-                    '    <img src="'+imgListModal[index].fileLink+'" alt="'+imgListModal[index].fileName+'" class="d-block mx-auto" style="width: 100%; height: auto; max-height: 340px;">'+    
+                    '<a class="" data-img-id-value="'+imgListModalChecked[index].docid+'" previewlistener="true" target="_blank" href="'+imgListModalChecked[index].fileLink+'">'+   
+                    '    <img src="'+imgListModalChecked[index].fileLink+'" alt="'+imgListModalChecked[index].fileName+'" class="d-block mx-auto" style="width: 100%; height: auto; max-height: 340px;">'+    
                     '</a>';
 
                     //Nút Next: Kiểm tra phần tử cuối
-                    if (index === imgListModal.length - 1) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg ps-4" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
-                    else bodyElement += '<button type="button" class="btn btn-link btn-lg ps-4 imgOther" data-img-id-value="'+imgListModal[index+1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+                    if (index === imgListModalChecked.length - 1) bodyElement += '<button type="button" disabled class="btn btn-link btn-lg ps-4" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
+                    else bodyElement += '<button type="button" class="btn btn-link btn-lg ps-4 imgOther" data-img-id-value="'+imgListModalChecked[index+1].docid+'" style="font-size: 2.25rem"><i class="fas fa-chevron-right"></i></button>';
 
                     $('#img-modal').find('.modal-header').prepend(btnImg);
                     $('#img-modal').find('.modal-body').html(bodyElement);
                 }
 
-                var checkedImg = [];
-                $('#demoimages input[type="checkbox"]:checked').each(function() {
-                    checkedImg.push($(this).val());
-                });
-
                 $('.footer-slideshow').html('');
-                for (var index = 0; index < imgListModal.length; index++) {
-                    if(checkedImg.includes(imgListModal[index].type))
-                        $('<img src="'+imgListModal[index].fileLink+'"  data-img-id-value="'+imgListModal[index].docid+'" width="100px" height="100px" alt="'+imgListModal[index].fileName+'" class="mx-2 cursor-pointer">').appendTo('.footer-slideshow');
+                for (var index = 0; index < imgListModalChecked.length; index++) {
+                    $('<img src="'+imgListModalChecked[index].fileLink+'"  data-img-id-value="'+imgListModalChecked[index].docid+'" width="100px" height="100px" alt="'+imgListModalChecked[index].fileName+'" class="mx-2 cursor-pointer">').appendTo('.footer-slideshow');
                 }
                 $('.footer-slideshow').find('img[data-img-id-value="'+idImg+'"]').addClass('img-selected-border');
 
@@ -482,7 +504,7 @@
                 $('#img-modal').modal('show');
             }
             //|*****************************************************
-            //|MODAL ẢNH END
+            //|MODAL ẢNH END + WITH CHECKBOX
             //|*****************************************************
         });
         

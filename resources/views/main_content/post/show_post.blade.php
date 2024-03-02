@@ -412,13 +412,15 @@
           <form id="them" method="post" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="mb-3">
-              <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
-              <input type="text" class="form-control mb-3" placeholder="Nhập tiêu đề" id="title" value="{{$bv->BV_TIEUDE}}" name="BV_TIEUDE">
-
-              <label class="form-label">Nội dung <span class="text-danger">(*)</span>:</label>
-              <textarea class="form-control mb-3" rows="5" id="comment" name="BV_NOIDUNG"
-                placeholder="Nhập nội dung" id="desc">{{$bv->BV_NOIDUNG}}</textarea>
-
+              <div class="mb-3">
+                <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
+                <input type="text" class="form-control" placeholder="Nhập tiêu đề" id="title" value="{{$bv->BV_TIEUDE}}" name="BV_TIEUDE">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Nội dung <span class="text-danger">(*)</span>:</label>
+                <textarea class="form-control" rows="5" id="comment" name="BV_NOIDUNG"
+                  placeholder="Nhập nội dung" id="desc">{{$bv->BV_NOIDUNG}}</textarea>
+              </div> 
               <div class="mb-3">
                 <label for="hashtag_input" class="form-label">Hashtag đính kèm <span class="text-danger">(tối đa 5 hashtag *)</span>:</label>
                 <div class="output"></div>
@@ -495,10 +497,10 @@
           <form id="them-c" method="post" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="mb-3">
-              <textarea class="form-control mb-3" rows="5" name="BL_NOIDUNG-c"
+              <textarea class="form-control" rows="5" name="BL_NOIDUNG-c"
                 placeholder="Nhập nội dung"></textarea>
 
-              <div class="mb-3">
+              <div class="mb-3 mt-3">
                 <div id="old-FDK-c" style="display: none;">
                   <label for="formFileMultiple" class="form-label">Các file đính kèm đang có:</label>
                   <div id="u-images-container-c" class="m-2 mt-3 mb-3 position-relative"></div>
@@ -548,8 +550,8 @@
 
           <!-- Modal body -->
           <div class="modal-body">
-            <span class="d-flex justify-content-between align-items-center mb-3">
-                <b>Nội dung báo cáo:</b>
+            <span class="d-flex justify-content-between align-items-center">
+                <b style="width: 12rem;">Nội dung báo cáo:</b>
                 <input class="form-control w-75" name="BC_NOIDUNG" list="datalistOptionsBan" placeholder="Chọn hoăc nhập mới...">
                 <datalist id="datalistOptionsBan">
                     <option value="Thông tin sai sự thật">
@@ -560,8 +562,8 @@
                 </datalist>
             </span>
 
-            <button type="button" class="btn btn-primary float-sm-end" id="report-btn">Gửi</button>
-            <button type="button" class="btn btn-outline-primary float-sm-end me-2" id="hoantac-btn" onclick="location.reload();">Hoàn tác</button>
+            <button type="button" class="btn btn-primary float-sm-end mt-3" id="report-btn">Gửi</button>
+            <button type="button" class="btn btn-outline-primary float-sm-end me-2 mt-3" id="hoantac-btn" onclick="location.reload();">Hoàn tác</button>
           </div>
 
           <!-- Modal footer -->
@@ -766,18 +768,19 @@
               var BV_TIEUDE = form.find('input[name="BV_TIEUDE"]').val();
               var BV_NOIDUNG = form.find('textarea[name="BV_NOIDUNG"]').val();
 
+              form.find('.temp-notice').remove();
               form.find('input[name="BV_TIEUDE"]').css('border-color', '');
               form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
               form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
 
               if(BV_TIEUDE == ""){
-                form.find('input[name="BV_TIEUDE"]').css('border-color', '#FA896B');
+                form.find('input[name="BV_TIEUDE"]').css('border-color', '#FA896B').after('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
               }
               else if(BV_NOIDUNG == ""){
-                form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '#FA896B');
+                form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '#FA896B').after('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
               }
               else if(selectedItems.length==0){
-                form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '#FA896B');
+                form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '#FA896B').after('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
               }
               else{
                 // Hiển thị thông báo xác nhận
@@ -909,6 +912,7 @@
                           form.find('input[name="BV_TIEUDE"]').css('border-color', '');
                           form.find('textarea[name="BV_NOIDUNG"]').css('border-color', '');
                           form.find('div.tokenfield.tokenfield-mode-tokens').css('border-color', '');
+                          form.find('.temp-notice').remove();
                           //console.log('Thành công');
 
                           window.location.href = '{{URL::to('/bai-dang/'.$BV_MA)}}';
@@ -1021,6 +1025,7 @@
                 form[0].reset();
                 form.find('textarea[name="BL_NOIDUNG-c"]').css('border-color', '');
                 form.find('textarea[name="BL_NOIDUNG-c"]').val(BL_NOIDUNG_content);
+                form.find('.temp-notice').remove();
 
                 //|-----------------------------------------------------
                 //|HIỆN FILE BÌNH LUẬN
@@ -1107,9 +1112,10 @@
 
                     var BL_NOIDUNG = form.find('textarea[name="BL_NOIDUNG-c"]').val();
                     form.find('textarea[name="BL_NOIDUNG-c"]').css('border-color', '');
+                    form.find('.temp-notice').remove();
 
                     if(BL_NOIDUNG == ""){
-                      form.find('textarea[name="BL_NOIDUNG-c"]').css('border-color', '#FA896B');
+                      form.find('textarea[name="BL_NOIDUNG-c"]').css('border-color', '#FA896B').after('<b class="text-danger px-0 fs-2 temp-notice">Trường này không thể rỗng</b>');
                     }
                     else{
                         //|-----------------------------------------------------
@@ -1207,6 +1213,7 @@
                                 document.getElementById('hoantac-btn-c').style.display = 'block';
                                 document.getElementById('spinner-c').style.display = 'none';
                                 form.find('textarea[name="BL_NOIDUNG-c"]').css('border-color', '');
+                                form.find('.temp-notice').remove();
                                 //console.log('Thành công');
                                 window.location.href = '{{URL::to('/bai-dang/'.$BV_MA.'?binh-luan=')}}'+BL_MA;
                             },
@@ -1518,6 +1525,7 @@
               var form0 = $(this).closest('form');
               var BL_NOIDUNG0 = form0.find('textarea[name="BL_NOIDUNG0"]').val();
 
+              form0.find('.temp-notice').remove();
               const BL_NOIDUNG0_Element = form0.find('textarea[name="BL_NOIDUNG0"]');
               BL_NOIDUNG0_Element.removeClass('border-danger');
               BL_NOIDUNG0_Element.addClass('border-secondary');
@@ -1581,6 +1589,7 @@
 
                 BL_NOIDUNG0_Element.removeClass('border-secondary');
                 BL_NOIDUNG0_Element.addClass('border-danger');
+                form0.after('<b class="text-danger px-0 fs-2 temp-notice ms-3">Trường này không thể rỗng</b>');
               }
     
               function Upload0 (){
@@ -1747,6 +1756,7 @@
                   var form1 = $(this).closest('form');
                   var BL_NOIDUNG1 = form1.find('textarea[name="BL_NOIDUNG1"]').val();
 
+                  form1.find('.temp-notice').remove();
                   const BL_NOIDUNG1_Element = form1.find('textarea[name="BL_NOIDUNG1"]');
                   BL_NOIDUNG1_Element.removeClass('border-danger');
                   BL_NOIDUNG1_Element.addClass('border-secondary');
@@ -1810,6 +1820,7 @@
 
                     BL_NOIDUNG1_Element.removeClass('border-secondary');
                     BL_NOIDUNG1_Element.addClass('border-danger');
+                    form1.after('<b class="text-danger px-0 fs-2 temp-notice ms-3">Trường này không thể rỗng</b>');
                   }
 
                   function Upload1 (){
@@ -2301,12 +2312,17 @@
           <?php if($userLog) { ?>
             $(document).on('click', '.report-post', function() {
               $('input[name="BC_NOIDUNG"]').css('border-color', '');
+              $('#reportmodal').find('.temp-notice').remove();
+
               $('#reportmodal').modal('show');
               var $element = $(this);
               var BV_MA = $(this).data('post-id-value');
               var _token = $('meta[name="csrf-token"]').attr('content');
 
               $('#report-btn').click(function(e) {
+                $('input[name="BC_NOIDUNG"]').css('border-color', '');
+                $('#reportmodal').find('.temp-notice').remove();
+
                 var BVBC_NOIDUNG = $('input[name="BC_NOIDUNG"]').val();
                 if (BVBC_NOIDUNG !== null && BVBC_NOIDUNG.trim() !== "") {
                     $.ajax({
@@ -2340,6 +2356,7 @@
                 }
                 else{
                   $('input[name="BC_NOIDUNG"]').css('border-color', '#FA896B');
+                  $('input[name="BC_NOIDUNG"]').closest('span').after('<b class="text-danger px-0 fs-2 temp-notice" style="margin-left: 12rem;">Trường này không thể rỗng</b>');
                 }
               });
             });
@@ -2353,12 +2370,17 @@
           <?php if($userLog) { ?>
             $(document).on('click', '.report-comment', function() {
               $('input[name="BC_NOIDUNG"]').css('border-color', '');
+              $('#reportmodal').find('.temp-notice').remove();
+
               $('#reportmodal').modal('show');
               var $element = $(this);
               var BL_MA = $(this).data('comment-id-value');
               var _token = $('meta[name="csrf-token"]').attr('content');
 
               $('#report-btn').click(function(e) {
+                $('input[name="BC_NOIDUNG"]').css('border-color', '');
+                $('#reportmodal').find('.temp-notice').remove();
+
                 var BLBC_NOIDUNG = $('input[name="BC_NOIDUNG"]').val();
                 if (BLBC_NOIDUNG !== null && BLBC_NOIDUNG.trim() !== "") {
                     $.ajax({
@@ -2392,6 +2414,7 @@
                 }
                 else{
                   $('input[name="BC_NOIDUNG"]').css('border-color', '#FA896B');
+                  $('input[name="BC_NOIDUNG"]').closest('span').after('<b class="text-danger px-0 fs-2 temp-notice" style="margin-left: 12rem;">Trường này không thể rỗng</b>');
                 }
               });
             });
