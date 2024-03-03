@@ -291,7 +291,8 @@ class PostController extends Controller
             ->whereNotIn('BL_MA', $binh_luan_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+            ->orderBy('BL_THOIGIANTAO')->get();
 
             $binh_luan_traloi = DB::table('binh_luan')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
@@ -302,7 +303,8 @@ class PostController extends Controller
             ->whereNotIn('BL_MA', $binh_luan_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+            ->orderBy('BL_THOIGIANTAO')->get();
             }
         else{
             $binh_luan_goc = DB::table('binh_luan')
@@ -311,7 +313,8 @@ class PostController extends Controller
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
             ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
             ->where('binh_luan.BL_TRALOI_MA', '=', null)
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+            ->orderBy('BL_THOIGIANTAO')->get();
 
             $binh_luan_traloi = DB::table('binh_luan')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
@@ -319,7 +322,8 @@ class PostController extends Controller
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
             ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
             ->where('binh_luan.BL_TRALOI_MA', '!=', null)
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->get();
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+            ->orderBy('BL_THOIGIANTAO')->get();
         }
 
         $binh_luan_bv= DB::table('binh_luan')
