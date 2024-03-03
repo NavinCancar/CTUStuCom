@@ -187,7 +187,7 @@ class NotificatonController_FB extends Controller
         $baiviet_binhluan = DB::table('binh_luan')
         ->where('BV_MA', $BV_MA)
         ->orderBy('binh_luan.BL_THOIGIANTAO', 'desc')
-        ->select('binh_luan.ND_MA')->first();
+        ->select('binh_luan.ND_MA', 'binh_luan.BL_MA')->first();
 
         if($baiviet_binhluan != null){
             $nguoidung_top_binhluan = DB::table('nguoi_dung')
@@ -208,7 +208,7 @@ class NotificatonController_FB extends Controller
                     'ND_NHAN_MA' =>  $nguoidung->ND_MA,  
                     'TB_ANHDINHKEM' => $nguoidung_top_binhluan->ND_ANHDAIDIEN,
                     'TB_NOIDUNG' =>  $string,
-                    'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA),
+                    'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA.'?binh-luan='.$baiviet_binhluan->BL_MA),
                     'TB_LOAI' => 'bình luận bài viết',
                     'TB_TRANGTHAI' => 0,
                     'TB_REALTIME' => new FirestoreTimestamp,
@@ -226,7 +226,7 @@ class NotificatonController_FB extends Controller
                 'ND_NHAN_MA' =>  $bai_viet->ND_MA,  
                 'TB_ANHDINHKEM' => $nguoidung_top_binhluan->ND_ANHDAIDIEN,
                 'TB_NOIDUNG' =>  $stringchu,
-                'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA),
+                'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA.'?binh-luan='.$baiviet_binhluan->BL_MA),
                 'TB_LOAI' => 'bình luận bài viết',
                 'TB_TRANGTHAI' => 0,
                 'TB_REALTIME' => new FirestoreTimestamp,
@@ -246,7 +246,7 @@ class NotificatonController_FB extends Controller
                         'ND_NHAN_MA' =>  $bvgoc->ND_MA,  
                         'TB_ANHDINHKEM' => $nguoidung_top_binhluan->ND_ANHDAIDIEN,
                         'TB_NOIDUNG' =>  $stringchu,
-                        'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA),
+                        'TB_DUONGDAN'=> URL::to('/bai-dang/'.$BV_MA.'?binh-luan='.$baiviet_binhluan->BL_MA),
                         'TB_LOAI' => 'bình luận bài viết',
                         'TB_TRANGTHAI' => 0,
                         'TB_REALTIME' => new FirestoreTimestamp,

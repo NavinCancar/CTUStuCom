@@ -36,7 +36,7 @@
                         {{ csrf_field() }}
                         <div class="form-group text-center">
                             <label class="form-label">Ảnh đại diện:</label>
-                            <input type="hidden" name="ND_ANHDAIDIENshow" disabled value="<?php if($account_info->ND_ANHDAIDIEN) echo $account_info->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" class="form-control">
+                            <input type="hidden" name="ND_ANHDAIDIENshow" disabled value="<?php if($account_info->ND_ANHDAIDIEN) echo $account_info->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" class="form-control">
 
                             <style>
                                 #file-input {
@@ -64,7 +64,7 @@
                         
                             <div class="container" style="height: 200px;">
                                 <label for="file-input" >
-                                    <img class="circle" src="<?php if($account_info->ND_ANHDAIDIEN) echo $account_info->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" id="img-preview" src="" alt="Image Preview">
+                                    <img class="circle" src="<?php if($account_info->ND_ANHDAIDIEN) echo $account_info->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" id="img-preview" src="" alt="Image Preview">
                                     <input type="file" name="ND_ANHDAIDIEN" class="form-control" id="file-input">
                                 </label>
                             </div>

@@ -44,7 +44,7 @@
                     <div class="dropdown pb-2">
                       <span>
                         <a href="{{URL::to('/tai-khoan/'.$bv->ND_MA)}}" class="text-body">
-                          <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="36" height="36" class="rounded-circle">
+                          <img src="<?php if($bv->ND_ANHDAIDIEN) echo $bv->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" alt="" width="36" height="36" class="rounded-circle">
                           <b>{{$bv->ND_HOTEN}}</b> 
                         </a>
                         @if($bv->VT_MA != 3)
@@ -199,7 +199,7 @@
                           <div class="d-flex flex-row pb-3 pt-1" data-comment-id-value="{{$blg->BL_MA}}">
                               <div>
                                 <a href="{{URL::to('/tai-khoan/'.$blg->ND_MA)}}" class="text-body">
-                                  <img src="<?php if($blg->ND_ANHDAIDIEN) echo $blg->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
+                                  <img src="<?php if($blg->ND_ANHDAIDIEN) echo $blg->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" alt="" 
                                       width="36" height="36" class="rounded-circle me-2">
                                 </a>
                               </div>
@@ -286,7 +286,7 @@
                               <div class="d-flex flex-row ms-5 pb-1 pt-3" data-comment-id-value="{{$bltl->BL_MA}}">
                                   <div>
                                     <a href="{{URL::to('/tai-khoan/'.$bltl->ND_MA)}}" class="text-body">
-                                      <img src="<?php if($bltl->ND_ANHDAIDIEN) echo $bltl->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
+                                      <img src="<?php if($bltl->ND_ANHDAIDIEN) echo $bltl->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" alt="" 
                                           width="36" height="36" class="rounded-circle me-2">
                                     </a>
                                   </div>
@@ -414,7 +414,7 @@
             <div class="mb-3">
               <div class="mb-3">
                 <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
-                <input type="text" class="form-control" placeholder="Nhập tiêu đề" id="title" value="{{$bv->BV_TIEUDE}}" name="BV_TIEUDE">
+                <input type="text" class="form-control" placeholder="Nhập tiêu đề" id="title" value="{{$bv->BV_TIEUDE}}" maxlength="150" name="BV_TIEUDE">
               </div>
               <div class="mb-3">
                 <label class="form-label">Nội dung <span class="text-danger">(*)</span>:</label>

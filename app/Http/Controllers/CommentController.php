@@ -514,7 +514,7 @@ class CommentController extends Controller
                         <div class="mb-3 mb-sm-0">
                             <div class="pb-2">
                             <a href="'. URL::to('/tai-khoan/'.$bl->ND_MA) .'" class="text-body">
-                                <img src="'; if($bl->ND_ANHDAIDIEN) $output .= $bl->ND_ANHDAIDIEN; else $output .= 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'; $output .= '" alt="" width="36" height="36" class="rounded-circle">
+                                <img src="'; if($bl->ND_ANHDAIDIEN) $output .= $bl->ND_ANHDAIDIEN; else $output .= config('constants.default_avatar'); $output .= '" alt="" width="36" height="36" class="rounded-circle">
                                 <b>'. $bl->ND_HOTEN .'</b> 
                             </a>';
                             if($bl->VT_MA != 3) $output .='<span class="badge-sm bg-warning rounded-pill"><i>'. $bl->VT_TEN .'</i></span>';
@@ -562,7 +562,7 @@ class CommentController extends Controller
                                     '<div class="d-flex flex-row pb-3 pt-1" data-report-nd-value="'. $bc->ND_MA .'">
                                         <div>
                                         <a href="'. URL::to('/tai-khoan/'.$bc->ND_MA) .'" class="text-body" previewlistener="true">
-                                            <img src="'; if($bc->ND_ANHDAIDIEN) $output .= $bc->ND_ANHDAIDIEN; else $output .= 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'; $output .= '" alt="" width="36" height="36" class="rounded-circle me-2">
+                                            <img src="'; if($bc->ND_ANHDAIDIEN) $output .= $bc->ND_ANHDAIDIEN; else $output .= config('constants.default_avatar'); $output .= '" alt="" width="36" height="36" class="rounded-circle me-2">
                                         </a>
                                         </div>
                                         <div class="pt-1" style="width:100%">

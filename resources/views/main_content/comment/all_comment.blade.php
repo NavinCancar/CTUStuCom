@@ -243,20 +243,34 @@
                 //|-----------------------------------------------------
                 const currentURL = window.location.href;
                 if (currentURL.includes('?binh-luan=')) {
-                    for (let i = 2; i <= <?php echo $binh_luan->lastPage(); ?>; i++) {
-                        var newURL = currentURL + `&page=${i}`;
-                        var trToFocus = document.querySelector(`tr[data-comment-id-value="${commentIdValue}"]`);
-                        if (trToFocus) {
-                            trToFocus.style.background = 'linear-gradient(to right, #ffffff00, #ffff0038, #ffff0038, #ffff0038, #ffffff00)';
-                            trToFocus.tabIndex = 0;
-                            trToFocus.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center', // Hoặc 'center', 'end', 'nearest'
-                            });
-                            break;
+                    async function processURLs(urls) {
+                        for (let i = 0; i < urls.length; i++) {
+                            var newURL = urls[i];
+                            const response = await fetch(newURL); //để tải nội dung của newURL
+                            const htmlString = await response.text(); //chuyển response qua text
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(htmlString, 'text/html'); //chuyển text qua html
+                            var trToFocus = doc.querySelector(`tr[data-comment-id-value="${commentIdValue}"]`);
+                            if (trToFocus) {
+                                trToFocus.style.background = 'linear-gradient(to right, #ffffff00, #ffff0038, #ffff0038, #ffff0038, #ffffff00)';
+                                trToFocus.tabIndex = 0;
+                                trToFocus.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center',
+                                });
+                                window.location.href = newURL;
+                                break;
+                            }
                         }
                     }
-                    window.location.href = newURL;
+
+                    // Sử dụng hàm
+                    const urls = [];
+                    for (let i = 2; i <= <?php echo $binh_luan->lastPage(); ?>; i++) {
+                        urls.push(currentURL + `&page=${i}`);
+                    }
+
+                    processURLs(urls);
                 }
             }
         <?php 

@@ -84,7 +84,7 @@
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown"
                   aria-expanded="false">
-                  <img src="<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="35" height="35" class="rounded-circle">
+                  <img src="<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" alt="" width="35" height="35" class="rounded-circle">
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
                   <div class="message-body">
@@ -300,7 +300,7 @@
                                 
                                 var divData = 
                                   '<a data-value="'+checkUser+'" href="'+linkChat+'/'+checkUser+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1" style="flex-wrap: wrap;">'+
-                                  '  <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
+                                  '  <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : '<?php echo config('constants.default_avatar'); ?>') +'" alt="" width="35" height="35"'+
                                   '    class="rounded-circle">'+
                                   '  <span class="mb-0 fs-3 wrap-friend-text" style="max-width: 250px;">'+
                                   '  <b>'+ND_HOTEN2+'</b>' +
@@ -460,7 +460,7 @@
                         function AddListNotiHeader(){
                           var divData = 
                               '<a data-value="'+iddata+'" data-href="'+data.TB_DUONGDAN+'" class="d-flex align-items-center gap-2 dropdown-item mt-1 mb-1 noti-href" style="flex-wrap: wrap;">' +
-                              '  <img src="'+ (data.TB_ANHDINHKEM != null ? data.TB_ANHDINHKEM : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
+                              '  <img src="'+ (data.TB_ANHDINHKEM != null ? data.TB_ANHDINHKEM : '<?php echo config('constants.default_avatar'); ?>') +'" alt="" width="35" height="35"'+
                               '    class="rounded-circle">'+
                               '  <p class="mb-0 fs-3 wrap-noti-text">' +
                               data.TB_NOIDUNG +

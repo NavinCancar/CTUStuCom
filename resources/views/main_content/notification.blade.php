@@ -153,7 +153,7 @@
                             var divData = 
                                 '    <a data-value="'+iddata+'" data-href="'+data.TB_DUONGDAN+'" class="p-3 noti-item cursor-pointer d-flex align-items-center gap-2 text-muted mt-1 mb-2 noti-href"' +
                                 '    style="flex-wrap: wrap;">' +
-                                '  <img src="'+ (data.TB_ANHDINHKEM != null ? data.TB_ANHDINHKEM : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" width="35" height="35"'+
+                                '  <img src="'+ (data.TB_ANHDINHKEM != null ? data.TB_ANHDINHKEM : '<?php echo config('constants.default_avatar'); ?>') +'" alt="" width="35" height="35"'+
                                 '        class="rounded-circle">' +
                                 '    <p class="mb-0 fs-3" style="max-width: 85%; overflow-wrap: break-word; white-space: normal;">' +
                                 data.TB_NOIDUNG +

@@ -13,7 +13,7 @@
                 <div class="card" id="chat">
                     <div class="d-flex justify-content-start align-items-center p-1 bg-secondary" style="border-radius: 15px 15px 0 0">
                     <?php if($userChat){ ?> <a href="{{URL::to('/tai-khoan/'.$userChat->ND_MA)}}" class="text-muted"> <?php  } ?>
-                        <?php if($userChat){ ?> <img src="<?php if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'; ?>" alt="" width="40" height="40" 
+                        <?php if($userChat){ ?> <img src="<?php if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo config('constants.default_avatar'); ?>" alt="" width="40" height="40" 
                             class="rounded-circle me-2"><?php  } else { echo '<div style="height:40px"></div>';} ?>
                         <b><?php if($userChat) echo $userChat->ND_HOTEN; ?></b>
                         <?php if($userChat){ ?> </a> <?php  } ?>
@@ -612,7 +612,7 @@
                                                 '               <i class="fas fa-copy ms-2" onclick="navigator.clipboard.writeText(`'+data.TN_NOIDUNG.replace(/<br>/g, '\n')+'`).then(() => { this.style.color = \'var(--bs-success)\'; setTimeout(() => { this.style.color = \'var(--bs-gray-400)\'; }, 500); }).catch(console.error);"></i>'+
                                                 '           </span>' + '<b class="mx-3">|</b>' + secondsDifferenceResult + '</p>'+
                                                 '    </div>'+
-                                                '    <img src="<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
+                                                '    <img src="<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
                                                 '</div>';
 
                                             if (checkRealtime >= justLoad) chatbox.insertAdjacentHTML('beforeend', divData); //Thêm cuối
@@ -662,7 +662,7 @@
                                                 '               <i class="fas fa-copy ms-2" onclick="navigator.clipboard.writeText(`'+data.TN_NOIDUNG.replace(/<br>/g, '\n')+'`).then(() => { this.style.color = \'var(--bs-success)\'; setTimeout(() => { this.style.color = \'var(--bs-gray-400)\'; }, 500); }).catch(console.error);"></i>'+
                                                 '           </span>' + '<b class="mx-3">|</b>' + secondsDifferenceResult + '</p>'+
                                                 '    </div>'+
-                                                '    <img src="<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
+                                                '    <img src="<?php if($userLog->ND_ANHDAIDIEN) echo $userLog->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
                                                 '</div>';
 
                                             if (checkRealtime >= justLoad) chatbox.insertAdjacentHTML('beforeend', divData); //Thêm cuối
@@ -694,7 +694,7 @@
                                         if(querySnapshotfile.empty){
                                             var divData = 
                                                 '<div class="d-flex flex-row justify-content-start">'+
-                                                '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76';}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
+                                                '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo config('constants.default_avatar');}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
                                                 '    <div class="me-5">'+
                                                 '        <p class="fs-3 p-2 ms-1 mb-1 rounded-3 friend-chat" data-chat-id-value="'+idChat+'">'+data.TN_NOIDUNG+'</p>'+
                                                 '        <p class="fs-2 ms-3 mb-3 rounded-3 text-muted">'+ secondsDifferenceResult + '<b class="mx-3">|</b>' +
@@ -715,7 +715,7 @@
 
                                             var divData = 
                                                 '<div class="d-flex flex-row justify-content-start">'+
-                                                '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76';}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
+                                                '    <img src="<?php if($userChat) {if($userChat->ND_ANHDAIDIEN) echo $userChat->ND_ANHDAIDIEN; else echo config('constants.default_avatar');}?>" alt="" width="40" height="40" class="rounded-circle me-2">'+
                                                 '    <div class="me-5">'+
                                                 ((data.TN_NOIDUNG=="")?'<p data-chat-id-value="'+idChat+'"></p>':'<p class="fs-3 p-2 ms-1 mb-1 rounded-3 friend-chat" data-chat-id-value="'+idChat+'">'+data.TN_NOIDUNG+'</p>');
 
@@ -861,7 +861,7 @@
                                             '    <a href="'+linkChat+'/'+checkUser+'" class="row">'+
                                             '        <div class="col-sm-8 d-flex flex-row">'+
                                             '            <div>'+
-                                            '                <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76') +'" alt="" '+
+                                            '                <img src="'+ (ND_ANHDAIDIEN2 != "" ? ND_ANHDAIDIEN2 : '<?php echo config('constants.default_avatar'); ?>') +'" alt="" '+
                                             '                    width="40" height="40" class="rounded-circle me-2">'+
                                             '            </div>'+
                                             '            <div class="pt-1">'+

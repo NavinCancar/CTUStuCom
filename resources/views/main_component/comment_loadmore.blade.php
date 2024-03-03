@@ -3,7 +3,7 @@
 <div class="d-flex flex-row pb-3 pt-1" data-comment-id-value="{{$bl->BL_MA}}">
   <div>
   <a class="text-body">
-      <img src="<?php if($bl->ND_ANHDAIDIEN) echo $bl->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>" alt="" 
+      <img src="<?php if($bl->ND_ANHDAIDIEN) echo $bl->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" alt="" 
           width="40" height="40" class="rounded-circle me-2">
   </a>
   </div>

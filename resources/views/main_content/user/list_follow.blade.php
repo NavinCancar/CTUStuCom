@@ -20,7 +20,7 @@
                                         <div class="justify-content-between">
                                             <div class="d-flex flex-row">
                                                 <div>
-                                                    <img src="<?php if($info->ND_ANHDAIDIEN) echo $info->ND_ANHDAIDIEN; else echo 'https://firebasestorage.googleapis.com/v0/b/ctu-student-community.appspot.com/o/users%2Fdefault.png?alt=media&token=16cbadb3-eed3-40d6-a6e5-f24f896b5c76'?>"
+                                                    <img src="<?php if($info->ND_ANHDAIDIEN) echo $info->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>"
                                                         alt="" width="50" height="50" class="rounded-circle me-2">
                                                 </div>
                                                 <div class="pt-1">

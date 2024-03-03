@@ -51,7 +51,7 @@
                       <div class="mb-3 mt-3">
                         <div class="mb-3">
                           <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
-                          <input type="text" class="form-control" placeholder="Nhập tiêu đề" id="title" name="BV_TIEUDE">
+                          <input type="text" class="form-control" placeholder="Nhập tiêu đề" id="title"  maxlength="150" name="BV_TIEUDE">
                         </div>
                         <div class="mb-3">
                           <label class="form-label">Nội dung <span class="text-danger">(*)</span>:</label>
