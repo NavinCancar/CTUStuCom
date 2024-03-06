@@ -25,7 +25,7 @@
                     <div class="mb-3 mb-sm-0">
                         <div class="position-center">
                             <h2 class="card-title fw-semibold text-center fs-6">THÊM HASHTAG</h2>
-                            <form hashtag="form" action="{{URL::to('/hashtag')}}" method="POST">
+                            <form role="form" action="{{URL::to('/hashtag')}}" method="POST">
                                 {{ csrf_field() }}
                                 <div class="form-group">
                                     <label class="form-label">Hashtag</label>

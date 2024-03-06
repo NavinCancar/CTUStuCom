@@ -673,39 +673,58 @@
         validateNewItem: null
       });
 
-      /*
-      const instance = new Tokenfield({
-            el: document.querySelector('.basic'),
-            remote: {
-              type: 'GET', // GET or POST
-              url: null, // Full url.
-              queryParam: 'q', // query parameter
-              delay: 300, // delay in ms
-              timestampParam: 't',
-              params: {},
-              headers: {}
-            },
-      });*/
+      instance.on('change', () => {
+      const selectedItems = instance.getItems();
+        var form = $('#them');
+        //|-----------------------------------------------------
+        //|XỬ LÝ HASHTAG
+        //|-----------------------------------------------------
+        var hashtagItems = [];
 
-      //******** UPDATE FUTURE: Gợi ý hashtag chọn: Sự kiện thay đổi trạng thái của tokenfield, hiển thị cả item lẫn
-      /*instance.on('change', () => {
-        const selectedItems = instance.getItems();
-        const inputElement = document.querySelector('.basic');
-        const outputDiv = document.querySelector('.output');
-        //outputDiv.innerHTML = `Mục đã chọn: ${selectedItems.map(item => item.name).join(', ')}`;
-        outputDiv.innerHTML = '';
-        selectedItems.forEach(function(item) {
-          if (item.isNew) {
-              outputDiv.innerHTML += `New: ${item.name}<br>`;
-          } else {
-              outputDiv.innerHTML += `Select: ${item.name}<br>`;
+        selectedItems.forEach(function(hashtag) {
+          if (hashtag.isNew) {} 
+          else {
+            hashtagItems.push(hashtag);
           }
         });
+        document.getElementById('hashtagsInput').value = JSON.stringify(hashtagItems);
 
-        //if(selectedItems!=null){
-        //  inputElement.removeAttribute('required');
-        //}
-      });*/
+        //|-----------------------------------------------------
+        //|GỬI FORM
+        //|-----------------------------------------------------
+        var hashtags = form.find('input[name="hashtags"]').val();
+        var _token = $('meta[name="csrf-token"]').attr('content'); 
+        
+        $.ajax({
+          url: '{{URL::to('/goi-y-hashtag')}}',
+          type: 'POST',
+          data: {
+            hashtags: hashtags,
+            _token: _token
+          },
+          success: function(response) {
+            
+            if(response.length > 0){
+              var kqGoiY = '';
+              for (var i = 0; i < response.length && i < 10; i++) {
+                  var item = response[i];
+                  kqGoiY += '<span class="cursor-pointer add-hashtag badge bg-secondary me-1 mb-1 p-1 px-2">'+ item.hashtag + "</span>";
+              }
+
+              $('.output').html(`Gợi ý hashtag: ${kqGoiY}`);
+
+              $('.add-hashtag').on('click', function() {
+                  var hashtag = $(this).text().trim();
+                  instance.addItems({ name: hashtag });
+              });
+            }
+            else $('.output').html(``);
+          },
+          error: function(error) {
+              console.log(error);
+          }
+        });
+    });
     </script>
     <!--XỬ LÝ HASHTAG END-->
 
@@ -884,7 +903,7 @@
                     var linkFile = form.find('input[name="linkFile"]').val();
                     var hashtags = form.find('input[name="hashtags"]').val();
                     var hashtagsNew = form.find('input[name="hashtagsNew"]').val();
-                    var _token = $('input[name="_token"]').val(); 
+                    var _token = $('meta[name="csrf-token"]').attr('content'); 
                     /*console.log("BV_TIEUDE:", BV_TIEUDE);
                     console.log("BV_NOIDUNG:", BV_NOIDUNG);
                     console.log("HP_MA:", HP_MA);
@@ -1197,7 +1216,7 @@
                           //|GỬI FORM
                           //|-----------------------------------------------------
                           var linkFileC = form.find('input[name="linkFile-c"]').val();
-                          var _token = $('input[name="_token"]').val(); 
+                          var _token = $('meta[name="csrf-token"]').attr('content'); 
 
                           $.ajax({
                             url: '{{URL::to('/binh-luan/')}}'+'/'+BL_MA,

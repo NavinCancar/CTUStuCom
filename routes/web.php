@@ -30,6 +30,12 @@ Route::get('/kho-bai-viet','App\Http\Controllers\HomeController@post_archive');
 Route::get('/kho-binh-luan','App\Http\Controllers\HomeController@comment_archive');
 Route::get('/kho-file','App\Http\Controllers\HomeController@file_archive');
 
+//--Lọc và gợi ý
+Route::post('/goi-y-hashtag', 'App\Http\Controllers\HomeController@suggest_hashtag');
+Route::post('/loc-bai-viet', 'App\Http\Controllers\HomeController@filter_post');
+Route::post('/ket-qua-tim-kiem', 'App\Http\Controllers\HomeController@search_post');
+
+
 //UserSys: Người dùng hệ thống
 //--Đăng nhập
 Route::get('/dang-nhap', 'App\Http\Controllers\UserSysController@login'); ///ok

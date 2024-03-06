@@ -10,9 +10,10 @@
                 <i class="fa fa-bars"></i>
               </a>
             </li>
-            <form class="d-flex nav-search">
-              <input class="form-control me-2" type="text" placeholder="Tìm kiếm...">
-              <button class="btn btn-outline-primary" type="button"><i class="fa fa-search"></i></button>
+            <form class="d-flex nav-search" role="form" action="{{URL::to('/ket-qua-tim-kiem')}}" method="POST">
+              {{ csrf_field() }}
+              <input class="form-control me-2" type="text" name="keywords" placeholder="Tìm kiếm...">
+              <button class="btn btn-outline-primary" type="submit"><i class="fa fa-search"></i></button>
             </form>
           </ul>
           <div class="navbar-collapse justify-content-end px-0" id="navbarNav">

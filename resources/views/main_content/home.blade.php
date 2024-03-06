@@ -109,76 +109,102 @@
                 <div class="card-body p-4">
                   <div class="mb-3 mb-sm-0">
                     <h5 class="card-title fw-semibold">Lọc bài viết</h5>
-                    <form id="form">
+                    <form id="form-loc" role="form" action="{{URL::to('/loc-bai-viet')}}" method="POST">
+                    {{ csrf_field() }}
                       <div class="mb-3 mt-3">
-                        <div class="row mb-3">
-                          <div class="col-lg-4 col-md-4 col-sm-12 ">
-                            <label for="exampleDataList" class="form-label">Xếp theo:</label>
+                        <div class="row mb-3 ms-0">
+                          <div class="col-lg-4 col-md-4 col-sm-12 ps-0">
+                            <label class="form-label">Xếp theo:</label>
                           </div>
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                            <input class="form-check-input" type="checkbox" value="" name="group_loai" checked>
-                            <label class="form-check-label" for="flexCheckDefault">
+                            <input class="form-check-input" type="radio" value="hot" name="BV_SAPXEP" checked>
+                            <label class="form-check-label">
                               Nổi bật
                             </label>
                           </div>
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                            <input class="form-check-input" type="checkbox" value="" name="group_loai">
-                            <label class="form-check-label" for="flexCheckDefault">
+                            <input class="form-check-input" type="radio" value="new" name="BV_SAPXEP">
+                            <label class="form-check-label">
                               Mới nhất
                             </label>
                           </div>
                         </div>
-                        
-                        <div class="row mb-3">
-                          <div class="col-lg-4 col-md-4 col-sm-6 ">
-                            <label for="exampleDataList" class="form-label">Đính kèm:</label>
-                          </div>
+
+                        <label class="form-label">Đính kèm:</label>
+                        <div class="row mb-4 ms-0">
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                            <input class="form-check-input" type="checkbox" value="" name="group_loai" checked>
-                            <label class="form-check-label" for="flexCheckDefault">
-                              Ảnh
+                            <input class="form-check-input" type="checkbox" value="img" name="FDK_LOAI[]" checked>
+                            <label class="form-check-label">
+                              Hình ảnh
                             </label>
                           </div>
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                            <input class="form-check-input" type="checkbox" value="" name="group_loai" checked>
-                            <label class="form-check-label" for="flexCheckDefault">
-                              Pdf
+                            <input class="form-check-input" type="checkbox" value="pdf" name="FDK_LOAI[]" checked>
+                            <label class="form-check-label">
+                              PDF
                             </label>
                           </div>
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                            <input class="form-check-input" type="checkbox" value="" name="group_loai" checked>
-                            <label class="form-check-label" for="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="doc" name="FDK_LOAI[]" checked>
+                            <label class="form-check-label">
                               Word
                             </label>
                           </div>
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                            <input class="form-check-input" type="checkbox" value="" name="group_loai" checked>
-                            <label class="form-check-label" for="flexCheckDefault">
-                              Khác
+                            <input class="form-check-input" type="checkbox" value="xls" name="FDK_LOAI[]" checked>
+                            <label class="form-check-label">
+                              Excel
                             </label>
                           </div>
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                            <input class="form-check-input" type="checkbox" value="" name="group_loai">
-                            <label class="form-check-label" for="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="ppt" name="FDK_LOAI[]" checked>
+                            <label class="form-check-label">
+                              Power point
+                            </label>
+                          </div>
+                          <div class="col-lg-4 col-md-4 col-sm-6 form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="remove-all-FDK_LOAI">
+                            <label class="form-check-label">
                               Không kèm file
                             </label>
                           </div>
                         </div>
 
-                        <label for="exampleDataList" class="form-label">Hashtag đi kèm:</label>
+                        <div class="row mb-3 ms-0">
+                          <div class="col-lg-4 col-md-4 col-sm-12 ps-0">
+                            <label class="form-label">Từ khoá đi kèm:</label>
+                          </div>
+                          <div class="col-lg-4 col-md-4 col-sm-6 form-check">
+                            <input class="form-check-input" type="radio" value="phrase" name="TU_KHOA_TT" checked>
+                            <label class="form-check-label">
+                              Tìm cả cụm
+                            </label>
+                          </div>
+                          <div class="col-lg-4 col-md-4 col-sm-6 form-check">
+                            <input class="form-check-input" type="radio" value="word" name="TU_KHOA_TT">
+                            <label class="form-check-label">
+                              Tìm từng từ
+                            </label>
+                          </div>
+                          <input class="form-control" type="text" name="TU_KHOA" placeholder="Từ khoá tìm kiếm">
+                        </div>
+
+                        <label class="form-label">Hashtag đi kèm:</label>
                         <div class="mb-3">
                           <div class="output2"></div>
                           <input class="basic2" placeholder="Hashtag đính kèm" />
+                          <input type="hidden" name="hashtags2" id="hashtagsInput2" value="">
                         </div>
 
-                        <label for="exampleDataList" class="form-label">Học phần liên quan:</label>
-                        <input class="form-control" list="datalistOptions" id="exampleDataList"
-                          placeholder="Tìm kiếm học phần">
+                        <label class="form-label">Học phần liên quan:</label>
+                        <input class="form-control" list="datalistOptions" name="HP_MA" placeholder="Tìm kiếm học phần">
                         <datalist id="datalistOptions">
                           @foreach($hoc_phan as $key => $hp)
                             <option value="{{$hp->HP_MA}}">{{ $hp->HP_TEN }}</option>
                           @endforeach
                         </datalist>
+
+                        <input type="hidden" name="KT_MA" value="">
                       </div>
                       <button type="submit" class="btn btn-primary float-sm-end">Lọc</button>
                     </form>
@@ -275,7 +301,7 @@
 
   <!--XỬ LÝ HASHTAG START-->
   <script src="{{asset('public/js/tokenfield.web.js')}}"></script>
-  
+  @if($userLog)
   <script>
     //Thêm bài
     const myItems = [
@@ -377,8 +403,62 @@
       //  inputElement.removeAttribute('required');
       //}
     });*/
-  </script>
+    
+    instance.on('change', () => {
+      const selectedItems = instance.getItems();
+        var form = $('#them');
+        //|-----------------------------------------------------
+        //|XỬ LÝ HASHTAG
+        //|-----------------------------------------------------
+        var hashtagItems = [];
 
+        selectedItems.forEach(function(hashtag) {
+          if (hashtag.isNew) {} 
+          else {
+            hashtagItems.push(hashtag);
+          }
+        });
+        document.getElementById('hashtagsInput').value = JSON.stringify(hashtagItems);
+
+        //|-----------------------------------------------------
+        //|GỬI FORM
+        //|-----------------------------------------------------
+        var hashtags = form.find('input[name="hashtags"]').val();
+        var _token = $('meta[name="csrf-token"]').attr('content'); 
+        
+        $.ajax({
+          url: '{{URL::to('/goi-y-hashtag')}}',
+          type: 'POST',
+          data: {
+            hashtags: hashtags,
+            _token: _token
+          },
+          success: function(response) {
+            
+            if(response.length > 0){
+              var kqGoiY = '';
+              for (var i = 0; i < response.length && i < 10; i++) {
+                  var item = response[i];
+                  kqGoiY += '<span class="cursor-pointer add-hashtag badge bg-secondary me-1 mb-1 p-1 px-2">'+ item.hashtag + "</span>";
+              }
+
+              $('.output').html(`Gợi ý hashtag: ${kqGoiY}`);
+
+              $('.add-hashtag').on('click', function() {
+                  var hashtag = $(this).text().trim();
+                  instance.addItems({ name: hashtag });
+              });
+            }
+            else $('.output').html(``);
+          },
+          error: function(error) {
+              console.log(error);
+          }
+        });
+    });
+  </script>
+  @endif
+  
   <script>
     //Lọc bài
       const myItems2 = [
@@ -400,6 +480,7 @@
         setItems: [], // array of pre-selected items
         newItems: false,
         multiple: true,
+        maxItems: 5,
         minLength: 0,
         keys: {
           17: 'ctrl',
@@ -446,24 +527,74 @@
         validateNewItem: null
       });
 
-      /*
-      const instance = new Tokenfield({
-            el: document.querySelector('.basic'),
-            remote: {
-              type: 'GET', // GET or POST
-              url: null, // Full url.
-              queryParam: 'q', // query parameter
-              delay: 300, // delay in ms
-              timestampParam: 't',
-              params: {},
-              headers: {}
-            },
-      });*/
       // Sự kiện thay đổi trạng thái của tokenfield, hiển thị cả item lẫn
       instance2.on('change', () => {
         const selectedItems2 = instance2.getItems();
-        const outputDiv2 = document.querySelector('.output2');
-        outputDiv2.innerHTML = `Mục đã chọn: ${selectedItems2.map(item => item.name).join(', ')}`;
+          var form = $('#form-loc');
+          //|-----------------------------------------------------
+          //|XỬ LÝ HASHTAG
+          //|-----------------------------------------------------
+          var hashtagItems = [];
+
+          selectedItems2.forEach(function(hashtag) {
+            if (hashtag.isNew) {} 
+            else {
+              hashtagItems.push(hashtag);
+            }
+          });
+          document.getElementById('hashtagsInput2').value = JSON.stringify(hashtagItems);
+
+          //|-----------------------------------------------------
+          //|GỬI FORM
+          //|-----------------------------------------------------
+          var hashtags = form.find('input[name="hashtags2"]').val();
+          var _token = $('meta[name="csrf-token"]').attr('content'); 
+          
+          $.ajax({
+            url: '{{URL::to('/goi-y-hashtag')}}',
+            type: 'POST',
+            data: {
+              hashtags: hashtags,
+              _token: _token
+            },
+            success: function(response) {
+              /*Kiểm tra kết quả select
+              console.log(response); */
+
+              /*
+                var html = '<ul>';
+                response.forEach(function(item) {
+                    html += '<li>' + item.SLBV_DINHKEM  + '</li>';
+                });
+                html += '</ul>';
+                $('.output2').html(html);
+
+                var html = '';
+                $.each(response, function(index, item) {
+                    html += "Tag: " + item.hashtag + ", Number: " + item.number + "<br>";
+                });
+              */
+
+              if(response.length > 0){
+                var kqGoiY = '';
+                for (var i = 0; i < response.length && i < 10; i++) {
+                    var item = response[i];
+                    kqGoiY += '<span class="cursor-pointer add-hashtag2 badge bg-secondary me-1 mb-1 p-1 px-2">'+ item.hashtag + "</span>";
+                }
+
+                $('.output2').html(`Gợi ý hashtag: ${kqGoiY}`);
+
+                $('.add-hashtag2').on('click', function() {
+                    var hashtag = $(this).text().trim();
+                    instance2.addItems({ name: hashtag });
+                });
+              }
+              else $('.output2').html(``);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+          });
       });
   </script>
   <!--XỬ LÝ HASHTAG END-->
@@ -669,7 +800,7 @@
               var linkFile = form.find('input[name="linkFile"]').val();
               var hashtags = form.find('input[name="hashtags"]').val();
               var hashtagsNew = form.find('input[name="hashtagsNew"]').val();
-              var _token = $('input[name="_token"]').val(); 
+              var _token = $('meta[name="csrf-token"]').attr('content'); 
               /*console.log("BV_TIEUDE:", BV_TIEUDE);
               console.log("BV_NOIDUNG:", BV_NOIDUNG);
               console.log("HP_MA:", HP_MA);
@@ -914,6 +1045,30 @@
       <?php } ?>
       //|*****************************************************
       //|LƯU BÀI VIẾT END
+      //|*****************************************************
+      //|*****************************************************
+      //|LỌC BÀI VIẾT START
+      //|*****************************************************
+
+      //|-----------------------------------------------------
+      //|CHECKBOX
+      //|-----------------------------------------------------
+      $('#remove-all-FDK_LOAI').change(function() {
+          var isChecked = $(this).prop('checked');
+          if (isChecked) $('input[name="FDK_LOAI[]"]').prop('checked', false);
+
+          var anyChecked = $('input[name="FDK_LOAI[]"]:checked').length > 0;
+          if (!anyChecked) {
+            $(this).prop('checked', true);
+          }
+      });
+      $('input[name="FDK_LOAI[]"]').change(function() {
+          var anyChecked = $('input[name="FDK_LOAI[]"]:checked').length > 0;
+          if (anyChecked) $('#remove-all-FDK_LOAI').prop('checked', false);
+      });
+
+      //|*****************************************************
+      //|LỌC BÀI VIẾT END
       //|*****************************************************
     });
   </script>

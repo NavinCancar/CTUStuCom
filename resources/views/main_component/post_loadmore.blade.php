@@ -1,6 +1,6 @@
 <?php $userLog= Session::get('userLog'); ?>
 @foreach($bai_viet as $key => $bv)
-  <div class="card">
+  <div class="card card-post" data-post-id-value="{{$bv->BV_MA}}">
     <div class="card-body p-4">
       <div class="mb-3 mb-sm-0">
         <div class="pb-2">

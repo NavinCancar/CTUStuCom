@@ -14,7 +14,7 @@
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0 row">
               @foreach($subject as $key => $sb)
-                  <a href="{{URL::to('/hoc-phan/'.$sb->HP_MA)}}" class="col-lg-4 col-md-6 col-sm-6"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-4 p-2">{{$sb->HP_MA}} {{$sb->HP_TEN}}</span></a>
+                  <a href="{{URL::to('/hoc-phan/'.$sb->HP_MA)}}" class="col-lg-4 col-md-6 col-sm-6"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-4 p-2">{{$sb->HP_MA}} {{$sb->HP_TEN}}</span></a>
               @endforeach
           </div>
         </div>

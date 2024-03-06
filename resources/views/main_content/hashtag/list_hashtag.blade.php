@@ -4,7 +4,7 @@
 <!-- Content Start -->
 <div class="container-fluid">
   <div class="row">
-    <div class="col-lg-8">
+    <div class="col-lg-12">
       <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
             <h5 class="card-title fw-semibold">Hashtag</h5>
             <a class="btn btn-primary" href="{{URL::to('/hashtag-theo-doi')}}" previewlistener="true">
@@ -12,13 +12,23 @@
             </a>
       </div>
       <hr>
-
+      <div class="mb-3 mb-sm-0 pb-3">
+          <span>Hashtag nổi bật:</span>
+          <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+          <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+          <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+          <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
+          <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
+          <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
+          <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
+          <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+      </div>
       <div class="card">
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0 row">
               @foreach($hashtag as $key => $tag)
                   <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="{{URL::to('/hashtag/'.$tag->H_HASHTAG)}}"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-4 p-2 long-hashtag">#{{$tag->H_HASHTAG}}</span></a>
+                    <a href="{{URL::to('/hashtag/'.$tag->H_HASHTAG)}}"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-4 p-2 long-hashtag">#{{$tag->H_HASHTAG}}</span></a>
                     <?php if($userLog) { 
                       $isFollowHashtag = $hashtag_theodoi_noget->clone()
                       ->where("H_HASHTAG", $tag->H_HASHTAG)->exists();
@@ -78,55 +88,6 @@
           </div>
       </nav>
       <!-- Page number end-->
-    </div>
-
-    <div class="col-lg-4">
-      <div class="mb-3 mb-sm-0">
-        <h5 class="card-title fw-semibold">Gợi ý khám phá</h5>
-      </div>
-      <hr>
-      <div class="card">
-        <div class="card-body p-4">
-          <div class="mb-3 mb-sm-0">
-            <h5 class="card-title fw-semibold">Bạn tương tác nhiều nhất:</h5>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body p-4">
-          <div class="mb-3 mb-sm-0">
-            <h5 class="card-title fw-semibold">Có thể bạn muốn khám phá thêm:</h5>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-success rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-body p-4">
-          <div class="mb-3 mb-sm-0">
-            <h5 class="card-title fw-semibold">Hot nhất gần đây:</h5>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-          </div>
-        </div>
-      </div>
-      
     </div>
   </div>
 </div>

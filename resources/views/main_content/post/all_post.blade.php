@@ -678,6 +678,70 @@
                         //|*****************************************************
                         //|CẬP NHẬT HASHTAG END 
                         //|*****************************************************
+
+                        //|*****************************************************
+                        //|GỢI HASHTAG START 
+                        //|*****************************************************
+                        suggestHashtag();
+                        instance.on('change', () => {
+                            suggestHashtag();
+                        });
+
+                        function suggestHashtag(){
+                            const selectedItems = instance.getItems();
+                            var form = $('#them');
+                            //|-----------------------------------------------------
+                            //|XỬ LÝ HASHTAG
+                            //|-----------------------------------------------------
+                            var hashtagItems = [];
+
+                            selectedItems.forEach(function(hashtag) {
+                            if (hashtag.isNew) {} 
+                            else {
+                                hashtagItems.push(hashtag);
+                            }
+                            });
+                            document.getElementById('hashtagsInput').value = JSON.stringify(hashtagItems);
+
+                            //|-----------------------------------------------------
+                            //|GỬI FORM
+                            //|-----------------------------------------------------
+                            var hashtags = form.find('input[name="hashtags"]').val();
+                            var _token = $('meta[name="csrf-token"]').attr('content'); 
+                            
+                            $.ajax({
+                                url: '{{URL::to('/goi-y-hashtag')}}',
+                                type: 'POST',
+                                data: {
+                                    hashtags: hashtags,
+                                    _token: _token
+                                },
+                                success: function(response) {
+                                    
+                                    if(response.length > 0){
+                                    var kqGoiY = '';
+                                    for (var i = 0; i < response.length && i < 10; i++) {
+                                        var item = response[i];
+                                        kqGoiY += '<span class="cursor-pointer add-hashtag badge bg-secondary me-1 mb-1 p-1 px-2">'+ item.hashtag + "</span>";
+                                    }
+
+                                    $('.output').html(`Gợi ý hashtag: ${kqGoiY}`);
+
+                                    $('.add-hashtag').on('click', function() {
+                                        var hashtag = $(this).text().trim();
+                                        instance.addItems({ name: hashtag });
+                                    });
+                                    }
+                                    else $('.output').html(``);
+                                },
+                                error: function(error) {
+                                    console.log(error);
+                                }
+                            });
+                        }
+                        //|*****************************************************
+                        //|GỢI HASHTAG END 
+                        //|*****************************************************
                     },
                     error: function(error) {
                         console.log(error);

@@ -277,7 +277,7 @@
           var VT_MA = form.find('select[name="VT_MA"]').val();
           var ND_ANHDAIDIEN = form.find('input[name="ND_ANHDAIDIEN"]').val();
           var ND_MOTA = form.find('textarea[name="ND_MOTA"]').val();
-          var _token = $('input[name="_token"]').val();
+          var _token = $('meta[name="csrf-token"]').attr('content');
 
           form.find('input[name="ND_HOTEN"]').css('border-color', '');
           form.find('input[name="ND_EMAIL"]').css('border-color', '');
