@@ -79,7 +79,7 @@
                         </label>
                       </div>
                       <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="remove-all-FDK_LOAI">
+                        <input class="form-check-input" type="checkbox" value="empty" name="FDK_LOAI[]" checked>
                         <label class="form-check-label">
                           Không kèm file
                         </label>
@@ -156,21 +156,13 @@
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0">
             <h5 class="card-title fw-semibold">Bài viết</h5>
-            <a href="javascript:void(0)" class="fs-4">
-              Bán các giáo trình anh văn căn bản giá siêu rẻ
-            </a><br>
-            <a href="javascript:void(0)" class="fs-4">
-              Chuẩn bị gì khi học quân sự?
-            </a><br>
-            <a href="javascript:void(0)" class="fs-4">
-              Sơ đồ khu II
-            </a><br>
-            <a href="javascript:void(0)" class="fs-4">
-              Chào mừng tân sinh viên
-            </a><br>
-            <a href="javascript:void(0)" class="fs-4">
-              Lịch nghỉ lễ
-            </a><br>
+            @if ($bai_viet_hot->count() > 0)
+                @foreach($bai_viet_hot as $key => $bvh)
+                <a href="{{URL::to('/bai-dang/'.$bvh->BV_MA)}}" class="fs-4 d-block mb-1"><i class="fas fa-angle-double-right"></i> &ensp; {{ $bvh->BV_TIEUDE }}</a>
+                @endforeach
+            @else
+              <div class="text-cente mt-4 mb-2">Rất tiếc! Không có nội dung nổi bật để hiển thị :(</div>
+            @endif
           </div>
         </div>
       </div>
@@ -191,19 +183,30 @@
           </div>
         </div>
       </div>
+
       <div class="mb-3 mb-sm-0">
-        <h5 class="card-title fw-semibold">Khám phá bảng tin khoa/trường khác</h5>
+        <h5 class="card-title fw-semibold">Học phần nổi bật của khoa/trường</h5>
       </div>
       <hr>
       <div class="card">
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0">
-            <h5 class="card-title fw-semibold">Khoa/trường</h5>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Trường Kinh tế</span></a><br>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Khoa Khoa học tự nhiên</span></a><br>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Khoa Chính trị</span></a><br>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Khoa Luật</span></a><br>
-            <a href="javascript:void(0)"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-school"></i> Trường Bách khoa</span></a><br>
+            <h5 class="card-title fw-semibold">Học phần</h5>
+            @if ($hoc_phan_hot->count() > 0)
+                @foreach($hoc_phan_hot as $key => $hph)
+                  @if($hph->HP_MA != null)
+                    <?php
+                      $hoc_phan_tim= $hoc_phan->where('HP_MA', $hph->HP_MA)->first();
+                    ?>
+                    <a href="{{URL::to('/hoc-phan/'.$hph->HP_MA)}}" class="d-block">
+                      <span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-1"><i class="fa fa-folder"></i> {{ $hoc_phan_tim->HP_MA }} {{$hoc_phan_tim->HP_TEN}}</span>
+                    </a>
+                  @endif
+                @endforeach
+            @else
+              <div class="text-center mt-4 mb-2">Rất tiếc! Không có học phần nổi bật để hiển thị :(</div>
+            @endif
+            
           </div>
         </div>
       </div>

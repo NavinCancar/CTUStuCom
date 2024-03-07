@@ -2,14 +2,10 @@
 @section('content')
 <?php $userLog= Session::get('userLog'); ?>
     <div class="container-fluid">
-      <div class="row" style="display: none;">
+      <div class="row">
         <div class="col-lg-12">
           <div class="mb-3 mb-sm-0 d-flex">
-            <h5 class="card-title fw-semibold">Kết quả lọc bài viết<?php if($data_filter['KT_MA']) echo ': '.$data_filter['KT_TEN'].'';?></h5>
-            <!--<div id="data_filter" data-bv-sapxep="{{ $data_filter['BV_SAPXEP'] }}" data-hashtags="{{ $data_filter['hashtags'] }}" 
-            data-fdk-loai="{{ json_encode($data_filter['FDK_LOAI']) }}" data-tu-khoa-tt="{{ $data_filter['TU_KHOA_TT'] }}" 
-            data-tu-khoa="{{ $data_filter['TU_KHOA'] }}" data-hp-ma="{{ $data_filter['HP_MA'] }}" data-kt-ma="{{ $data_filter['KT_MA'] }}"></div>-->
-
+            <h5 class="card-title fw-semibold">Kết quả tìm kiếm<?php echo ': '.$keywords.'';?></h5>
           </div>
           <?php
             $alert = Session::get('alert');
@@ -52,54 +48,53 @@
                           <label class="form-label">Xếp theo:</label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="radio" value="hot" name="BV_SAPXEP" <?php if($data_filter['BV_SAPXEP'] == "hot") echo "checked" ?>>
+                          <input class="form-check-input" type="radio" value="hot" name="BV_SAPXEP" checked>
                           <label class="form-check-label">
                             Nổi bật
                           </label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="radio" value="new" name="BV_SAPXEP" <?php if($data_filter['BV_SAPXEP'] == "new") echo "checked" ?>>
+                          <input class="form-check-input" type="radio" value="new" name="BV_SAPXEP">
                           <label class="form-check-label">
                             Mới nhất
                           </label>
                         </div>
                       </div>
 
-                      <?php $FDK_LOAI = $data_filter['FDK_LOAI']; ?>
                       <label class="form-label">Đính kèm:</label>
                       <div class="row mb-4 ms-0">
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="checkbox" value="img" name="FDK_LOAI[]" <?php if (is_array($FDK_LOAI) && in_array('img', $FDK_LOAI)) echo 'checked'; ?>>
+                          <input class="form-check-input" type="checkbox" value="img" name="FDK_LOAI[]" checked>
                           <label class="form-check-label">
                             Hình ảnh
                           </label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="checkbox" value="pdf" name="FDK_LOAI[]" <?php if (is_array($FDK_LOAI) && in_array('pdf', $FDK_LOAI)) echo 'checked'; ?>>
+                          <input class="form-check-input" type="checkbox" value="pdf" name="FDK_LOAI[]" checked>
                           <label class="form-check-label">
                             PDF
                           </label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="checkbox" value="doc" name="FDK_LOAI[]" <?php if (is_array($FDK_LOAI) && in_array('doc', $FDK_LOAI)) echo 'checked'; ?>>
+                          <input class="form-check-input" type="checkbox" value="doc" name="FDK_LOAI[]" checked>
                           <label class="form-check-label">
                             Word
                           </label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="checkbox" value="xls" name="FDK_LOAI[]" <?php if (is_array($FDK_LOAI) && in_array('xls', $FDK_LOAI)) echo 'checked'; ?>>
+                          <input class="form-check-input" type="checkbox" value="xls" name="FDK_LOAI[]" checked>
                           <label class="form-check-label">
                             Excel
                           </label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="checkbox" value="ppt" name="FDK_LOAI[]" <?php if (is_array($FDK_LOAI) && in_array('ppt', $FDK_LOAI)) echo 'checked'; ?>>
+                          <input class="form-check-input" type="checkbox" value="ppt" name="FDK_LOAI[]" checked>
                           <label class="form-check-label">
                             Power point
                           </label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="checkbox" value="empty" name="FDK_LOAI[]" <?php if (is_array($FDK_LOAI) && in_array('empty', $FDK_LOAI)) echo 'checked'; ?>>
+                          <input class="form-check-input" type="checkbox" value="empty" name="FDK_LOAI[]" checked>
                           <label class="form-check-label">
                             Không kèm file
                           </label>
@@ -111,18 +106,18 @@
                           <label class="form-label">Từ khoá đi kèm:</label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="radio" value="phrase" name="TU_KHOA_TT" <?php if($data_filter['TU_KHOA_TT'] == "phrase") echo "checked" ?>>
+                          <input class="form-check-input" type="radio" value="phrase" name="TU_KHOA_TT">
                           <label class="form-check-label">
                             Tìm cả cụm
                           </label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
-                          <input class="form-check-input" type="radio" value="word" name="TU_KHOA_TT" <?php if($data_filter['TU_KHOA_TT'] == "word") echo "checked" ?>>
+                          <input class="form-check-input" type="radio" value="word" name="TU_KHOA_TT" checked>
                           <label class="form-check-label">
                             Tìm từng từ
                           </label>
                         </div>
-                        <input class="form-control" type="text" name="TU_KHOA" placeholder="Từ khoá tìm kiếm" value="<?php echo $data_filter['TU_KHOA'] ?>">
+                        <input class="form-control" type="text" name="TU_KHOA" placeholder="Từ khoá tìm kiếm" value="<?php echo $keywords ?>">
                       </div>
 
                       <label class="form-label">Hashtag đi kèm:</label>
@@ -133,14 +128,14 @@
                       </div>
 
                       <label class="form-label">Học phần liên quan:</label>
-                      <input class="form-control" list="datalistOptions" name="HP_MA" placeholder="Tìm kiếm học phần" <?php if($data_filter['HP_MA']) echo 'value="'.$data_filter['HP_MA'].'"'; ?>>
+                      <input class="form-control" list="datalistOptions" name="HP_MA" placeholder="Tìm kiếm học phần">
                       <datalist id="datalistOptions">
                         @foreach($hoc_phan as $key => $hp)
                           <option value="{{$hp->HP_MA}}">{{ $hp->HP_TEN }}</option>
                         @endforeach
                       </datalist>
 
-                      <input type="hidden" name="KT_MA" <?php if($data_filter['KT_MA']) echo 'value="'.$data_filter['KT_MA'].'"'; else echo 'value=""'?>>
+                      <input type="hidden" name="KT_MA" value="">
                     </div>
                     <button type="submit" class="btn btn-primary float-sm-end">Lọc</button>
                   </form>
@@ -164,7 +159,7 @@
       </div>
     </div>
 
-    <div class="auto-load text-center">
+    <div class="auto-load text-center" style="display: none;">
         <div class="spinner-border text-primary"></div>
     </div>
 
@@ -190,7 +185,7 @@
         addItemOnBlur: false,
         addItemsOnPaste: false,
         keepItemsOrder: true,
-        setItems: <?php if(!empty($data_filter['hashtags'])) echo $data_filter['hashtags']; else echo '[]' ?>, // array of pre-selected items
+        setItems: [], // array of pre-selected items
         newItems: false,
         multiple: true,
         maxItems: 5,
@@ -244,8 +239,6 @@
       instance2.on('change', () => {
         suggestHashtag2();
       });
-
-      <?php if(!empty($data_filter['hashtags'])) echo "suggestHashtag2();"; ?>
 
       function suggestHashtag2(){
         const selectedItems2 = instance2.getItems();
@@ -333,168 +326,32 @@
 
     $(document).ready(function() {
 
-      //|*****************************************************
-      //|LỌC BÀI VIẾT START
-      //|*****************************************************
-
-      //|*****************************************************
-      //|FILTER 6: FILE ĐÍNH KÈM START
-      //|*****************************************************
-      //BIẾN FILTER 6: FILE ĐÍNH KÈM
-      var bv_img = [];
-      var bv_pdf = [];
-      var bv_doc = [];
-      var bv_xls = [];
-      var bv_ppt = [];
-      var bv_with_file =[];
-      var filterType = <?php echo json_encode($data_filter['FDK_LOAI']) ?>;
-
-      (async () => {
-        const qfile = query(
-            collection(db, "FILE_DINH_KEM"), 
-            where('ND_NHAN_MA', '==', 0),
-            where('ND_GUI_MA', '==', 0),
-            where('BV_MA', '!=', 0),
-            where('BL_MA', '==', 0),
-            where('TN_THOIGIANGUI', '==', null)
-        );
-
-        const querySnapshotfile = await getDocs(qfile);
-
-        //ĐẨY MÃ BV CÓ FILE VÔ MẢNG PHÂN LOẠI
-        querySnapshotfile.forEach((doc) => {
-            const fileName = doc.data().FDK_TEN;
-            const fileLink = doc.data().FDK_DUONGDAN;
-            const fileExtension = fileName.split('.').pop().toLowerCase();
-
-            if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
-                if (bv_img.indexOf(doc.data().BV_MA) === -1) {
-                    bv_img.push(doc.data().BV_MA);
-                }
-            }
-            else if (['pdf'].includes(fileExtension)) {
-                if (bv_pdf.indexOf(doc.data().BV_MA) === -1) {
-                    bv_pdf.push(doc.data().BV_MA);
-                }
-            }
-            else if (['docx', 'doc'].includes(fileExtension)) {
-                if (bv_doc.indexOf(doc.data().BV_MA) === -1) {
-                    bv_doc.push(doc.data().BV_MA);
-                }
-            }
-            else if (['xlsx', 'xls'].includes(fileExtension)) {
-                if (bv_xls.indexOf(doc.data().BV_MA) === -1) {
-                    bv_xls.push(doc.data().BV_MA);
-                }
-            }
-            else if (['ppt', 'pptx'].includes(fileExtension)) {
-                if (bv_ppt.indexOf(doc.data().BV_MA) === -1) {
-                    bv_ppt.push(doc.data().BV_MA);
-                }
-            }
-        });
-
-        //ĐẨY MÃ BV CÓ FILE VÔ MẢNG CHỨA FILE
-        bv_with_file.push(...bv_img);
-        bv_with_file.push(...bv_pdf);
-        bv_with_file.push(...bv_doc);
-        bv_with_file.push(...bv_xls);
-        bv_with_file.push(...bv_ppt);
-
-        $('.card.card-post').each(function() {
-          var BV_MA = $(this).data('post-id-value');
-          //console.log(BV_MA);
-
-          if (!filterType.includes("img") && bv_img.includes(BV_MA)){
-              $(this).remove();
-          };
-          if (!filterType.includes("pdf") && bv_pdf.includes(BV_MA)){
-              $(this).remove();
-          };
-          if (!filterType.includes("doc") && bv_doc.includes(BV_MA)){
-              $(this).remove();
-          };
-          if (!filterType.includes("xls") && bv_xls.includes(BV_MA)){
-              $(this).remove();
-          };
-          if (!filterType.includes("ppt") && bv_ppt.includes(BV_MA)){
-              $(this).remove();
-          };
-          if (!filterType.includes("empty") && !bv_with_file.includes(BV_MA)){
-              $(this).remove();
-          };
-
-          if (filterType.length === 1 && filterType[0] === "empty" && bv_with_file.includes(BV_MA)){
-            //Chỉ chứa đúng 1 phần tử empty
-              $(this).remove();
-          };
-        });
-        
-
-        $('.row').show();
-        $('.auto-load').hide();
-      })().catch((error) => {
-          console.error("Error in script: ", error);
-      });
-
-      //|*****************************************************
-      //|FILTER 6: FILE ĐÍNH KÈM END
-      //|*****************************************************
-
       //|-----------------------------------------------------
       //|HIGHLIGHT
       //|-----------------------------------------------------
-      <?php if($data_filter['TU_KHOA'] != "") { ?>
+      <?php if($keywords != "") { ?>
         $('.post-title').each(function() {
-          <?php if($data_filter['TU_KHOA_TT'] == "phrase") { ?>
-
-            var txtToHighlight = $(this).text();
-            var txtToHighlight = txtToHighlight.replace(new RegExp("<?php echo $data_filter['TU_KHOA'] ?>", "gi"), '<span class="mark">$&</span>');
-            $(this).html(txtToHighlight);
-
-          <?php } ?>
-
-
-          <?php 
-            if($data_filter['TU_KHOA_TT'] == "word") { 
-              $words = explode(' ', $data_filter['TU_KHOA']); ?>
+          <?php $words = explode(' ', $keywords); ?>
               var txtToHighlight = $(this).text();
               <?php foreach ($words as $word) { ?>
           
-              var txtToHighlight = txtToHighlight.replace(new RegExp("<?php echo $word ?>", "gi"), '<span class="mark">$&</span>');
-              
-            <?php } ?>
-            $(this).html(txtToHighlight);
-          <?php } ?>
+                var txtToHighlight = txtToHighlight.replace(new RegExp("<?php echo $word ?>", "gi"), '<span class="mark">$&</span>');
+                
+              <?php } ?>
+          $(this).html(txtToHighlight);
         });
 
         $('.limited-lines').each(function() {
-          <?php if($data_filter['TU_KHOA_TT'] == "phrase") { ?>
-
+          <?php $words = explode(' ', $keywords); ?>
             var txtToHighlight = $(this).text();
-            var txtToHighlight = txtToHighlight.replace(new RegExp("<?php echo $data_filter['TU_KHOA'] ?>", "gi"), '<span class="mark">$&</span>');
-            $(this).html(txtToHighlight);
-
-          <?php } ?>
-
-          
-          <?php 
-            if($data_filter['TU_KHOA_TT'] == "word") { 
-              $words = explode(' ', $data_filter['TU_KHOA']); ?>
-              var txtToHighlight = $(this).text();
-              <?php foreach ($words as $word) { ?>
-          
+            <?php foreach ($words as $word) { ?>
+        
               var txtToHighlight = txtToHighlight.replace(new RegExp("<?php echo $word ?>", "gi"), '<span class="mark">$&</span>');
               
             <?php } ?>
-            $(this).html(txtToHighlight);
-          <?php } ?>
+          $(this).html(txtToHighlight);
         });
       <?php } ?>
-
-      //|*****************************************************
-      //|LỌC BÀI VIẾT END
-      //|*****************************************************
 
       //|*****************************************************
       //|LIKE BÀI VIẾT START
