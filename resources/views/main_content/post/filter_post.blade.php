@@ -49,7 +49,7 @@
                     <div class="mb-3 mt-3">
                       <div class="row mb-3 ms-0">
                         <div class="col-lg-4 col-md-4 col-sm-12 ps-0">
-                          <label class="form-label">Xếp theo:</label>
+                          <label class="form-label">Xếp theo</label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
                           <input class="form-check-input" type="radio" value="hot" name="BV_SAPXEP" <?php if($data_filter['BV_SAPXEP'] == "hot") echo "checked" ?>>
@@ -66,7 +66,7 @@
                       </div>
 
                       <?php $FDK_LOAI = $data_filter['FDK_LOAI']; ?>
-                      <label class="form-label">Đính kèm:</label>
+                      <label class="form-label">Đính kèm</label>
                       <div class="row mb-4 ms-0">
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
                           <input class="form-check-input" type="checkbox" value="img" name="FDK_LOAI[]" <?php if (is_array($FDK_LOAI) && in_array('img', $FDK_LOAI)) echo 'checked'; ?>>
@@ -108,7 +108,7 @@
 
                       <div class="row mb-3 ms-0">
                         <div class="col-lg-4 col-md-4 col-sm-12 ps-0">
-                          <label class="form-label">Từ khoá đi kèm:</label>
+                          <label class="form-label">Từ khoá đi kèm</label>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-6 form-check">
                           <input class="form-check-input" type="radio" value="phrase" name="TU_KHOA_TT" <?php if($data_filter['TU_KHOA_TT'] == "phrase") echo "checked" ?>>
@@ -125,14 +125,14 @@
                         <input class="form-control" type="text" name="TU_KHOA" placeholder="Từ khoá tìm kiếm" value="<?php echo $data_filter['TU_KHOA'] ?>">
                       </div>
 
-                      <label class="form-label">Hashtag đi kèm:</label>
+                      <label class="form-label">Hashtag đi kèm</label>
                       <div class="mb-3">
                         <div class="output2"></div>
                         <input class="basic2" placeholder="Hashtag đính kèm" />
                         <input type="hidden" name="hashtags2" id="hashtagsInput2" value="">
                       </div>
 
-                      <label class="form-label">Học phần liên quan:</label>
+                      <label class="form-label">Học phần liên quan</label>
                       <input class="form-control" list="datalistOptions" name="HP_MA" placeholder="Tìm kiếm học phần" <?php if($data_filter['HP_MA']) echo 'value="'.$data_filter['HP_MA'].'"'; ?>>
                       <datalist id="datalistOptions">
                         @foreach($hoc_phan as $key => $hp)
@@ -223,7 +223,7 @@
         copyDelimiter: ', ',
         placeholder: null,
         inputType: 'text',
-        minChars: 1,
+        minChars: 0,
         maxSuggest: 10,
         maxSuggestWindow: 10,
         filterSetItems: true,

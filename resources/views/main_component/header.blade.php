@@ -25,9 +25,10 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
                   <div class="message-body">
-                    <form class="d-flex m-3">
-                      <input class="form-control me-2" type="text" placeholder="Search">
-                      <button class="btn btn-outline-primary" type="button"><i class="fa fa-search"></i></button>
+                    <form class="d-flex m-3" role="form" action="{{URL::to('/ket-qua-tim-kiem')}}" method="POST">
+                      {{ csrf_field() }}
+                      <input class="form-control me-2" type="text" name="keywords" placeholder="Tìm kiếm...">
+                      <button class="btn btn-outline-primary" type="submit"><i class="fa fa-search"></i></button>
                     </form>
                   </div>
                 </div>

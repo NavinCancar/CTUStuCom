@@ -72,15 +72,44 @@ class HashtagController extends Controller
 
         $hashtag = DB::table('hashtag')->paginate(20);
 
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+
         if($userLog){
             $hashtag_theodoi_noget = DB::table('theo_doi_boi')
             ->where("ND_MA", $userLog->ND_MA);
 
-            return view('main_content.hashtag.list_hashtag')->with('hashtag', $hashtag)
-            ->with('hashtag_theodoi_noget', $hashtag_theodoi_noget);
+            $bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
+            $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
+            $nguoi_dung_not_in2 = DB::table('chan')->where('ND_BICHAN_MA', $userLog->ND_MA)->pluck('ND_CHAN_MA')->toArray();
+
+            $bai_viet_clone = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->whereNotIn('BV_MA', $bai_viet_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+        }
+        else{
+            $bai_viet_clone = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
         }
         
-        return view('main_content.hashtag.list_hashtag')->with('hashtag', $hashtag);
+        $hashtag_hot = $bai_viet_clone->clone()
+        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+        ->groupby('H_HASHTAG')
+        ->select('H_HASHTAG')->selectRaw('COUNT(*) as sl_bv')
+        ->orderby('sl_bv', 'desc')->limit(7)->get();
+        
+        if($userLog){
+            return view('main_content.hashtag.list_hashtag')
+            ->with('hashtag', $hashtag)->with('hashtag_hot', $hashtag_hot)
+            ->with('hashtag_theodoi_noget', $hashtag_theodoi_noget);
+        }
+        return view('main_content.hashtag.list_hashtag')
+        ->with('hashtag', $hashtag)->with('hashtag_hot', $hashtag_hot);
     }
 
     /**

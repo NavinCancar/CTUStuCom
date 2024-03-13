@@ -50,16 +50,16 @@
                       {{ csrf_field() }}
                       <div class="mb-3 mt-3">
                         <div class="mb-3">
-                          <label class="form-label">Tiêu đề <span class="text-danger">(*)</span>:</label>
+                          <label class="form-label">Tiêu đề <span class="text-danger">(*)</span></label>
                           <input type="text" class="form-control" placeholder="Nhập tiêu đề" id="title"  maxlength="150" name="BV_TIEUDE">
                         </div>
                         <div class="mb-3">
-                          <label class="form-label">Nội dung <span class="text-danger">(*)</span>:</label>
+                          <label class="form-label">Nội dung <span class="text-danger">(*)</span></label>
                           <textarea class="form-control" rows="5" id="comment" name="BV_NOIDUNG"
                             placeholder="Nhập nội dung" id="desc"></textarea>
                         </div>
                         <div class="mb-3">
-                          <label for="hashtag_input" class="form-label">Hashtag đính kèm <span class="text-danger">(tối đa 5 hashtag *)</span>:</label>
+                          <label for="hashtag_input" class="form-label">Hashtag đính kèm <span class="text-danger">(tối đa 5 hashtag *)</span></label>
                           <div class="output"></div>
                           <input class="basic" name="BV_HASHTAG" placeholder="Hashtag đính kèm"/>
 
@@ -68,7 +68,7 @@
                         </div>
 
                         <div class="mb-3">
-                          <label for="formFileMultiple" class="form-label">Các file đính kèm (nếu có):</label>
+                          <label for="formFileMultiple" class="form-label">Các file đính kèm (nếu có)</label>
 
                           <label for="file-input" class="ms-3 text-muted" style="cursor: pointer;">
                             <span class="btn btn-link" style="text-decoration: none;"><i class="fas fa-paperclip"></i> Thêm file</span>
@@ -82,7 +82,7 @@
                           <div  id="selected-images-container" class="m-2 mb-3 position-relative"></div>
                         </div>
 
-                        <label for="exampleDataList" class="form-label">Học phần liên quan (nếu có):</label>
+                        <label for="exampleDataList" class="form-label">Học phần liên quan (nếu có)</label>
                         <input class="form-control" list="datalistOptions" id="exampleDataList"
                           placeholder="Tìm kiếm học phần" name="HP_MA">
                         <datalist id="datalistOptions">
@@ -114,7 +114,7 @@
                       <div class="mb-3 mt-3">
                         <div class="row mb-3 ms-0">
                           <div class="col-lg-4 col-md-4 col-sm-12 ps-0">
-                            <label class="form-label">Xếp theo:</label>
+                            <label class="form-label">Xếp theo</label>
                           </div>
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
                             <input class="form-check-input" type="radio" value="hot" name="BV_SAPXEP" checked>
@@ -130,7 +130,7 @@
                           </div>
                         </div>
 
-                        <label class="form-label">Đính kèm:</label>
+                        <label class="form-label">Đính kèm</label>
                         <div class="row mb-4 ms-0">
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
                             <input class="form-check-input" type="checkbox" value="img" name="FDK_LOAI[]" checked>
@@ -172,7 +172,7 @@
 
                         <div class="row mb-3 ms-0">
                           <div class="col-lg-4 col-md-4 col-sm-12 ps-0">
-                            <label class="form-label">Từ khoá đi kèm:</label>
+                            <label class="form-label">Từ khoá đi kèm</label>
                           </div>
                           <div class="col-lg-4 col-md-4 col-sm-6 form-check">
                             <input class="form-check-input" type="radio" value="phrase" name="TU_KHOA_TT" checked>
@@ -189,14 +189,14 @@
                           <input class="form-control" type="text" name="TU_KHOA" placeholder="Từ khoá tìm kiếm">
                         </div>
 
-                        <label class="form-label">Hashtag đi kèm:</label>
+                        <label class="form-label">Hashtag đi kèm</label>
                         <div class="mb-3">
                           <div class="output2"></div>
                           <input class="basic2" placeholder="Hashtag đính kèm" />
                           <input type="hidden" name="hashtags2" id="hashtagsInput2" value="">
                         </div>
 
-                        <label class="form-label">Học phần liên quan:</label>
+                        <label class="form-label">Học phần liên quan</label>
                         <input class="form-control" list="datalistOptions" name="HP_MA" placeholder="Tìm kiếm học phần">
                         <datalist id="datalistOptions">
                           @foreach($hoc_phan as $key => $hp)
@@ -504,7 +504,7 @@
         copyDelimiter: ', ',
         placeholder: null,
         inputType: 'text',
-        minChars: 1,
+        minChars: 0,
         maxSuggest: 10,
         maxSuggestWindow: 10,
         filterSetItems: true,

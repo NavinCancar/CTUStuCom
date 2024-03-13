@@ -282,9 +282,24 @@ class PostController extends Controller
             $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
             $nguoi_dung_not_in2 = DB::table('chan')->where('ND_BICHAN_MA', $userLog->ND_MA)->pluck('ND_CHAN_MA')->toArray();
             
+
+            $co_theo_doi = DB::table('theo_doi')
+            ->where('ND_THEODOI_MA', $userLog->ND_MA)
+            ->select('ND_DUOCTHEODOI_MA');
+
+            $sap_xep_thich = DB::table('binhluan_thich')
+            ->groupBy('BL_MA')
+            ->select(DB::raw('BL_MA AS BL_MA_Connect, COUNT(*) AS total_thich'));
+
             $binh_luan_goc = DB::table('binh_luan')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->leftJoinSub($co_theo_doi, 'co_theo_doi', function ($join) {
+                $join->on('binh_luan.ND_MA', '=', 'co_theo_doi.ND_DUOCTHEODOI_MA');
+            })
+            ->leftJoinSub($sap_xep_thich, 'sap_xep_thich', function ($join) {
+                $join->on('binh_luan.BL_MA', '=', 'sap_xep_thich.BL_MA_Connect');
+            })
             ->where('binh_luan.BV_MA', '=', $bai_dang->BV_MA)
             ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
             ->where('binh_luan.BL_TRALOI_MA', '=', null)
@@ -292,7 +307,8 @@ class PostController extends Controller
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
-            ->orderBy('BL_THOIGIANTAO')->get();
+            ->select('binh_luan.*', 'nguoi_dung.*', 'vai_tro.*', DB::raw('CASE WHEN co_theo_doi.ND_DUOCTHEODOI_MA IS NOT NULL THEN 1 ELSE 0 END AS BL_THEODOI'))
+            ->orderBy('BL_THEODOI', 'desc')->orderBy('total_thich', 'desc')->orderBy('BL_THOIGIANTAO')->get();
 
             $binh_luan_traloi = DB::table('binh_luan')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')

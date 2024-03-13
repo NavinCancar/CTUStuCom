@@ -84,7 +84,7 @@ class SubjectController extends Controller
             $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
             $nguoi_dung_not_in2 = DB::table('chan')->where('ND_BICHAN_MA', $userLog->ND_MA)->pluck('ND_CHAN_MA')->toArray();
             
-            $bai_viet = DB::table('bai_viet')
+            $bai_viet_clone = DB::table('bai_viet')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
@@ -93,18 +93,26 @@ class SubjectController extends Controller
             ->whereNotIn('bai_viet.BV_MA', $bai_viet_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(5);
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
         }
         else{
-            $bai_viet = DB::table('bai_viet')
+            $bai_viet_clone = DB::table('bai_viet')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
             ->where('bai_viet.HP_MA', '=', $hoc_phan->HP_MA)
             ->orderBy('bai_viet.BV_THOIGIANDANG', 'desc')
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(5);
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
         }
         
+        $bai_viet = $bai_viet_clone->clone()->paginate(5);
+
+        $hashtag_hot = $bai_viet_clone->clone()
+        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+        ->groupby('H_HASHTAG')
+        ->select('H_HASHTAG')->selectRaw('COUNT(*) as sl_bv')
+        ->orderby('sl_bv', 'desc')->limit(7)->get();
+
         $hashtag_bai_viet = DB::table('hashtag')
         ->join('cua_bai_viet', 'cua_bai_viet.H_HASHTAG', '=', 'hashtag.H_HASHTAG')->get();
         $hoc_phan = DB::table('hoc_phan')->get();
@@ -132,7 +140,7 @@ class SubjectController extends Controller
             ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
             ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
             ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get)
-            ->with('bai_viet_luu', $bai_viet_luu)->render();
+            ->with('bai_viet_luu', $bai_viet_luu)->with('hashtag_hot', $hashtag_hot)->render();
   
             return response()->json(['html' => $view]);
         }
@@ -142,7 +150,7 @@ class SubjectController extends Controller
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
         ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
         ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get)
-        ->with('bai_viet_luu', $bai_viet_luu);
+        ->with('bai_viet_luu', $bai_viet_luu)->with('hashtag_hot', $hashtag_hot);
     }
 
     /*

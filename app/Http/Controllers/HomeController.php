@@ -61,6 +61,42 @@ class HomeController extends Controller
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+
+            $co_theo_doi = DB::table('theo_doi')
+            ->where('ND_THEODOI_MA', $userLog->ND_MA)
+            ->select('ND_DUOCTHEODOI_MA');
+
+            $chua_hashtag_theo_doi = DB::table('cua_bai_viet')
+            ->select('BV_MA', DB::raw('CASE WHEN cua_bai_viet.H_HASHTAG IN (SELECT H_HASHTAG FROM `theo_doi_boi` WHERE ND_MA = '.$userLog->ND_MA.') THEN 1 ELSE 0 END AS CBV_DIEM'));
+
+            $subquery = $chua_hashtag_theo_doi->toSql();
+
+            $sum_chua_hashtag_theo_doi = DB::table(DB::raw("($subquery) as temp_table"))
+            ->groupBy('BV_MA')
+            ->select(DB::raw('BV_MA AS BV_MA_GROUP_HASHTAG, SUM(CBV_DIEM) AS total_CBV_DIEM'));
+            
+
+            $bai_viet = $bai_viet_clone->clone()
+            ->leftJoinSub($co_theo_doi, 'co_theo_doi', function ($join) {
+                $join->on('bai_viet.ND_MA', '=', 'co_theo_doi.ND_DUOCTHEODOI_MA');
+            })
+            ->leftJoinSub($sum_chua_hashtag_theo_doi, 'hashtag_theo_doi', function ($join) {
+                $join->on('bai_viet.BV_MA', '=', 'hashtag_theo_doi.BV_MA_GROUP_HASHTAG');
+            })
+            //->select('bai_viet.*', 'nguoi_dung.*', 'vai_tro.*', DB::raw('CASE WHEN co_theo_doi.ND_DUOCTHEODOI_MA IS NOT NULL THEN 1 ELSE 0 END + IFNULL(hashtag_theo_doi.total_CBV_DIEM, 0) AS BV_DIEM'))
+            ->select('bai_viet.*', 'nguoi_dung.*', 'vai_tro.*', DB::raw('
+                CASE 
+                    WHEN bai_viet.BV_THOIGIANDANG >= NOW() - INTERVAL 7 DAY THEN 
+                        CASE WHEN co_theo_doi.ND_DUOCTHEODOI_MA IS NOT NULL THEN 1 ELSE 0 END + IFNULL(hashtag_theo_doi.total_CBV_DIEM, 0)
+                    ELSE 0
+                END AS BV_DIEM'
+            )) //Chỉ xét ưu tiên bài viết trong 7 ngày gần nhất
+            ->orderBy('BV_DIEM', 'desc')->orderBy('BV_THOIGIANDANG', 'desc')
+            ->paginate(5);
+
+            /*echo '<pre>';
+            print_r ($bai_viet);
+            echo '</pre>';*/
         }
         else{
             $bai_viet_clone = DB::table('bai_viet')
@@ -68,9 +104,11 @@ class HomeController extends Controller
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+
+            $bai_viet = $bai_viet_clone->clone()->orderBy('BV_THOIGIANDANG', 'desc')->paginate(5);
         }
 
-        $bai_viet = $bai_viet_clone->clone()->orderBy('BV_THOIGIANDANG', 'desc')->paginate(5);
+        //$bai_viet = $bai_viet_clone->clone()->orderBy('BV_THOIGIANDANG', 'desc')->paginate(5);
         
         $hashtag_bai_viet = DB::table('hashtag')
         ->join('cua_bai_viet', 'cua_bai_viet.H_HASHTAG', '=', 'hashtag.H_HASHTAG')->get();
@@ -275,6 +313,7 @@ class HomeController extends Controller
         $this->AuthLogin_ND();
         return view('main_content.archive.file_archive');
     }
+
 
     /**
      * Gợi ý hashtag
