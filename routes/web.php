@@ -35,6 +35,9 @@ Route::post('/goi-y-hashtag', 'App\Http\Controllers\HomeController@suggest_hasht
 Route::post('/loc-bai-viet', 'App\Http\Controllers\HomeController@filter_post');
 Route::post('/ket-qua-tim-kiem', 'App\Http\Controllers\HomeController@search_post');
 
+//--Thống kê
+Route::get('/thong-ke','App\Http\Controllers\HomeController@chart');
+Route::post('/thong-ke','App\Http\Controllers\HomeController@chart_time');
 
 //UserSys: Người dùng hệ thống
 //--Đăng nhập

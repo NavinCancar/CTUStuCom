@@ -260,6 +260,95 @@ class UserSysController extends Controller
         ->join('binhluan_thich', 'binhluan_thich.BL_MA', '=', 'binh_luan.BL_MA')
         ->where('binh_luan.ND_MA', $tai_khoan->ND_MA)->where('binh_luan.BL_TRANGTHAI', '!=', 'Đã xoá');
         
+
+        //Hashtag nổi bật
+        $Total_hashtag_BL = DB::table('binh_luan')
+        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'binh_luan.BV_MA')
+        ->where('binh_luan.ND_MA', $tai_khoan->ND_MA)
+        ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
+        ->whereNull('binh_luan.BL_TRALOI_MA')
+        ->groupBy('cua_bai_viet.H_HASHTAG')
+        ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) * 3 AS Total_hashtag'))
+        ->get();
+
+
+        $Total_hashtag_BLTL = DB::table('binh_luan')
+        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'binh_luan.BV_MA')
+        ->where('binh_luan.ND_MA', $tai_khoan->ND_MA)
+        ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
+        ->whereNotNull('binh_luan.BL_TRALOI_MA')
+        ->groupBy('cua_bai_viet.H_HASHTAG')
+        ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) AS Total_hashtag'))
+        ->get();
+
+
+        $Total_hashtag_BV = DB::table('bai_viet')
+        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('bai_viet.ND_MA', $tai_khoan->ND_MA)
+        ->where('bai_viet.BV_TRANGTHAI', 'Đã duyệt')
+        ->groupBy('cua_bai_viet.H_HASHTAG')
+        ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) * 6 AS Total_hashtag'))
+        ->get();
+
+
+        //Tổng kết quả
+        $Total_hashtag_result = $Total_hashtag_BV->map(function ($item) {
+            return [
+                'hashtag' => $item->H_HASHTAG,
+                'Total_hashtag' => $item->Total_hashtag
+            ];
+        })->toArray();
+
+        foreach ($Total_hashtag_BL as $item) {
+            $hashtag = $item->H_HASHTAG;
+            $Total_hashtag_item = $item->Total_hashtag;
+            
+            // Kiểm tra xem hashtag đã tồn tại chưa
+            $index = array_search($hashtag, array_column($Total_hashtag_result, 'hashtag'));
+        
+            if ($index !== false) { //Tồn tại
+                $Total_hashtag_result[$index]["Total_hashtag"] += $Total_hashtag_item;
+            } else { //Không tồn tại
+                $Total_hashtag_result[] = [
+                    'hashtag' => $hashtag,
+                    'Total_hashtag' => $Total_hashtag_item
+                ];
+            }
+        }
+
+        foreach ($Total_hashtag_BLTL as $item) {
+            $hashtag = $item->H_HASHTAG;
+            $Total_hashtag_item = $item->Total_hashtag;
+            
+            // Kiểm tra xem hashtag đã tồn tại chưa
+            $index = array_search($hashtag, array_column($Total_hashtag_result, 'hashtag'));
+        
+            if ($index !== false) { //Tồn tại
+                $Total_hashtag_result[$index]["Total_hashtag"] += $Total_hashtag_item;
+            } else { //Không tồn tại
+                $Total_hashtag_result[] = [
+                    'hashtag' => $hashtag,
+                    'Total_hashtag' => $Total_hashtag_item
+                ];
+            }
+        }
+
+        usort($Total_hashtag_result, function($a, $b) {
+            return $b['Total_hashtag'] - $a['Total_hashtag'];
+        });
+
+        $total_hashtag = array_slice($Total_hashtag_result, 0, 7);
+
+        /*echo '<pre>';
+        print_r ($Total_hashtag);
+        print_r ("-------BV------");
+        print_r ($Total_hashtag_BV);
+        print_r ("-------BL------");
+        print_r ($Total_hashtag_BL);
+        print_r ("-------BLTL------");
+        print_r ($Total_hashtag_BLTL);
+        echo '</pre>';*/
+
         return view('main_content.user.show_user')
         ->with('account_info', $account_info)->with('college', $college)
         ->with('checkBlockND', $checkBlockND)->with('checkBlockND2', $checkBlockND2)->with('checkBlockND3', $checkBlockND3)
@@ -267,7 +356,8 @@ class UserSysController extends Controller
         ->with('nguoi_theo_doi_no_get', $nguoi_theo_doi_no_get)->with('nguoi_bi_chan_no_get', $nguoi_bi_chan_no_get)
         ->with('bai_viet_count', $bai_viet_count)->with('bai_viet', $bai_viet)
         ->with('binh_luan_count', $binh_luan_count)->with('binh_luan', $binh_luan)
-        ->with('binh_luan_no_get', $binh_luan_no_get)->with('binh_luan_thich_no_get', $binh_luan_thich_no_get);
+        ->with('binh_luan_no_get', $binh_luan_no_get)->with('binh_luan_thich_no_get', $binh_luan_thich_no_get)
+        ->with('total_hashtag', $total_hashtag);
     }
 
     /**

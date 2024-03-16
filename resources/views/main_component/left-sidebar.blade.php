@@ -99,7 +99,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="javascript:void(0)" aria-expanded="false">
+              <a class="sidebar-link" href="{{URL::to('/thong-ke')}}" aria-expanded="false">
                 <span>
                   <i class="fas fa-chart-bar"></i>
                 </span>

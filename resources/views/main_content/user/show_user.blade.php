@@ -24,7 +24,7 @@
                                 class="rounded-circle border border-light border-5">
                         </div>
                         <div class="col-lg-10 d-flex justify-content-center align-items-center">
-                            <div class="card m-3">
+                            <div class="card m-3 w-100">
                                 <div class="card-body p-4">
                                     <h4 class="fw-bold">{{$info->ND_HOTEN}}
                                     @if($info->VT_MA != 3)
@@ -59,15 +59,17 @@
                                         @endif
                                     
                                         <div class="mt-3 mb-sm-0">
-                                            <span>Đóng góp nhiều cho các nội dung:</span>
-                                            <a href="javascript:void(0)"><span class="badge bg-info rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-                                            <a href="javascript:void(0)"><span class="badge bg-info rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-                                            <a href="javascript:void(0)"><span class="badge bg-info rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-                                            <a href="javascript:void(0)"><span class="badge bg-info rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-                                            <a href="javascript:void(0)"><span class="badge bg-info rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
-                                            <a href="javascript:void(0)"><span class="badge bg-info rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-                                            <a href="javascript:void(0)"><span class="badge bg-info rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-                                            <a href="javascript:void(0)"><span class="badge bg-info rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
+                                            <?php
+                                                if (!empty($total_hashtag)) {
+                                                    echo '<span>Đóng góp nhiều cho các nội dung: </span>';
+                                                    foreach ($total_hashtag as $item) {
+                                                        $hashtag = $item["hashtag"];
+                                                        $total = $item["Total_hashtag"];
+                                                        
+                                                        echo '<a href='.URL::to('/hashtag/'.$hashtag).'><span class="badge bg-info rounded-3 fw-semibold me-1 mb-1">#'.$hashtag.'</span></a>';
+                                                    }
+                                                }
+                                            ?>
                                         </div>
                                     </div>
                                 </div>
