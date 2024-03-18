@@ -196,7 +196,7 @@
               <div class="card" id="form-comment1">
                   <div class="card-body p-3">
                       <div class="list-unstyled mb-0 p-2 reply-comment-card">
-                          <div class="d-flex flex-row pb-3 pt-1" data-comment-id-value="{{$blg->BL_MA}}">
+                          <div class="d-flex flex-row pb-3 pt-1 bl-frame" data-comment-id-value="{{$blg->BL_MA}}">
                               <div>
                                 <a href="{{URL::to('/tai-khoan/'.$blg->ND_MA)}}" class="text-body">
                                   <img src="<?php if($blg->ND_ANHDAIDIEN) echo $blg->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" alt="" 
@@ -205,7 +205,7 @@
                               </div>
                               <div class="pt-1" style="width:100%">
                                   <div class="dropdown">
-                                      <a href="{{URL::to('/tai-khoan/'.$blg->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0">{{$blg->ND_HOTEN}}</span></a>
+                                      <a href="{{URL::to('/tai-khoan/'.$blg->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0 bl-ten-nd" data-user-id-value="{{$blg->ND_MA}}">{{$blg->ND_HOTEN}}</span></a>
                                       @if($blg->VT_MA != 3)
                                         <span class="badge-sm bg-warning rounded-pill"><i>{{$blg->VT_TEN}}</i></span>
                                       @endif
@@ -280,10 +280,22 @@
                               </div>
                           </div>
 
+                          <?php
+                              $repCommentArray = array();
+                              $repCommentArray[] = array("BL_MA" => $blg->BL_MA, "ND_MA" => $blg->ND_MA, "ND_HOTEN" => $blg->ND_HOTEN);
+                              //print_r($repCommentArray);
+                          ?>
+
                           <!-- Rep Comment -->
                           @foreach($binh_luan_traloi as $key => $bltl)
-                            @if($bltl->BL_TRALOI_MA == $blg->BL_MA)
-                              <div class="d-flex flex-row ms-5 pb-1 pt-3" data-comment-id-value="{{$bltl->BL_MA}}">
+                            <?php
+                              $index = false;
+                              $repCommentIndex = array_column($repCommentArray, 'BL_MA');
+                              $index = array_search($bltl->BL_TRALOI_MA, $repCommentIndex); //echo $index;
+                              //if ($index !== false) print_r($repCommentArray[$index]["ND_MA"]);
+                            ?>
+                            @if(($bltl->BL_TRALOI_MA == $blg->BL_MA && $index !== false) || ($index !== false))
+                              <div class="d-flex flex-row ms-5 pb-1 pt-3 bl-frame" data-comment-id-value="{{$bltl->BL_MA}}">
                                   <div>
                                     <a href="{{URL::to('/tai-khoan/'.$bltl->ND_MA)}}" class="text-body">
                                       <img src="<?php if($bltl->ND_ANHDAIDIEN) echo $bltl->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>" alt="" 
@@ -292,7 +304,7 @@
                                   </div>
                                   <div class="pt-1" style="width:100%">
                                       <div class="dropdown">
-                                          <a href="{{URL::to('/tai-khoan/'.$bltl->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0">{{$bltl->ND_HOTEN}}</span></a>
+                                          <a href="{{URL::to('/tai-khoan/'.$bltl->ND_MA)}}" class="text-muted"><span class="fw-bold mb-0 bl-ten-nd" data-user-id-value="{{$bltl->ND_MA}}">{{$bltl->ND_HOTEN}}</span></a>
                                           @if($bltl->VT_MA != 3)
                                             <span class="badge-sm bg-warning rounded-pill"><i>{{$bltl->VT_TEN}}</i></span>
                                           @endif
@@ -306,6 +318,12 @@
                                           </ul>
                                           @endif
                                       </div>
+                                      
+                                      @if ($repCommentArray[$index]["ND_MA"] != $bltl->ND_MA)
+                                        <a href="{{URL::to('/tai-khoan/'.$repCommentArray[$index]['ND_MA'])}}" class="bg-light">
+                                          <i>@ {{$repCommentArray[$index]["ND_HOTEN"]}}</i>
+                                        </a> &nbsp;
+                                      @endif
                                       <span class="text-muted">{!! nl2br(e($bltl->BL_NOIDUNG)) !!}</span>
 
                                       <!-- Images Container -->
@@ -340,6 +358,9 @@
                                                 if($count_bl_thich1) echo $count_bl_thich1; else echo 0;
                                               ?>
                                             </b>
+                                            <a class="ms-3 text-muted reply-comment-btn cursor-pointer" data-comment-id-value="{{$bltl->BL_MA}}">
+                                              <i class="fas fa-reply"></i> Trả lời
+                                            </a>
                                             <a class="ms-3 cursor-pointer text-muted <?php 
                                               if($userLog){
                                                   $check_bl_luu = $binh_luan_luu_no_get->clone()
@@ -356,6 +377,8 @@
                                       </div>
                                   </div>
                               </div>
+
+                              <?php $repCommentArray[] = array("BL_MA" => $bltl->BL_MA, "ND_MA" => $bltl->ND_MA, "ND_HOTEN" => $bltl->ND_HOTEN); ?>
                             @endif
                           @endforeach
 
@@ -1740,11 +1763,17 @@
               //Chỉ 1 form rep comment tồn tại
               $( "#divdata-unique" ).remove();
 
+              var ma_nd_tl = $(this).closest('.bl-frame').find('.bl-ten-nd').attr('data-user-id-value');
+              var ten_nd_tl = $(this).closest('.bl-frame').find('.bl-ten-nd').html();
+              var tl = '';
+              if(ma_nd_tl != <?php echo $userLog->ND_MA ?>) tl = `<i class="ps-3">Trả lời bình luận của <b>@ `+ten_nd_tl+`</b></i>`;
+              else tl = `<i class="ps-3">Trả lời bình luận của <b>chính bạn</b></i>`;
+
               var dataValue = $(this).attr('data-comment-id-value');
               var closestReplyComment = $(this).closest('.reply-comment-card')[0];
-              var divData = 
-                      `<div id="divdata-unique" tabindex="0" class="ms-5 pb-1 pt-3">`+
-                      `<form id="reply-form1" class="text-muted d-flex justify-content-start align-items-center pe-3 mt-3">`+
+              var divData =
+                      `<div id="divdata-unique" tabindex="0" class="ms-5 pb-1 pt-3 mt-1">`+ tl +
+                      `<form id="reply-form1" class="text-muted d-flex justify-content-start align-items-center pe-3 mt-2">`+
                       `    {{ csrf_field() }}`+
                       `    <textarea name="BL_NOIDUNG1" class="form-control border-secondary ms-3" placeholder="Nhập bình luận" rows="2" style="resize: none;"></textarea>`+
                       `    <label for="file-input1" class="ms-3 text-muted" style="cursor: pointer;">`+
