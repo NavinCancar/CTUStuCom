@@ -30,8 +30,7 @@
                         <div class="mb-3 mb-sm-0">
                             <h2 class="card-title fw-semibold text-center fs-6">THỐNG KÊ THEO THỜI GIAN</h2>
                             <div class="panel-body">
-                                <form role="form" action="{{URL::to('/thong-ke')}}" method="POST">
-                                    {{ csrf_field() }}
+                                <form role="form" action="{{URL::to('/thong-ke')}}" method="GET">
                                     <div class="form-group row pt-4 align-items-center">
                                         <div class="col-sm-2 align-items-center pb-2"><label>Theo thời gian:</label></div>
                                         <div class="col-sm-4 d-flex d-block align-items-center justify-content-between pb-2">
@@ -50,6 +49,32 @@
                     </div>
                 </div>
 
+                <div class="d-block">
+                    <?php 
+                        $maxDate = (new DateTime($now))->format('Y-m-d H');
+
+
+                        $today = (new DateTime($now))->format('Y-m-d'); 
+                        echo '<a class="btn btn-primary btn-sm me-2 mb-3" href="'.URL::to('/thong-ke').'?TGBDau='.$today.'&TGKThuc='.$today.'">Hôm nay</a>';
+
+                        $yesterday = (new DateTime($today))->modify('-1 day')->format('Y-m-d');
+                        echo '<a class="btn btn-primary btn-sm me-2 mb-3" href="'.URL::to('/thong-ke').'?TGBDau='.$yesterday.'&TGKThuc='.$yesterday.'">Hôm qua</a>';
+
+                        $last7days = (new DateTime($today))->modify('-7 day')->format('Y-m-d');
+                        echo '<a class="btn btn-primary btn-sm me-2 mb-3" href="'.URL::to('/thong-ke').'?TGBDau='.$last7days.'&TGKThuc='.$today.'">7 ngày qua</a>';
+
+                        //$lastmonth = (new DateTime($today))->modify('-1 month')->format('Y-m-d');
+                        $thismonthfirstday = (new DateTime($today))->modify('first day of this month')->format('Y-m-d');
+                        $lastmonthfirstday = (new DateTime($today))->modify('first day of last month')->format('Y-m-d');
+                        $lastmonthlastday = (new DateTime($today))->modify('last day of last month')->format('Y-m-d');
+                        echo '<a class="btn btn-primary btn-sm me-2 mb-3" href="'.URL::to('/thong-ke').'?TGBDau='.$thismonthfirstday.'&TGKThuc='.$today.'">Tháng này</a>';
+                        echo '<a class="btn btn-primary btn-sm me-2 mb-3" href="'.URL::to('/thong-ke').'?TGBDau='.$lastmonthfirstday.'&TGKThuc='.$lastmonthlastday.'">Tháng trước</a>';
+
+                        /*$last3month = (new DateTime($today))->modify('-3 month')->format('Y-m-d');
+                        $last3monthfirstday = (new DateTime($today))->modify('-3 month')->modify('first day of this month')->format('Y-m-d');
+                        echo '<a class="btn btn-primary btn-sm me-2 mb-3" href="'.URL::to('/thong-ke').'?TGBDau='.$last3monthfirstday.'&TGKThuc='.$lastmonthlastday.'">3 tháng trước</a>';*/
+                    ?>
+                </div>
 
                 <div class="card">
                     <div class="card-body p-4">
@@ -102,7 +127,7 @@
     const chartActivity = document.getElementById('chartActivity');
 
     const dataActivity = {
-        labels: ["<?php echo date('Y-m-d H:i:s', strtotime($TGBDau)) ?>", "<?php echo date('Y-m-d H:i:s', strtotime($TGKThuc)) ?>"],
+        labels: ["<?php echo date('Y-m-d H:i:s', strtotime($TGBDau)) ?>", "<?php if($now > $TGKThuc) echo date('Y-m-d H:i:s', strtotime($TGKThuc)); else echo date('Y-m-d H:i:s', strtotime($now)); ?>"],
         datasets: [
             {
                 label: 'Bài viết mới',
@@ -120,6 +145,8 @@
                             if (!$found) {
                                 echo '{ x: "'.$date.'", y: "0" },';
                             }
+
+                            if ($date == $maxDate) break;
                         }
                     ?>
                 ],
@@ -146,6 +173,8 @@
                             if (!$found) {
                                 echo '{ x: "'.$date.'", y: "0" },';
                             }
+
+                            if ($date == $maxDate) break;
                         }
                     ?>
                 ],
@@ -313,6 +342,8 @@
         },
     });
 
+    <?php if (empty($total_hashtag)) echo "$('#chartHashtag').closest('div').html(`<p class='text-center pt-5 pb-5'>Không có hashtag nào được tương tác trong khoảng thời gian này!</p>`);" ?>
+
     //|-----------------------------------------------------
     //|THỐNG KÊ NGƯỜI DÙNG MỚI
     //|-----------------------------------------------------
@@ -324,8 +355,8 @@
             labels: [
                 <?php 
                     if($minUnit == "gio") {
-                        echo '"'.$ndm->thoi_diem.'", '; 
-                        $endDate = $ndm->thoi_diem;
+                        echo '"'.date('Y-m-d', strtotime($TGBDau)).'", '; 
+                        $endDate = date('Y-m-d', strtotime($TGBDau));
                     } 
                     else { 
                         foreach ($allDates as $date) { 
@@ -341,7 +372,9 @@
                 label: 'Số lượng người dùng mới',
                 data: [
                     <?php
-                        if($minUnit == "gio") echo $ndm->so_luong;
+                        if($minUnit == "gio") {
+                            if(!is_null($ndm)) echo $ndm->so_luong; else echo '0';
+                        }
                         else{
                             foreach ($allDates as $date) {
                                 $found = false;

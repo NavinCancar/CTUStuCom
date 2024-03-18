@@ -146,6 +146,22 @@
                 </small>
             </div>
             
+            <?php
+                $add = '';
+                if (isset($_GET['trang-thai'])) {
+                    $geturl = $_GET['trang-thai'];
+                    
+                    if ($geturl == 'dang-hien-thi') $add = '&trang-thai=dang-hien-thi';
+                    else if ($geturl == 'vi-pham-tieu-chuan') $add = '&trang-thai=vi-pham-tieu-chuan';
+                    else if ($geturl == 'da-xoa') $add = '&trang-thai=da-xoa';
+                }
+                else if (isset($_GET['bao-cao'])) {
+                    $geturl = $_GET['bao-cao'];
+                    
+                    if ($geturl == 'nhieu-nhat') $add = '&bao-cao=nhieu-nhat';
+                    else if ($geturl == 'gan-nhat') $add = '&bao-cao=gan-nhat';
+                }
+            ?>
             <nav aria-label="Page navigation">
                 <div class="text-center d-flex justify-content-center mt-3">
                     <ul class="pagination pagination-sm m-t-none m-b-none ">
@@ -154,18 +170,18 @@
                             <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-left"></i></a></li>
                         @else
                             <li class="page-item">
-                                <a class="page-link" href="{{ $binh_luan->previousPageUrl() }}"><i class="fas fa-angle-left"></i></a>
+                                <a class="page-link" href="{{ $binh_luan->previousPageUrl().$add }}"><i class="fas fa-angle-left"></i></a>
                             </li>
                         @endif
                         {{-- Pagination Elements --}}
                         @for ($key=0; $key+1<=$binh_luan->lastPage(); $key++)
                                 @if ($binh_luan->currentPage() === $key + 1)
                                     <li class="page-item active">
-                                        <a class="page-link" href="{{ $binh_luan->url($key + 1) }}">{{ $key + 1 }}</a>
+                                        <a class="page-link" href="{{ $binh_luan->url($key + 1).$add }}">{{ $key + 1 }}</a>
                                     </li>
                                 @else
                                     <li class="page-item">
-                                        <a class="page-link" href="{{ $binh_luan->url($key + 1) }}">{{ $key + 1 }}</a>
+                                        <a class="page-link" href="{{ $binh_luan->url($key + 1).$add }}">{{ $key + 1 }}</a>
                                     </li>
                                 @endif
                         @endfor
@@ -173,7 +189,7 @@
                         {{-- Next Page Link --}}
                         @if ($binh_luan->hasMorePages())
                             <li class="page-item">
-                                <a class="page-link" href="{{ $binh_luan->nextPageUrl() }}"><i class="fas fa-angle-right"></i></a>
+                                <a class="page-link" href="{{ $binh_luan->nextPageUrl().$add }}"><i class="fas fa-angle-right"></i></a>
                             </li>
                         @else
                             <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-right"></i></a></li>

@@ -49,12 +49,12 @@
                         <div>
                             @if($isInactive)
                                 <div class="text-muted pe-3 pt-4 mt-2 text-center"><hr><i>Người dùng này đã vô hiệu hoá tài khoản!</i></div>
-                            @elseif($isBlock)
+                            @elseif($isBlock && $userLog->VT_MA!=1)
                                 <div class="text-muted pe-3 pt-4 mt-2 text-center"><hr>
                                     <i>Bạn đã chặn người dùng này!</i>
                                     <button class="btn btn-muted ms-2 unblock btn-sm" data-user-id-value="<?php echo $userChat->ND_MA;?>" type="button"><i class="fas fa-ban"></i> Bỏ chặn</button>
                                 </div>
-                            @elseif($isBlocked)
+                            @elseif($isBlocked && $userLog->VT_MA!=1)
                                 <div class="text-muted pe-3 pt-4 mt-2 text-center"><hr><i>Bạn đã bị chặn khỏi cuộc trò chuyện!</i></div>
                             @else
                             <form id="message-form" class="text-muted d-flex justify-content-start align-items-center pe-3 pt-3 mt-2">

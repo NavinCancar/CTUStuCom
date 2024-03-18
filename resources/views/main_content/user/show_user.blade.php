@@ -3,7 +3,7 @@
 <?php $userLog= Session::get('userLog'); ?>
     <!-- Content Start -->
     @foreach($account_info as $key => $info)
-        @if(!$checkBlockND && !$checkBlockND2 && !$checkBlockND3)
+        @if(($userLog && $userLog->VT_MA==1) || (!$checkBlockND && !$checkBlockND2 && !$checkBlockND3))
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12">

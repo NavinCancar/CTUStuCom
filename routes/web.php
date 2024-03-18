@@ -37,7 +37,6 @@ Route::post('/ket-qua-tim-kiem', 'App\Http\Controllers\HomeController@search_pos
 
 //--Thống kê
 Route::get('/thong-ke','App\Http\Controllers\HomeController@chart');
-Route::post('/thong-ke','App\Http\Controllers\HomeController@chart_time');
 
 //UserSys: Người dùng hệ thống
 //--Đăng nhập

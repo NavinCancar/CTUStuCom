@@ -708,7 +708,41 @@ class UserSysController extends Controller
         $all_user = DB::table('nguoi_dung')
         ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
         ->orderby('ND_MA')->paginate(10);
-        return view('main_content.user.all_user')->with('all_user', $all_user);
+
+        $all_vaitro = DB::table('vai_tro')->get();
+
+        //-----------------------------------------------------------------
+        //VAI TRÒ: http://localhost/ctustucom/tai-khoan?vai-tro={vai-tro}
+        $filterRole = request()->query('vai-tro');
+        if($filterRole) {
+            $state = '';
+            if($filterRole == 'quan-tri-vien') $state = 1;
+            else if($filterRole == 'kiem-duyet-vien') $state = 2;
+            else if($filterRole == 'nguoi-dung-thanh-vien') $state = 3;
+
+            $all_user = DB::table('nguoi_dung')
+            ->where('nguoi_dung.VT_MA', $state)
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->orderby('ND_MA')->paginate(10);
+        }
+        $filterRole = null;
+
+        //TRẠNG THÁI: http://localhost/ctustucom/tai-khoan?trang-thai={trang-thai}
+        $filterState = request()->query('trang-thai');
+        if($filterState) {
+            $state = '';
+            if($filterState == 'hoat-dong') $state = 1;
+            else if($filterState == 'vo-hieu-hoa') $state = 0;
+
+            $all_user = DB::table('nguoi_dung')
+            ->where('ND_TRANGTHAI', $state)
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->orderby('ND_MA')->paginate(10);
+        }
+        $filterState = null;
+
+        return view('main_content.user.all_user')
+        ->with('all_user', $all_user)->with('all_vaitro', $all_vaitro);
     }
 
 }

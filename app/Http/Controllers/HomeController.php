@@ -713,143 +713,25 @@ class HomeController extends Controller
     /**
      * Thống kê (***)
      */
+
     public function chart(){ ///
-        $this->AuthLogin_QTV();
-
-        $TGBDau = Carbon::now('Asia/Ho_Chi_Minh')->subMonths(1)->startOfDay();
-        $TGKThuc = Carbon::now('Asia/Ho_Chi_Minh')->endOfDay();
-        $minUnit = "ngay";
-
-        
-        //NGÀY THÁNG NĂM (trong 30 ngày)
-        // Tạo mảng ngày
-        $allDates = [];
-        $currentDate = strtotime($TGBDau);
-        $endDate = strtotime($TGKThuc);
-        while ($currentDate <= $endDate) {
-            $allDates[] = date('Y-m-d', $currentDate);
-            $currentDate = strtotime('+1 day', $currentDate); // Tăng thêm 1 ngày
-        }
-
-        $tt_bv = DB::table('bai_viet')
-        ->whereBetween('BV_THOIGIANTAO', [$TGBDau, $TGKThuc])
-        ->groupBy('thoi_diem')->orderBy('thoi_diem')
-        ->select(
-            DB::raw('DATE_FORMAT(BV_THOIGIANTAO, "%Y-%m-%d") as thoi_diem'),
-            DB::raw('COUNT(*) as so_luong')
-        )
-        ->get();
-
-        $tt_bl = DB::table('binh_luan')
-        ->whereBetween('BL_THOIGIANTAO', [$TGBDau, $TGKThuc])
-        ->groupBy('thoi_diem')->orderBy('thoi_diem')
-        ->select(
-            DB::raw('DATE_FORMAT(BL_THOIGIANTAO, "%Y-%m-%d") as thoi_diem'),
-            DB::raw('COUNT(*) as so_luong')
-        )
-        ->get();
-
-        $ndm = DB::table('nguoi_dung')
-        ->whereBetween('ND_NGAYTHAMGIA', [$TGBDau, $TGKThuc])
-        ->groupBy('thoi_diem')->orderBy('thoi_diem')
-        ->select(
-            DB::raw('DATE_FORMAT(ND_NGAYTHAMGIA, "%Y-%m-%d") as thoi_diem'),
-            DB::raw('COUNT(*) as so_luong')
-        )
-        ->get();
-        
-
-
-        //Hashtag nổi bật
-        $Total_hashtag_BL = DB::table('binh_luan')
-        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'binh_luan.BV_MA')
-        ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
-        ->whereBetween('BL_THOIGIANTAO', [$TGBDau, $TGKThuc])
-        ->whereNull('binh_luan.BL_TRALOI_MA')
-        ->groupBy('cua_bai_viet.H_HASHTAG')
-        ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) * 3 AS Total_hashtag'))
-        ->get();
-        $Total_hashtag_BLTL = DB::table('binh_luan')
-        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'binh_luan.BV_MA')
-        ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
-        ->whereBetween('BL_THOIGIANTAO', [$TGBDau, $TGKThuc])
-        ->whereNotNull('binh_luan.BL_TRALOI_MA')
-        ->groupBy('cua_bai_viet.H_HASHTAG')
-        ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) AS Total_hashtag'))
-        ->get();
-
-
-        $Total_hashtag_BV = DB::table('bai_viet')
-        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
-        ->where('bai_viet.BV_TRANGTHAI', 'Đã duyệt')
-        ->whereBetween('BV_THOIGIANTAO', [$TGBDau, $TGKThuc])
-        ->groupBy('cua_bai_viet.H_HASHTAG')
-        ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) * 6 AS Total_hashtag'))
-        ->get();
-
-        //Tổng kết quả
-        $Total_hashtag_result = $Total_hashtag_BV->map(function ($item) {
-            return [
-                'hashtag' => $item->H_HASHTAG,
-                'Total_hashtag' => $item->Total_hashtag
-            ];
-        })->toArray();
-
-        foreach ($Total_hashtag_BL as $item) {
-            $hashtag = $item->H_HASHTAG;
-            $Total_hashtag_item = $item->Total_hashtag;
-            
-            // Kiểm tra xem hashtag đã tồn tại chưa
-            $index = array_search($hashtag, array_column($Total_hashtag_result, 'hashtag'));
-        
-            if ($index !== false) { //Tồn tại
-                $Total_hashtag_result[$index]["Total_hashtag"] += $Total_hashtag_item;
-            } else { //Không tồn tại
-                $Total_hashtag_result[] = [
-                    'hashtag' => $hashtag,
-                    'Total_hashtag' => $Total_hashtag_item
-                ];
-            }
-        }
-        foreach ($Total_hashtag_BLTL as $item) {
-            $hashtag = $item->H_HASHTAG;
-            $Total_hashtag_item = $item->Total_hashtag;
-            
-            // Kiểm tra xem hashtag đã tồn tại chưa
-            $index = array_search($hashtag, array_column($Total_hashtag_result, 'hashtag'));
-        
-            if ($index !== false) { //Tồn tại
-                $Total_hashtag_result[$index]["Total_hashtag"] += $Total_hashtag_item;
-            } else { //Không tồn tại
-                $Total_hashtag_result[] = [
-                    'hashtag' => $hashtag,
-                    'Total_hashtag' => $Total_hashtag_item
-                ];
-            }
-        }
-
-        usort($Total_hashtag_result, function($a, $b) {
-            return $b['Total_hashtag'] - $a['Total_hashtag'];
-        });
-
-
-        return view('main_content.chart')
-        ->with('minUnit', $minUnit)->with('allDates', $allDates)
-        ->with('TGBDau', $TGBDau)->with('TGKThuc', $TGKThuc)
-        ->with('tt_bv', $tt_bv)->with('tt_bl', $tt_bl)
-        ->with('ndm', $ndm)->with('total_hashtag', $Total_hashtag_result);
-    }
-
-    public function chart_time(Request $request){ ///
         $this->AuthLogin_QTV();
 
         //$TGBDau = $request->TGBDau;
         //$TGKThuc = $request->TGKThuc;
 
-        $TGBDau = date('Y-m-d 00:00:00', strtotime($request->TGBDau));
-        $TGKThuc = date('Y-m-d 23:59:59', strtotime($request->TGKThuc));
+        //http://localhost/ctustucom/thong-ke?TGBDau=2024-02-17&TGKThuc=2024-03-17
+        if(request()->query('TGBDau') && request()->query('TGKThuc')){
+            $TGBDau = date('Y-m-d 00:00:00', strtotime(request()->query('TGBDau')));
+            $TGKThuc = date('Y-m-d 23:59:59', strtotime(request()->query('TGKThuc')));
+        }
+        else{
+            $TGBDau = Carbon::now('Asia/Ho_Chi_Minh')->subMonths(1)->startOfDay();
+            $TGKThuc = Carbon::now('Asia/Ho_Chi_Minh')->endOfDay();
+        }
 
-        $homnay=Carbon::now('Asia/Ho_Chi_Minh')->endOfDay();
+        $homnay = Carbon::now('Asia/Ho_Chi_Minh')->endOfDay();
+        $now = Carbon::now('Asia/Ho_Chi_Minh');
 
         if ($TGBDau && $TGKThuc && $TGBDau <= $TGKThuc && $TGKThuc <= $homnay){
 
@@ -1059,7 +941,7 @@ class HomeController extends Controller
             print_r ($minUnit);
             echo '</pre>';*/
             
-            return view('main_content.chart')
+            return view('main_content.chart')->with('now', $now)
             ->with('minUnit', $minUnit)->with('allDates', $allDates)
             ->with('TGBDau', $TGBDau)->with('TGKThuc', $TGKThuc)
             ->with('tt_bv', $tt_bv)->with('tt_bl', $tt_bl)

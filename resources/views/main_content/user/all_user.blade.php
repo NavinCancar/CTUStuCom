@@ -7,9 +7,9 @@
         <div class="col-lg-12">
             <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
             <h5 class="card-title fw-semibold">Quản lý tài khoản người dùng</h5>
-            <a class="btn btn-primary" href="javascript:void(0)">
+            <!--<a class="btn btn-primary" href="javascript:void(0)">
                 <i class="fas fa-user"></i> Tài khoản cần xem xét
-            </a>
+            </a>-->
             </div>
             <hr>
             <?php
@@ -50,9 +50,26 @@
                                         <tr>
                                             <th scope="col">Mã</th>
                                             <th scope="col">Tên người dùng</th>
-                                            <th scope="col">Trạng thái</th>
+                                            <th scope="col">
+                                                <div class="dropdown dropdown-sm" style ="position: static;">
+                                                    <span class="dropdown-toggle" data-bs-toggle="dropdown">Trạng thái</span>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a href="{{URL::to('/tai-khoan/?trang-thai=hoat-dong')}}" class="dropdown-item">Hoạt động</a></li>
+                                                        <li><a href="{{URL::to('/tai-khoan/?trang-thai=vo-hieu-hoa')}}" class="dropdown-item">Vô hiệu hoá</a></li>
+                                                    </ul>
+                                                </div>
+                                            </th>
                                             <th scope="col">Ngày tham gia</th>
-                                            <th scope="col">Vai trò</th>
+                                            <th scope="col">
+                                                <div class="dropdown dropdown-sm" style ="position: static;">
+                                                    <span class="dropdown-toggle" data-bs-toggle="dropdown">Vai trò</span>
+                                                    <ul class="dropdown-menu">
+                                                        @foreach($all_vaitro as $key => $vt)
+                                                        <li><a href="{{URL::to('/tai-khoan/?vai-tro='.Str::slug($vt->VT_TEN))}}" class="dropdown-item">{{$vt->VT_TEN}}</a></li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            </th>
                                             <th scope="col" width="70"></th>
                                         </tr>
                                     </thead>
@@ -92,6 +109,22 @@
                 </small>
             </div>
             
+            <?php
+                $add = '';
+                if (isset($_GET['trang-thai'])) {
+                    $geturl = $_GET['trang-thai'];
+                    
+                    if ($geturl == 'hoat-dong') $add = '&trang-thai=hoat-dong';
+                    else if ($geturl == 'vo-hieu-hoa') $add = '&trang-thai=vo-hieu-hoa';
+                }
+                else if (isset($_GET['vai-tro'])) {
+                    $geturl = $_GET['vai-tro'];
+                    
+                    if ($geturl == 'quan-tri-vien') $add = '&vai-tro=quan-tri-vien';
+                    else if ($geturl == 'kiem-duyet-vien') $add = '&vai-tro=kiem-duyet-vien';
+                    else if ($geturl == 'nguoi-dung-thanh-vien') $add = '&vai-tro=nguoi-dung-thanh-vien';
+                }
+            ?>
             <nav aria-label="Page navigation">
                 <div class="text-center d-flex justify-content-center mt-3">
                     <ul class="pagination pagination-sm m-t-none m-b-none ">
@@ -100,18 +133,18 @@
                             <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-left"></i></a></li>
                         @else
                             <li class="page-item">
-                                <a class="page-link" href="{{ $all_user->previousPageUrl() }}"><i class="fas fa-angle-left"></i></a>
+                                <a class="page-link" href="{{ $all_user->previousPageUrl().$add }}"><i class="fas fa-angle-left"></i></a>
                             </li>
                         @endif
                         {{-- Pagination Elements --}}
                         @for ($key=0; $key+1<=$all_user->lastPage(); $key++)
                                 @if ($all_user->currentPage() === $key + 1)
                                     <li class="page-item active">
-                                        <a class="page-link" href="{{ $all_user->url($key + 1) }}">{{ $key + 1 }}</a>
+                                        <a class="page-link" href="{{ $all_user->url($key + 1).$add }}">{{ $key + 1 }}</a>
                                     </li>
                                 @else
                                     <li class="page-item">
-                                        <a class="page-link" href="{{ $all_user->url($key + 1) }}">{{ $key + 1 }}</a>
+                                        <a class="page-link" href="{{ $all_user->url($key + 1).$add }}">{{ $key + 1 }}</a>
                                     </li>
                                 @endif
                         @endfor
@@ -119,7 +152,7 @@
                         {{-- Next Page Link --}}
                         @if ($all_user->hasMorePages())
                             <li class="page-item">
-                                <a class="page-link" href="{{ $all_user->nextPageUrl() }}"><i class="fas fa-angle-right"></i></a>
+                                <a class="page-link" href="{{ $all_user->nextPageUrl().$add }}"><i class="fas fa-angle-right"></i></a>
                             </li>
                         @else
                             <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-right"></i></a></li>
