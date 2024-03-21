@@ -10,14 +10,15 @@
         </div>
       
         <hr>
-        <div class="mb-3 mb-sm-0 pb-3">
-            <span>Hashtag thường đi kèm:</span>
-            @foreach($hashtag_hot as $key => $hottag)
-            <a href="{{URL::to('/hashtag/'.$hottag->H_HASHTAG)}}"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#{{$hottag->H_HASHTAG}}</span></a>
-            @endforeach
-        </div>
-
         @if ($bai_viet->total() > 0)
+          <div class="mb-3 mb-sm-0 pb-3">
+              <span>Hashtag thường đi kèm:</span>
+              @foreach($hashtag_hot as $key => $hottag)
+              <a href="{{URL::to('/hashtag/'.$hottag->H_HASHTAG)}}"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#{{$hottag->H_HASHTAG}}</span></a>
+              @endforeach
+          </div>
+
+        
           <div id="post_container">
             @include('main_component.post_loadmore')
           </div>

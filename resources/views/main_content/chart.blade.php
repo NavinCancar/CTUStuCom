@@ -90,7 +90,7 @@
                 <div class="card">
                     <div class="card-body p-4">
                         <div class="mb-3 mb-sm-0">
-                            <h2 class="card-title fw-semibold text-center fs-6">THỐNG KÊ HASHTAG TƯƠNG TÁC</h2>
+                            <h2 class="card-title fw-semibold text-center fs-6">THỐNG KÊ MỨC ĐỘ TƯƠNG TÁC VỚI HASHTAG</h2>
                             <div class="m-4 w-50 mx-auto">
                                 <canvas id="chartHashtag" class="mx-auto"></canvas>
                             </div>

@@ -57,6 +57,7 @@ Route::get('/danh-sach-nguoi-dung', 'App\Http\Controllers\UserSysController@list
 Route::get('/danh-sach-theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysController@list_follow'); ///ok
 Route::get('/danh-sach-nguoi-theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysController@list_followme'); ///ok
 Route::get('/danh-sach-chan', 'App\Http\Controllers\UserSysController@list_block'); ///ok
+Route::get('/nhin-lai-qua-trinh', 'App\Http\Controllers\UserSysController@chart');
 Route::resource('/tai-khoan', 'App\Http\Controllers\UserSysController')->except(['create', 'store']); ///ok: CUD_ND
 
 //-- Theo dõi

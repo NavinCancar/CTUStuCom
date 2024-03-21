@@ -26,19 +26,14 @@
         </div>
         
         <hr>
-        <div class="mb-3 mb-sm-0 pb-3">
-            <span>Hashtag thường đi kèm:</span>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#ung_dung</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#lay_y_kien</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#pass_sach</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#tsv</span></a>
-            <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#k49</span></a>
-        </div>
+        @if ($bai_viet->total() > 0)        
+          <div class="mb-3 mb-sm-0 pb-3">
+              <span>Hashtag thường đi kèm:</span>
+              @foreach($maybe_suggest as $key => $hottag)
+              <a href="{{URL::to('/hashtag/'.$hottag->H_HASHTAG)}}"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#{{$hottag->H_HASHTAG}}</span></a>
+              @endforeach
+          </div>
 
-        @if ($bai_viet->total() > 0)
           <div id="post_container">
             @include('main_component.post_loadmore')
           </div>

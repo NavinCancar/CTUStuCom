@@ -255,7 +255,20 @@ class PostController extends Controller
         ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA')
         ->where('bai_viet.BV_MA', '=', $bai_dang->BV_MA);
 
-        $hashtag = DB::table('hashtag')->get();
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+
+        $hashtagcount = DB::table('bai_viet')
+        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+        ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+        ->groupby('H_HASHTAG')
+        ->select('H_HASHTAG as H_HASHTAG_connect')->selectRaw('COUNT(*) as sl_bv');
+
+        $hashtag = DB::table('hashtag')
+        ->leftJoinSub($hashtagcount, 'hashtagcount', function ($join) {
+            $join->on('hashtag.H_HASHTAG', '=', 'hashtagcount.H_HASHTAG_connect');
+        })->orderby('sl_bv', 'desc')->get();
 
         //Bình luận
         $count_binh_luan = DB::table('bai_viet')
@@ -676,7 +689,20 @@ class PostController extends Controller
             ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA')
             ->where('bai_viet.BV_MA', '=', $BV_MA);
 
-            $hashtag = DB::table('hashtag')->get();
+            $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+
+            $hashtagcount = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+            ->groupby('H_HASHTAG')
+            ->select('H_HASHTAG as H_HASHTAG_connect')->selectRaw('COUNT(*) as sl_bv');
+
+            $hashtag = DB::table('hashtag')
+            ->leftJoinSub($hashtagcount, 'hashtagcount', function ($join) {
+                $join->on('hashtag.H_HASHTAG', '=', 'hashtagcount.H_HASHTAG_connect');
+            })->orderby('sl_bv', 'desc')->get();
 
             //Bình luận
             $count_binh_luan = DB::table('bai_viet')

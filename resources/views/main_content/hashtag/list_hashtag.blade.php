@@ -12,18 +12,16 @@
             </a>
       </div>
       <hr>
-      <div class="mb-3 mb-sm-0 pb-3">
+      <!--<div class="mb-3 mb-sm-0 pb-3">
           <span>Hashtag nổi bật:</span>
-          @foreach($hashtag_hot as $key => $hottag)
-          <a href="{{URL::to('/hashtag/'.$hottag->H_HASHTAG)}}"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#{{$hottag->H_HASHTAG}}</span></a>
-          @endforeach
-      </div>
+          <a href="javascript:void(0)"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-1">#</span></a>
+      </div>-->
       <div class="card">
         <div class="card-body p-4">
           <div class="mb-3 mb-sm-0 row">
               @foreach($hashtag as $key => $tag)
                   <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="{{URL::to('/hashtag/'.$tag->H_HASHTAG)}}"><span class="badge bg-indigo rounded-3 fw-semibold me-1 mb-4 p-2 long-hashtag">#{{$tag->H_HASHTAG}}</span></a>
+                    <a href="{{URL::to('/hashtag/'.$tag->H_HASHTAG)}}"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-4 p-2 long-hashtag">#{{$tag->H_HASHTAG}}</span></a>
                     <?php if($userLog) { 
                       $isFollowHashtag = $hashtag_theodoi_noget->clone()
                       ->where("H_HASHTAG", $tag->H_HASHTAG)->exists();

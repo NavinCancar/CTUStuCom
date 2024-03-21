@@ -80,7 +80,7 @@
                         @if ($userLog)
                             @if($userLog && $info->ND_MA == $userLog->ND_MA)
                                 <a href="{{URL::to('/danh-sach-bai-dang')}}"><button class="btn btn-primary ms-2" type="button"><i class="fa fa-comment-alt"></i> Bài viết của bạn</button></a>
-                                <a href="javascript:void(0)"><button class="btn btn-success ms-2" type="button"><i class="fas fa-chart-pie"></i> Nhìn lại quá trình</button></a>
+                                <a href="{{URL::to('/nhin-lai-qua-trinh')}}"><button class="btn btn-success ms-2" type="button"><i class="fas fa-chart-pie"></i> Nhìn lại quá trình</button></a>
                             @else
                                 <a href="{{URL::to('/tin-nhan/'.$info->ND_MA)}}"><button class="btn btn-primary" type="button"><i class="fab fa-facebook-messenger"></i> Nhắn tin</button></a>
                                 <?php 

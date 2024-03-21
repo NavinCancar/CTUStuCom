@@ -70,15 +70,26 @@ class HashtagController extends Controller
     public function list(){ ///
         $userLog = Session::get('userLog');
 
-        $hashtag = DB::table('hashtag')->paginate(20);
-
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+
+        $hashtagcount = DB::table('bai_viet')
+        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+        ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+        ->groupby('H_HASHTAG')
+        ->select('H_HASHTAG as H_HASHTAG_connect')->selectRaw('COUNT(*) as sl_bv');
+
+        $hashtag = DB::table('hashtag')
+        ->leftJoinSub($hashtagcount, 'hashtagcount', function ($join) {
+            $join->on('hashtag.H_HASHTAG', '=', 'hashtagcount.H_HASHTAG_connect');
+        })->orderby('sl_bv', 'desc')->paginate(20);
 
         if($userLog){
             $hashtag_theodoi_noget = DB::table('theo_doi_boi')
             ->where("ND_MA", $userLog->ND_MA);
 
-            $bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
+            /*$bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
             $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
             $nguoi_dung_not_in2 = DB::table('chan')->where('ND_BICHAN_MA', $userLog->ND_MA)->pluck('ND_CHAN_MA')->toArray();
 
@@ -88,9 +99,9 @@ class HashtagController extends Controller
             ->whereNotIn('BV_MA', $bai_viet_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);*/
         }
-        else{
+        /*else{
             $bai_viet_clone = DB::table('bai_viet')
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
             ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
@@ -101,15 +112,13 @@ class HashtagController extends Controller
         ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
         ->groupby('H_HASHTAG')
         ->select('H_HASHTAG')->selectRaw('COUNT(*) as sl_bv')
-        ->orderby('sl_bv', 'desc')->limit(7)->get();
+        ->orderby('sl_bv', 'desc')->limit(7)->get();*/
         
         if($userLog){
             return view('main_content.hashtag.list_hashtag')
-            ->with('hashtag', $hashtag)->with('hashtag_hot', $hashtag_hot)
-            ->with('hashtag_theodoi_noget', $hashtag_theodoi_noget);
+            ->with('hashtag', $hashtag)->with('hashtag_theodoi_noget', $hashtag_theodoi_noget);
         }
-        return view('main_content.hashtag.list_hashtag')
-        ->with('hashtag', $hashtag)->with('hashtag_hot', $hashtag_hot);
+        return view('main_content.hashtag.list_hashtag')->with('hashtag', $hashtag);
     }
 
     /**
@@ -137,6 +146,13 @@ class HashtagController extends Controller
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(5);
 
+            $bai_viet_not_in_suggest = DB::table('bai_viet')
+            ->where('bai_viet.BV_TRANGTHAI', '!=', 'Đã duyệt')
+            ->orWhereIn('bai_viet.BV_MA', $bai_viet_not_in)
+            ->orWhereIn('ND_MA', $nguoi_dung_not_in)
+            ->orWhereIn('ND_MA', $nguoi_dung_not_in2)
+            ->orWhereIn('ND_MA', $nguoi_dung_not_in3)->pluck('BV_MA')->toArray();
+
             $isFollowHashtag = DB::table('theo_doi_boi')
             ->where("H_HASHTAG", $hashtag->H_HASHTAG)->where("ND_MA", $userLog->ND_MA)->exists();
         }
@@ -149,6 +165,11 @@ class HashtagController extends Controller
             ->where('cua_bai_viet.H_HASHTAG', '=', $hashtag->H_HASHTAG)
             ->orderBy('bai_viet.BV_THOIGIANDANG', 'desc')
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(5);
+
+            
+            $bai_viet_not_in_suggest = DB::table('bai_viet')
+            ->where('bai_viet.BV_TRANGTHAI', '!=', 'Đã duyệt')
+            ->orWhereIn('ND_MA', $nguoi_dung_not_in3)->pluck('BV_MA')->toArray();
 
             $isFollowHashtag = null;
         }
@@ -176,13 +197,27 @@ class HashtagController extends Controller
 
         $bai_viet_luu= DB::table('danh_dau');
 
+        // Những hashtag thường đi kèm
+        $post_have_initial_hashtag = DB::table('cua_bai_viet')
+        ->where('H_HASHTAG', $hashtag->H_HASHTAG)
+        ->whereNotIn('BV_MA', $bai_viet_not_in_suggest)
+        ->select('BV_MA')->distinct()->pluck('BV_MA')->toArray();
+
+        $maybe_suggest = DB::table('cua_bai_viet')
+        ->whereIn('BV_MA', $post_have_initial_hashtag)
+        ->whereNotIn('BV_MA', $bai_viet_not_in_suggest)
+        ->where('H_HASHTAG', '!=', $hashtag->H_HASHTAG)
+        ->groupby('H_HASHTAG')
+        ->select('H_HASHTAG', DB::raw('COUNT(BV_MA) as SLBV_DINHKEM'))
+        ->orderBy('SLBV_DINHKEM', 'desc')->limit(7)->get();
+
         if ($request->ajax()) {//Chạy nút load-more
             $view = view('main_component.post_loadmore')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
             ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
             ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
             ->with('thich_no_get', $thich_no_get)->with('hashtag_get', $hashtag_get)
             ->with('isFollowHashtag', $isFollowHashtag)->with('bai_viet_luu', $bai_viet_luu)
-            ->with('count_theo_doi', $count_theo_doi)->render();
+            ->with('count_theo_doi', $count_theo_doi)->with('maybe_suggest', $maybe_suggest)->render();
   
             return response()->json(['html' => $view]);
         }
@@ -193,7 +228,7 @@ class HashtagController extends Controller
         ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
         ->with('thich_no_get', $thich_no_get)->with('hashtag_get', $hashtag_get)
         ->with('isFollowHashtag', $isFollowHashtag)->with('bai_viet_luu', $bai_viet_luu)
-        ->with('count_theo_doi', $count_theo_doi);
+        ->with('count_theo_doi', $count_theo_doi)->with('maybe_suggest', $maybe_suggest);
     }
 
 
