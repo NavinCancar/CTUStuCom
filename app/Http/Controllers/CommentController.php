@@ -387,7 +387,7 @@ class CommentController extends Controller
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
         $binh_luan = DB::table('binh_luan')
             ->orderBy('BL_THOIGIANTAO', 'desc')
-            ->whereNotIn('binh_luan.ND_MA', $nguoi_dung_not_in3)->paginate(10);
+            ->whereNotIn('binh_luan.ND_MA', $nguoi_dung_not_in3);
 
         $binhluan_baocao_noget = DB::table('binhluan_baocao');
 
@@ -401,14 +401,14 @@ class CommentController extends Controller
             ->whereNotIn('binh_luan.ND_MA', $nguoi_dung_not_in3)
             ->groupBy('binh_luan.BL_MA', 
             'binh_luan.BV_MA', 'binh_luan.ND_MA', 'binh_luan.BL_NOIDUNG', 'binh_luan.BL_TRALOI_MA', 'binh_luan.BL_TRANGTHAI', 'binh_luan.BL_THOIGIANTAO')
-            ->orderBy('COUNT_BC', 'desc')->paginate(10);
+            ->orderBy('COUNT_BC', 'desc');
         }
         else if($filterReport == 'gan-nhat') {
             $binh_luan = DB::table('binh_luan')
             ->select('binh_luan.*')
             ->leftJoin('binhluan_baocao', 'binh_luan.BL_MA', '=', 'binhluan_baocao.BL_MA')
             ->whereNotIn('binh_luan.ND_MA', $nguoi_dung_not_in3)
-            ->orderBy('BLBC_THOIDIEM', 'desc')->distinct()->paginate(10);
+            ->orderBy('BLBC_THOIDIEM', 'desc')->distinct();
         }
         $filterReport = null;
 
@@ -423,9 +423,25 @@ class CommentController extends Controller
             $binh_luan = DB::table('binh_luan')
             ->where('BL_TRANGTHAI', 'LIKE', $state.'%')
             ->orderBy('BL_THOIGIANTAO', 'desc')
-            ->whereNotIn('ND_MA', $nguoi_dung_not_in3)->paginate(10);
+            ->whereNotIn('ND_MA', $nguoi_dung_not_in3);
         }
         $filterState = null;
+
+        //SEARCH: http://localhost/ctustucom/bai-dang?tu-khoa=18%2F03%2F2024
+        $keywordSearch = request()->query('tu-khoa');
+        if($keywordSearch){
+            $binh_luan = $binh_luan->where(function ($query) use ($keywordSearch) {
+                $query->where('binh_luan.BL_MA', 'like', '%'.$keywordSearch.'%')
+                      ->orWhere('binh_luan.BL_NOIDUNG', 'like', '%'.$keywordSearch.'%');
+
+                $datePattern = '/^\d{2}\/\d{2}\/\d{4}$/';
+                if (preg_match($datePattern, $keywordSearch)) {
+                    $query->orWhereDate('binh_luan.BL_THOIGIANTAO', Carbon::createFromFormat('d/m/Y', $keywordSearch)->format('Y-m-d'));
+                }
+            });
+        }
+        
+        $binh_luan = $binh_luan->paginate(10);
 
         return view('main_content.comment.all_comment')
         ->with('binh_luan', $binh_luan)->with('binhluan_baocao_noget', $binhluan_baocao_noget);
@@ -518,11 +534,11 @@ class CommentController extends Controller
                                 <b>'. $bl->ND_HOTEN .'</b> 
                             </a>';
                             if($bl->VT_MA != 3) $output .='<span class="badge-sm bg-warning rounded-pill"><i>'. $bl->VT_TEN .'</i></span>';
-                            $output .= ' đã gửi vào '. date('H:i', strtotime($bl->BL_THOIGIANTAO)) .' ngày '. date('d/m/Y', strtotime($bl->BL_THOIGIANTAO)) .'
+                            $output .= '<span class="check-highlight"> đã gửi vào '. date('H:i', strtotime($bl->BL_THOIGIANTAO)) .' ngày '. date('d/m/Y', strtotime($bl->BL_THOIGIANTAO)) .'</span>
                             </div>
 
                             <div class="mx-2">
-                            <span style="font-size: 0.92rem;">'. nl2br(e($bl->BL_NOIDUNG)) .'</span>
+                            <span style="font-size: 0.92rem;" class="check-highlight">'. nl2br(e($bl->BL_NOIDUNG)) .'</span>
                             </div>
 
                             <!-- Images Container -->

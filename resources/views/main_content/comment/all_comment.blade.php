@@ -1,12 +1,29 @@
 @extends('welcome')
 @section('content')
 <?php $userLog= Session::get('userLog'); ?>
+
+<?php
+    $addTT = ''; $addBC = ''; $addTK = '';
+    if(request()->query('trang-thai')){
+        $addTT .= '&trang-thai='.request()->query('trang-thai');
+    }
+    if(request()->query('bao-cao')){
+        $addBC .= '&bao-cao='.request()->query('bao-cao');
+    }
+    if(request()->query('tu-khoa')){
+        $addTK .= '&tu-khoa='.request()->query('tu-khoa');
+    }
+?>
 <!-- Content Start -->
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
             <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
-            <h5 class="card-title fw-semibold">Danh sách bình luận</h5>
+            <h5 class="card-title fw-semibold">Danh sách bình luận
+                <?php if($addTT != '' || $addBC != '' || $addTK != '') { ?>
+                    <a href="{{URL::to('/bai-dang')}}" class="ms-2 fs-4"><i class="fas fa-sync-alt"></i></a>
+                <?php } ?>
+            </h5> 
             </div>
             <hr>
             <?php
@@ -66,9 +83,11 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group">
-                                    <form class="d-flex input-group-sm w-100 mt-2 mb-3">
-                                    <input class="form-control me-2" type="text" placeholder="Tìm kiếm">
-                                    <button class="btn btn-outline-primary" type="button"><i class="fa fa-search"></i></button>
+                                    <form class="d-flex input-group-sm w-100 mt-2 mb-3" role="form" action="{{URL::to('/binh-luan')}}" method="GET">
+                                        <?php if(request()->query('trang-thai')) echo '<input name="trang-thai" hidden value="'.request()->query('trang-thai').'">'; ?>
+                                        <?php if(request()->query('bao-cao')) echo '<input name="bao-cao" hidden value="'.request()->query('bao-cao').'">'; ?>
+                                        <input class="form-control me-2" type="text" name="tu-khoa" placeholder="Tìm kiếm">
+                                        <button class="btn btn-outline-primary" type="submit"><i class="fa fa-search"></i></button>
                                     </form>
                                     </div>
                                 </div>
@@ -107,8 +126,8 @@
                                     <tbody>
                                         @foreach($binh_luan as $key => $bl)
                                         <tr data-comment-id-value="{{$bl->BL_MA}}">
-                                            <td>{{$bl->BL_MA}}</td>
-                                            <td><span class="limited-lines">{{$bl->BL_NOIDUNG}}</span></td>
+                                            <td class="check-highlight">{{$bl->BL_MA}}</td>
+                                            <td class="check-highlight"><span class="limited-lines">{{$bl->BL_NOIDUNG}}</span></td>
                                             <td class="trangthai">
                                                 <?php 
                                                     if($bl->BL_TRANGTHAI == 'Đang hiển thị') echo '<span class="badge-sm bg-success rounded-pill fs-2"><i>Đang hiển thị</i></span>';
@@ -116,7 +135,7 @@
                                                     else echo '<span class="badge-sm bg-warning rounded-pill fs-2"><i>'.trim(strstr($bl->BL_TRANGTHAI, ':', true)).'</i></span>'; 
                                                 ?>
                                             </td>
-                                            <td>{{date('d/m/Y', strtotime($bl->BL_THOIGIANTAO))}}</td>
+                                            <td class="check-highlight">{{date('d/m/Y', strtotime($bl->BL_THOIGIANTAO))}}</td>
                                             <td class="text-center td_sl_baocao"><?php 
                                                 $count = $binhluan_baocao_noget->clone()->groupby('BL_MA')->where('BL_MA', $bl->BL_MA)->count(); 
                                                 if($count != 0) echo '<b class="cursor-pointer"><span class="sl_baocao">'.$count.'</span>&ensp;<i class="fas fa-flag"></i></b>'; 
@@ -148,18 +167,14 @@
             
             <?php
                 $add = '';
-                if (isset($_GET['trang-thai'])) {
-                    $geturl = $_GET['trang-thai'];
-                    
-                    if ($geturl == 'dang-hien-thi') $add = '&trang-thai=dang-hien-thi';
-                    else if ($geturl == 'vi-pham-tieu-chuan') $add = '&trang-thai=vi-pham-tieu-chuan';
-                    else if ($geturl == 'da-xoa') $add = '&trang-thai=da-xoa';
+                if(request()->query('trang-thai')){
+                    $add .= '&trang-thai='.request()->query('trang-thai');
                 }
-                else if (isset($_GET['bao-cao'])) {
-                    $geturl = $_GET['bao-cao'];
-                    
-                    if ($geturl == 'nhieu-nhat') $add = '&bao-cao=nhieu-nhat';
-                    else if ($geturl == 'gan-nhat') $add = '&bao-cao=gan-nhat';
+                if(request()->query('bao-cao')){
+                    $add .= '&bao-cao='.request()->query('bao-cao');
+                }
+                if(request()->query('tu-khoa')){
+                    $add .= '&tu-khoa='.request()->query('tu-khoa');
                 }
             ?>
             <nav aria-label="Page navigation">
@@ -335,7 +350,7 @@
                     success: function(response) {
                         $('#modal-content').html(response);
                         var defaultValue = $('select[name="BL_TRANGTHAI"]').val();
-
+                        highLight();
                         //|-----------------------------------------------------
                         //|HIỆN FILE BÌNH LUẬN
                         //|-----------------------------------------------------
@@ -760,6 +775,28 @@
         //|*****************************************************
         //|LƯU FILE END + WITH UPDATE
         //|*****************************************************
+        //|-----------------------------------------------------
+        //|HIGHLIGHT
+        //|-----------------------------------------------------
+        highLight();
+        function highLight(){
+            <?php 
+                $keywords = request()->query('tu-khoa'); 
+                if($keywords) { 
+            ?>
+                $('.check-highlight').each(function() {
+                <?php $words = explode(' ', $keywords); ?>
+                    var txtToHighlight = $(this).text();
+                    <?php foreach ($words as $word) { ?>
+                
+                        var txtToHighlight = txtToHighlight.replace(new RegExp("<?php echo $word ?>", "gi"), '<span class="mark">$&</span>');
+                        
+                    <?php } ?>
+                $(this).html(txtToHighlight);
+                });
+            <?php } ?>
+        }
+        
         })
     </script>
 @endsection

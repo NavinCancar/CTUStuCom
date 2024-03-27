@@ -294,7 +294,31 @@ class HashtagController extends Controller
      */
     public function index(){ ///
         $this->AuthLogin_KDV();
-        $all_hashtag = DB::table('hashtag')->paginate(10);
+
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+
+        $hashtagcount = DB::table('bai_viet')
+        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+        ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+        ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+        ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+        ->groupby('H_HASHTAG')
+        ->select('H_HASHTAG as H_HASHTAG_connect')->selectRaw('COUNT(*) as sl_bv');
+
+        $all_hashtag = DB::table('hashtag')
+        ->leftJoinSub($hashtagcount, 'hashtagcount', function ($join) {
+            $join->on('hashtag.H_HASHTAG', '=', 'hashtagcount.H_HASHTAG_connect');
+        })->orderby('sl_bv', 'desc');
+
+        //SEARCH: http://localhost/ctustucom/bai-dang?tu-khoa=18%2F03%2F2024
+        $keywordSearch = request()->query('tu-khoa');
+        if($keywordSearch){
+            $all_hashtag = $all_hashtag->where('hashtag.H_HASHTAG', 'like', '%'.$keywordSearch.'%');
+        }
+        
+        $all_hashtag = $all_hashtag->paginate(10);
+
+        //$all_hashtag = DB::table('hashtag')->paginate(10);
         $count_dinh_kem_noget = DB::table('cua_bai_viet')
         ->join('bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
         ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')

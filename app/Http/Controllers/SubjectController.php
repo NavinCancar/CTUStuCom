@@ -165,7 +165,22 @@ class SubjectController extends Controller
     public function index(){ ///
         $this->AuthLogin_QTV();
         $all_subject = DB::table('hoc_phan')
-        ->join('khoa_truong', 'khoa_truong.KT_MA', '=', 'hoc_phan.KT_MA')->orderby('HP_MA')->paginate(10);
+        ->join('khoa_truong', 'khoa_truong.KT_MA', '=', 'hoc_phan.KT_MA')->orderby('HP_MA');
+
+        //SEARCH: http://localhost/ctustucom/bai-dang?tu-khoa=18%2F03%2F2024
+        $keywordSearch = request()->query('tu-khoa');
+        if($keywordSearch){
+            $all_subject = $all_subject->where(function ($query) use ($keywordSearch) {
+                $query->where('hoc_phan.HP_MA', 'like', '%'.$keywordSearch.'%')
+                      ->orWhere('hoc_phan.HP_TEN', 'like', '%'.$keywordSearch.'%')
+                      ->orWhere('khoa_truong.KT_TEN', 'like', '%'.$keywordSearch.'%');
+            });
+        }
+
+        $all_subject = $all_subject->paginate(10);
+
+        //$all_subject = DB::table('hoc_phan')
+        //->join('khoa_truong', 'khoa_truong.KT_MA', '=', 'hoc_phan.KT_MA')->orderby('HP_MA')->paginate(10);
         return view('main_content.subject.all_subject')->with('all_subject', $all_subject);
     }
 

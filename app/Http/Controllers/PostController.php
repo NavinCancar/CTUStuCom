@@ -618,7 +618,7 @@ class PostController extends Controller
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
         $bai_viet = DB::table('bai_viet')
             ->orderBy('BV_THOIGIANTAO', 'desc')
-            ->whereNotIn('ND_MA', $nguoi_dung_not_in3)->paginate(10);
+            ->whereNotIn('ND_MA', $nguoi_dung_not_in3);
 
         $baiviet_baocao_noget = DB::table('baiviet_baocao');
 
@@ -632,14 +632,14 @@ class PostController extends Controller
             ->whereNotIn('bai_viet.ND_MA', $nguoi_dung_not_in3)
             ->groupBy('bai_viet.BV_MA', 
             'bai_viet.ND_MA', 'bai_viet.HP_MA', 'bai_viet.BV_TIEUDE', 'bai_viet.BV_NOIDUNG', 'bai_viet.BV_TRANGTHAI', 'bai_viet.BV_THOIGIANTAO', 'bai_viet.BV_THOIGIANDANG', 'bai_viet.BV_LUOTXEM')
-            ->orderBy('COUNT_BC', 'desc')->paginate(10);
+            ->orderBy('COUNT_BC', 'desc');
         }
         else if($filterReport == 'gan-nhat') {
             $bai_viet = DB::table('bai_viet')
             ->select('bai_viet.*')
             ->leftJoin('baiviet_baocao', 'bai_viet.BV_MA', '=', 'baiviet_baocao.BV_MA')
             ->whereNotIn('bai_viet.ND_MA', $nguoi_dung_not_in3)
-            ->orderBy('BVBC_THOIDIEM', 'desc')->distinct()->paginate(10);
+            ->orderBy('BVBC_THOIDIEM', 'desc')->distinct();
         }
         $filterReport = null;
 
@@ -656,10 +656,26 @@ class PostController extends Controller
             $bai_viet = DB::table('bai_viet')
             ->where('BV_TRANGTHAI', 'LIKE', $state.'%')
             ->orderBy('BV_THOIGIANTAO', 'desc')
-            ->whereNotIn('ND_MA', $nguoi_dung_not_in3)->paginate(10);
+            ->whereNotIn('ND_MA', $nguoi_dung_not_in3);
         }
         $filterState = null;
 
+        //SEARCH: http://localhost/ctustucom/bai-dang?tu-khoa=18%2F03%2F2024
+        $keywordSearch = request()->query('tu-khoa');
+        if($keywordSearch){
+            $bai_viet = $bai_viet->where(function ($query) use ($keywordSearch) {
+                $query->where('bai_viet.BV_MA', 'like', '%'.$keywordSearch.'%')
+                      ->orWhere('bai_viet.BV_TIEUDE', 'like', '%'.$keywordSearch.'%')
+                      ->orWhere('bai_viet.BV_NOIDUNG', 'like', '%'.$keywordSearch.'%');
+
+                $datePattern = '/^\d{2}\/\d{2}\/\d{4}$/';
+                if (preg_match($datePattern, $keywordSearch)) {
+                    $query->orWhereDate('bai_viet.BV_THOIGIANTAO', Carbon::createFromFormat('d/m/Y', $keywordSearch)->format('Y-m-d'));
+                }
+            });
+        }
+        
+        $bai_viet = $bai_viet->paginate(10);
         return view('main_content.post.all_post')
         ->with('bai_viet', $bai_viet)->with('baiviet_baocao_noget', $baiviet_baocao_noget);
     }
@@ -794,13 +810,13 @@ class PostController extends Controller
                                 <b>'. $bv->ND_HOTEN .'</b> 
                             </a>';
                             if($bv->VT_MA != 3) $output .='<span class="badge-sm bg-warning rounded-pill"><i>'. $bv->VT_TEN .'</i></span>';
-                            if($bv->BV_THOIGIANDANG == null ) $output .= '<span class="thoigian"> đã gửi vào '. date('H:i', strtotime($bv->BV_THOIGIANTAO)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANTAO)).'</span>';
+                            if($bv->BV_THOIGIANDANG == null ) $output .= '<span class="thoigian check-highlight"> đã gửi vào '. date('H:i', strtotime($bv->BV_THOIGIANTAO)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANTAO)).'</span>';
                             else $output .= '<span class="thoigian"> đã đăng vào '. date('H:i', strtotime($bv->BV_THOIGIANDANG)) .' ngày '. date('d/m/Y', strtotime($bv->BV_THOIGIANDANG)).'</span>';
                 $output .= '</div>
 
                             <div class="mx-2">
-                            <h5 class="card-title fw-semibold post-title">'. $bv->BV_TIEUDE .'</h5>
-                            <span style="font-size: 0.92rem;">'. nl2br(e($bv->BV_NOIDUNG)) .'</span>
+                            <h5 class="card-title fw-semibold post-title check-highlight">'. $bv->BV_TIEUDE .'</h5>
+                            <span style="font-size: 0.92rem;" class="check-highlight">'. nl2br(e($bv->BV_NOIDUNG)) .'</span>
                             </div>
 
                             <!-- Images Container -->

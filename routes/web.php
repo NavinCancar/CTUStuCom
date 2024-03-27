@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| NGƯỜI DÙNG
+| MYSQL
 |--------------------------------------------------------------------------
 */
 
@@ -59,6 +59,7 @@ Route::get('/danh-sach-nguoi-theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysCon
 Route::get('/danh-sach-chan', 'App\Http\Controllers\UserSysController@list_block'); ///ok
 Route::get('/nhin-lai-qua-trinh', 'App\Http\Controllers\UserSysController@chart');
 Route::resource('/tai-khoan', 'App\Http\Controllers\UserSysController')->except(['create', 'store']); ///ok: CUD_ND
+Route::post('/vai-tro-nguoi-dung', 'App\Http\Controllers\UserSysController@role_update');
 
 //-- Theo dõi
 Route::get('/theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysController@theodoi'); ///ok
@@ -131,7 +132,12 @@ Route::get('/danh-sach-hoc-phan', 'App\Http\Controllers\SubjectController@list')
 Route::resource('/hoc-phan', 'App\Http\Controllers\SubjectController'); ///ok
 
 
-//FIREBASE
+/*
+|--------------------------------------------------------------------------
+| FIREBASE
+|--------------------------------------------------------------------------
+*/
+
 //Message: Tin nhắn
 Route::resource('/tin-nhan', 'App\Http\Controllers\MessageController_FB')->only(['index', 'show']); ///ok
 

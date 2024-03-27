@@ -63,7 +63,20 @@ class RoleController extends Controller
      */
     public function index(){ ///
         $this->AuthLogin_QTV();
-        $all_role = DB::table('vai_tro')->orderby('VT_MA')->paginate(10);
+        $all_role = DB::table('vai_tro')->orderby('VT_MA');
+
+        //SEARCH: http://localhost/ctustucom/bai-dang?tu-khoa=18%2F03%2F2024
+        $keywordSearch = request()->query('tu-khoa');
+        if($keywordSearch){
+            $all_role = $all_role->where(function ($query) use ($keywordSearch) {
+                $query->where('vai_tro.VT_MA', 'like', '%'.$keywordSearch.'%')
+                      ->orWhere('vai_tro.VT_TEN', 'like', '%'.$keywordSearch.'%');
+            });
+        }
+
+        $all_role = $all_role->paginate(10);
+
+        //$all_role = DB::table('vai_tro')->orderby('VT_MA')->paginate(10);
         return view('main_content.role.all_role')->with('all_role', $all_role);
     }
 

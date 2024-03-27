@@ -79,7 +79,7 @@ class HomeController extends Controller
             ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
             ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
-            ->whereNotIn('BV_MA', $bai_viet_not_in)
+            ->whereNotIn('bai_viet.BV_MA', $bai_viet_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in2)
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);

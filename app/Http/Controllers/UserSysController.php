@@ -24,6 +24,7 @@ class UserSysController extends Controller
     - Hàm xây dựng FireStore
     - Kiểm tra đăng nhập: Người dùng => (*)
     - Kiểm tra đăng nhập: Quản trị viên => (***)
+    - Kiểm tra đăng nhập: Bản thân => (****)
     - Kiểm tra đăng nhập: Bản thân & quản trị viên => (******)
     
     NGƯỜI DÙNG
@@ -70,6 +71,22 @@ class UserSysController extends Controller
             }
             else{
                 return Redirect::to('/')->send();
+            }
+        }else{
+            return Redirect::to('dang-nhap')->send();
+        }
+    }
+
+    /**
+     * Kiểm tra đăng nhập: Bản thân => (****)
+     */
+    public function AuthLogin_BT($ma){ ///
+        $userLog = Session::get('userLog');
+        if($userLog){
+            if ($userLog->ND_MA == $ma){
+            }
+            else{
+                return Redirect::to('tai-khoan/'.$userLog->ND_MA.'/edit')->send();
             }
         }else{
             return Redirect::to('dang-nhap')->send();
@@ -361,10 +378,10 @@ class UserSysController extends Controller
     }
 
     /**
-     * Cập nhật tài khoản người dùng (******)
+     * Cập nhật tài khoản người dùng (****)
      */
     public function edit(UserSys $tai_khoan){///
-        $this->AuthLogin_BTwQTV($tai_khoan->ND_MA);
+        $this->AuthLogin_BT($tai_khoan->ND_MA);
 
         $account_info = DB::table('nguoi_dung')
             ->where('ND_MA', $tai_khoan->ND_MA)->get();
@@ -449,9 +466,16 @@ class UserSysController extends Controller
             'ND_TRANGTHAI' => 0
         ]);
 
-        Session::put('alert', ['type' => 'success', 'content' => 'Tài khoản bị vô hiệu hoá thành công!']);
-        if ($tai_khoan->ND_MA == $userLog->ND_MA) {Session::put('userLog',null); Session::put('uSysAvatar',null);}
-        return;
+        if ($tai_khoan->ND_MA == $userLog->ND_MA) {
+            Session::put('alert', ['type' => 'success', 'content' => 'Tài khoản bị vô hiệu hoá thành công!']);
+            Session::put('userLog',null); 
+            Session::put('uSysAvatar',null); 
+            return;
+        }
+        else{
+            Session::put('alert', ['type' => 'success', 'content' => 'Tài khoản bị vô hiệu hoá thành công!']);
+            return Redirect::back()->send();
+        }
     }
 
      /**
@@ -1039,9 +1063,14 @@ class UserSysController extends Controller
      */
     public function index(){ ///
         $this->AuthLogin_QTV();
+        //FOCUS: http://localhost/ctustucom/bai-dang?bai-dang={bai_viet}
+        $nguoiDungMa = request()->query('nguoi-dung');
+        if($nguoiDungMa) Session::put('ND_MA_Focus', $nguoiDungMa);
+        $nguoiDungMa = null;
+
         $all_user = DB::table('nguoi_dung')
         ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-        ->orderby('ND_MA')->paginate(10);
+        ->orderby('ND_MA');
 
         $all_vaitro = DB::table('vai_tro')->get();
 
@@ -1057,7 +1086,7 @@ class UserSysController extends Controller
             $all_user = DB::table('nguoi_dung')
             ->where('nguoi_dung.VT_MA', $state)
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-            ->orderby('ND_MA')->paginate(10);
+            ->orderby('ND_MA');
         }
         $filterRole = null;
 
@@ -1071,12 +1100,38 @@ class UserSysController extends Controller
             $all_user = DB::table('nguoi_dung')
             ->where('ND_TRANGTHAI', $state)
             ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-            ->orderby('ND_MA')->paginate(10);
+            ->orderby('ND_MA');
         }
         $filterState = null;
+
+        //SEARCH: http://localhost/ctustucom/bai-dang?tu-khoa=18%2F03%2F2024
+        $keywordSearch = request()->query('tu-khoa');
+        if($keywordSearch){
+            $all_user = $all_user->where(function ($query) use ($keywordSearch) {
+                $query->where('nguoi_dung.ND_MA', 'like', '%'.$keywordSearch.'%')
+                      ->orWhere('nguoi_dung.ND_HOTEN', 'like', '%'.$keywordSearch.'%');
+
+                $datePattern = '/^\d{2}\/\d{2}\/\d{4}$/';
+                if (preg_match($datePattern, $keywordSearch)) {
+                    $query->orWhereDate('nguoi_dung.ND_NGAYTHAMGIA', Carbon::createFromFormat('d/m/Y', $keywordSearch)->format('Y-m-d'));
+                }
+            });
+        }
+        
+        $all_user = $all_user->paginate(10);
 
         return view('main_content.user.all_user')
         ->with('all_user', $all_user)->with('all_vaitro', $all_vaitro);
     }
 
+    public function role_update(Request $request){ ///
+        $this->AuthLogin_QTV();
+        DB::table('nguoi_dung')
+        ->where('ND_MA', $request->ND_MA)
+        ->update([ 
+            'VT_MA' => $request->VT_MA,
+        ]);
+        Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật vai trò thành công!']);
+        return Redirect::to('tai-khoan?nguoi-dung='.$request->ND_MA);
+    }
 }

@@ -206,7 +206,20 @@ class CollegeController extends Controller
      */
     public function index(){ ///
         $this->AuthLogin_QTV();
-        $all_college = DB::table('khoa_truong')->orderby('KT_MA')->paginate(10);
+        $all_college = DB::table('khoa_truong')->orderby('KT_MA');
+
+        //SEARCH: http://localhost/ctustucom/bai-dang?tu-khoa=18%2F03%2F2024
+        $keywordSearch = request()->query('tu-khoa');
+        if($keywordSearch){
+            $all_college = $all_college->where(function ($query) use ($keywordSearch) {
+                $query->where('khoa_truong.KT_MA', 'like', '%'.$keywordSearch.'%')
+                      ->orWhere('khoa_truong.KT_TEN', 'like', '%'.$keywordSearch.'%');
+            });
+        }
+
+        $all_college = $all_college->paginate(10);
+
+        //$all_college = DB::table('khoa_truong')->orderby('KT_MA')->paginate(10);
         return view('main_content.college.all_college')->with('all_college', $all_college);
     }
 

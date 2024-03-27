@@ -35,9 +35,9 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group">
-                                    <form class="d-flex input-group-sm w-100 mt-2 mb-3">
-                                    <input class="form-control me-2" type="text" placeholder="Tìm kiếm">
-                                    <button class="btn btn-outline-primary" type="button"><i class="fa fa-search"></i></button>
+                                    <form class="d-flex input-group-sm w-100 mt-2 mb-3" role="form" action="{{URL::to('/hoc-phan')}}" method="GET">
+                                        <input class="form-control me-2" type="text" name="tu-khoa" placeholder="Tìm kiếm">
+                                        <button class="btn btn-outline-primary" type="submit"><i class="fa fa-search"></i></button>
                                     </form>
                                     </div>
                                 </div>
@@ -57,9 +57,9 @@
                                     <tbody>
                                         @foreach($all_subject as $key => $item)
                                         <tr>
-                                            <td>{{$item->HP_MA}}</td>
-                                            <td>{{$item->HP_TEN}}</td>
-                                            <td>{{$item->KT_TEN}}</td>
+                                            <td class="check-highlight">{{$item->HP_MA}}</td>
+                                            <td class="check-highlight">{{$item->HP_TEN}}</td>
+                                            <td class="check-highlight">{{$item->KT_TEN}}</td>
                                             <td>
                                                 <div class="d-flex justify-content-between">
                                                     <a href="{{URL::to('/hoc-phan/'.$item -> HP_MA)}}" previewlistener="true"><i class="fas fa-info-circle text-primary"></i></a>
@@ -88,6 +88,12 @@
                 </small>
             </div>
             
+            <?php
+                $add = '';
+                if(request()->query('tu-khoa')){
+                    $add .= '&tu-khoa='.request()->query('tu-khoa');
+                }
+            ?>
             <nav aria-label="Page navigation">
                 <div class="text-center d-flex justify-content-center mt-3">
                     <ul class="pagination pagination-sm m-t-none m-b-none ">
@@ -96,18 +102,18 @@
                             <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-left"></i></a></li>
                         @else
                             <li class="page-item">
-                                <a class="page-link" href="{{ $all_subject->previousPageUrl() }}"><i class="fas fa-angle-left"></i></a>
+                                <a class="page-link" href="{{ $all_subject->previousPageUrl().$add }}"><i class="fas fa-angle-left"></i></a>
                             </li>
                         @endif
                         {{-- Pagination Elements --}}
                         @for ($key=0; $key+1<=$all_subject->lastPage(); $key++)
                                 @if ($all_subject->currentPage() === $key + 1)
                                     <li class="page-item active">
-                                        <a class="page-link" href="{{ $all_subject->url($key + 1) }}">{{ $key + 1 }}</a>
+                                        <a class="page-link" href="{{ $all_subject->url($key + 1).$add }}">{{ $key + 1 }}</a>
                                     </li>
                                 @else
                                     <li class="page-item">
-                                        <a class="page-link" href="{{ $all_subject->url($key + 1) }}">{{ $key + 1 }}</a>
+                                        <a class="page-link" href="{{ $all_subject->url($key + 1).$add }}">{{ $key + 1 }}</a>
                                     </li>
                                 @endif
                         @endfor
@@ -115,7 +121,7 @@
                         {{-- Next Page Link --}}
                         @if ($all_subject->hasMorePages())
                             <li class="page-item">
-                                <a class="page-link" href="{{ $all_subject->nextPageUrl() }}"><i class="fas fa-angle-right"></i></a>
+                                <a class="page-link" href="{{ $all_subject->nextPageUrl().$add }}"><i class="fas fa-angle-right"></i></a>
                             </li>
                         @else
                             <li class="page-item disabled"><a class="page-link" href="javascript:void(0)"><i class="fas fa-angle-right"></i></a></li>
@@ -127,4 +133,29 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        //|-----------------------------------------------------
+        //|HIGHLIGHT
+        //|-----------------------------------------------------
+        highLight();
+        function highLight(){
+            <?php 
+                $keywords = request()->query('tu-khoa'); 
+                if($keywords) { 
+            ?>
+                $('.check-highlight').each(function() {
+                <?php $words = explode(' ', $keywords); ?>
+                    var txtToHighlight = $(this).text();
+                    <?php foreach ($words as $word) { ?>
+                
+                        var txtToHighlight = txtToHighlight.replace(new RegExp("<?php echo $word ?>", "gi"), '<span class="mark">$&</span>');
+                        
+                    <?php } ?>
+                $(this).html(txtToHighlight);
+                });
+            <?php } ?>
+        }
+    })
+</script>
 @endsection
