@@ -6,7 +6,10 @@
   <div class="row">
     <div class="col-lg-12">
         <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
+          <span>
             <h5 class="card-title fw-semibold">Học phần: <?php echo $subject_get->HP_MA .' '. $subject_get->HP_TEN ?></h5>
+            <i class="fs-3 px-3"><?php if($count_bai_viet) echo $count_bai_viet; else echo '0'; ?> bài viết</i>
+          </span>
         </div>
       
         <hr>

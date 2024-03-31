@@ -7,7 +7,8 @@
     <div class="col-lg-8">
         <div class="mb-3 mb-sm-0">
           <h5 class="card-title fw-semibold">Bảng tin: <?php echo $college->KT_TEN ?></h5>
-          <p class=" fw-semibold">Xem các bạn <?php echo $college->KT_TEN ?> đang bàn luận về điều gì.</p>
+          <span class="px-3 fw-semibold">Xem các bạn <?php echo $college->KT_TEN ?> đang bàn luận về điều gì.</span><br>
+          <i class="fs-3 px-3"><?php if($count_bai_viet) echo $count_bai_viet; else echo '0'; ?> bài viết</i><br>
         </div>
       
         <hr>

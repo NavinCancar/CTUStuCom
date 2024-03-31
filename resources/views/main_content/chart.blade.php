@@ -3,7 +3,15 @@
 <?php 
     $userLog= Session::get('userLog');  
 ?>
-    
+    <style>
+        /* CSS cho đường gạch ngăn cách */
+        .col-sm-6 {
+            border-right: 1px solid #ccc; 
+        }
+        .col-sm-6:last-child {
+            border-right: none;
+        }
+    </style>
     <!-- Content Start -->
     <div class="container-fluid">
         <div class="row">
@@ -80,8 +88,88 @@
                     <div class="card-body p-4">
                         <div class="mb-3 mb-sm-0">
                             <h2 class="card-title fw-semibold text-center fs-6">THỐNG KÊ TƯƠNG TÁC</h2>
-                            <div class="m-4 w-100 mx-auto">
+                            <div class="mt-4 mb-4 w-100 mx-auto">
                                 <canvas id="chartActivity"></canvas>
+                                <div class="row h-100 mt-5">
+                                    <div class="col-sm-6">
+                                        <h2 class="card-title fw-semibold text-center fs-5" style="color: rgb(0, 175, 239)">BÀI VIẾT</h2>
+                                        <div class="row h-100">
+                                            <div class="col-sm-6">
+                                                <h2 class="card-title fw-semibold text-center fs-4 pb-3">NỔI BẬT</h2>
+                                                @if ($bai_viet_hot->count() > 0)
+                                                    @foreach($bai_viet_hot as $key => $bvh)
+                                                    <a href="{{URL::to('/bai-dang/'.$bvh->BV_MA)}}" class="fs-4 d-block mb-1">
+                                                        <i class="fas fa-angle-double-right"></i> &ensp; {{ Str::limit($bvh->BV_TIEUDE, 50) }}
+                                                        <br>
+                                                        <div class="text-muted" style="text-align: end; font-size: 0.82rem !important;">
+                                                            <i class="fas fa-eye pe-1"></i> <b>{{ isset($bvh->BV_LUOTXEM) ? $bvh->BV_LUOTXEM : 0 }}</b> <span class="px-2">|</span> 
+                                                            <i class="fas fa-heart pe-1"></i> <b>{{ isset($bvh->SL_THICH) ? $bvh->SL_THICH : 0 }}</b> <span class="px-2">|</span>  
+                                                            <i class="fas fa-reply pe-1"></i> <b>{{ isset($bvh->SL_BINHLUAN) ? $bvh->SL_BINHLUAN : 0 }}</b>
+                                                        </div>
+                                                    </a><hr>
+                                                    @endforeach
+                                                @else
+                                                    <div class="text-center mt-4 mb-2">Rất tiếc! Không có nội dung nổi bật để hiển thị :(</div>
+                                                @endif
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <h2 class="card-title fw-semibold text-center fs-4 pb-3">BỊ BÁO CÁO NỔI BẬT</h2>
+                                                @if ($bai_viet_bc->count() > 0)
+                                                    @foreach($bai_viet_bc as $key => $bvbc)
+                                                    <a href="{{URL::to('/bai-dang/'.$bvbc->BV_MA)}}" class="fs-4 d-block mb-1">
+                                                        <i class="fas fa-angle-double-right"></i> &ensp; {{ Str::limit($bvbc->BV_TIEUDE, 50) }}
+                                                        <br>
+                                                        <div class="text-muted" style="text-align: end; font-size: 0.82rem !important;">
+                                                            <i class="fas fa-eye pe-1"></i> <b>{{ isset($bvbc->BV_LUOTXEM) ? $bvbc->BV_LUOTXEM : 0 }}</b> <span class="px-2">|</span> 
+                                                            <i class="fas fa-flag pe-1"></i> <b>{{ isset($bvbc->BV_BC) ? $bvbc->BV_BC : 0 }}</b>
+                                                        </div>
+                                                    </a><hr>
+                                                    @endforeach
+                                                @else
+                                                    <div class="text-center mt-4 mb-2">Rất tiếc! Không có nội dung nổi bật để hiển thị :(</div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h2 class="card-title fw-semibold text-center fs-5" style="color: rgb(239, 64, 0)">BÌNH LUẬN</h2>
+                                        <div class="row h-100">
+                                            <div class="col-sm-6">
+                                                <h2 class="card-title fw-semibold text-center fs-4 pb-3">NỔI BẬT</h2>
+                                                @if ($binh_luan_hot->count() > 0)
+                                                    @foreach($binh_luan_hot as $key => $blh)
+                                                    <a href="{{URL::to('/bai-dang/'.$blh->BV_MA.'?binh-luan='.$blh->BL_MA)}}" class="fs-4 d-block mb-1">
+                                                        <i class="fas fa-angle-double-right"></i> &ensp; {{ Str::limit($blh->BL_NOIDUNG, 50) }}
+                                                        <br>
+                                                        <div class="text-muted" style="text-align: end; font-size: 0.82rem !important;">
+                                                            <i class="fas fa-heart pe-1"></i> <b>{{ isset($blh->SL_THICH) ? $blh->SL_THICH : 0 }}</b> <span class="px-2">|</span>  
+                                                            <i class="fas fa-reply pe-1"></i> <b>{{ isset($blh->SL_BINHLUAN) ? $blh->SL_BINHLUAN : 0 }}</b>
+                                                        </div>
+                                                    </a><hr>
+                                                    @endforeach
+                                                @else
+                                                    <div class="text-center mt-4 mb-2">Rất tiếc! Không có nội dung nổi bật để hiển thị :(</div>
+                                                @endif
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <h2 class="card-title fw-semibold text-center fs-4 pb-3">BỊ BÁO CÁO NỔI BẬT</h2>
+                                                @if ($binh_luan_bc->count() > 0)
+                                                    @foreach($binh_luan_bc as $key => $blbc)
+                                                    <a href="{{URL::to('/bai-dang/'.$blbc->BV_MA.'?binh-luan='.$blbc->BL_MA)}}" class="fs-4 d-block mb-1">
+                                                        <i class="fas fa-angle-double-right"></i> &ensp; {{ Str::limit($blbc->BL_NOIDUNG, 50) }}
+                                                        <br>
+                                                        <div class="text-muted" style="text-align: end; font-size: 0.82rem !important;">
+                                                            <i class="fas fa-flag pe-1"></i> <b>{{ isset($blbc->BL_BC) ? $blbc->BL_BC : 0 }}</b>
+                                                        </div>
+                                                    </a><hr>
+                                                    @endforeach
+                                                @else
+                                                    <div class="text-center mt-4 mb-2">Rất tiếc! Không có nội dung nổi bật để hiển thị :(</div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -91,8 +179,86 @@
                     <div class="card-body p-4">
                         <div class="mb-3 mb-sm-0">
                             <h2 class="card-title fw-semibold text-center fs-6">THỐNG KÊ MỨC ĐỘ TƯƠNG TÁC VỚI HASHTAG</h2>
-                            <div class="m-4 w-50 mx-auto">
-                                <canvas id="chartHashtag" class="mx-auto"></canvas>
+                            <div class="mt-4 mb-4 row">
+                                <div class="col-sm-5 pt-4">
+                                    <canvas id="chartHashtag" class="mx-auto"></canvas>
+                                </div>
+                                <div class="col-sm-7">
+                                    <div class="table-responsive">
+                                        <table class="table bg-white rounded shadow-sm table-bordered table-hover">
+                                            <thead>
+                                                <!--<tr>
+                                                    <th scope="col">Hashtag</th>
+                                                    <th scope="col">Bài viết</th>
+                                                    <th scope="col">Thích bài viết</th>
+                                                    <th scope="col">Bình luận</th>
+                                                    <th scope="col">Thích bình luận</th>
+                                                    <th scope="col">Người tương tác</th>
+                                                    <th scope="col">Người theo dõi</th>
+                                                    <th scope="col">Mức độ tương tác</th>
+                                                </tr>-->
+                                                <tr class="text-center">
+                                                    <th scope="col" rowspan="2">Hashtag</th>
+                                                    <th scope="col" colspan="2">Bài viết</th>
+                                                    <th scope="col" colspan="2">Bình luận</th>
+                                                    <th scope="col" colspan="2">Người dùng</th>
+                                                    <th scope="col" rowspan="2">Mức độ tương tác</th>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Số lượng</th>
+                                                    <th scope="col">Lượt thích</th>
+                                                    <th scope="col">Số lượng</th>
+                                                    <th scope="col">Lượt thích</th>
+                                                    <th scope="col">Tương tác</th>
+                                                    <th scope="col">Theo dõi</th>
+                                                </tr>
+
+                                            </thead>
+                                            <tbody>
+                                                <?php $i=0; $sum_total_hashtag = array_sum(array_column($total_hashtag, 'Total_hashtag'));?>
+                                                @foreach($total_hashtag as $item)
+                                                    @if($i < 10)
+                                                    <?php
+                                                        $bv_hashtag_thich = $bv_hashtag->clone()
+                                                        ->join('baiviet_thich', 'baiviet_thich.BV_MA', '=', 'bai_viet.BV_MA')
+                                                        ->where('H_HASHTAG', $item["hashtag"])->count();
+
+                                                        $bl_hashtag_thich = $bl_hashtag->clone()
+                                                        ->join('binhluan_thich', 'binhluan_thich.BL_MA', '=', 'binh_luan.BL_MA')
+                                                        ->where('H_HASHTAG', $item["hashtag"])->count();
+
+
+                                                        $bv_hashtag_nd = $bv_hashtag->clone()
+                                                        ->where('H_HASHTAG', $item["hashtag"])
+                                                        ->pluck('bai_viet.ND_MA')->toArray();
+
+                                                        $bl_hashtag_nd = $bl_hashtag->clone()
+                                                        ->where('H_HASHTAG', $item["hashtag"])
+                                                        ->pluck('binh_luan.ND_MA')->toArray();
+
+                                                        $nd_hashtag = array_unique(array_merge($bl_hashtag_nd, $bv_hashtag_nd));
+
+                                                        /*echo '<pre>';
+                                                        print_r ($nd_hashtag);
+                                                        echo '</pre>';*/
+                                                    ?>
+                                                    <tr>
+                                                        <td>{{$item["hashtag"]}}</td>
+                                                        <td>{{$item["sl_baiviet"]}}</td>
+                                                        <td>{{$bv_hashtag_thich}}</td>
+                                                        <td>{{$item["sl_binhluan"]+$item["sl_binhluantl"]}}</td>
+                                                        <td>{{$bl_hashtag_thich}}</td>
+                                                        <td>{{count($nd_hashtag)}}</td>
+                                                        <td><?php echo $hashtagcount->clone()->where('H_HASHTAG', $item["hashtag"])->count(); ?></td>
+                                                        <td>{{round(($item["Total_hashtag"] / $sum_total_hashtag) * 100, 1)}}%</td>
+                                                    </tr>
+                                                    <?php $i++ ?>
+                                                    @endif
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -101,9 +267,109 @@
                 <div class="card">
                     <div class="card-body p-4">
                         <div class="mb-3 mb-sm-0">
-                            <h2 class="card-title fw-semibold text-center fs-6">THỐNG KÊ NGƯỜI DÙNG MỚI</h2>
-                            <div class="m-4 w-100 mx-auto">
+                            <h2 class="card-title fw-semibold text-center fs-6">THỐNG KÊ NGƯỜI DÙNG</h2>
+                            <div class="mt-4 mb-4 w-100 mx-auto">
                                 <canvas id="chartNewUser"></canvas>
+                                <div class="row h-100 mt-5">
+                                    <div class="col-sm-6">
+                                        <h2 class="card-title fw-semibold text-center fs-5 pb-3">HOẠT ĐỘNG NỔI BẬT</h2>
+                                        <div class="h-100">
+                                        @if ($account_hot->count() > 0)
+                                                @foreach($account_hot as $key => $info)    
+                                                <div class="mb-3 mb-sm-0">
+                                                    <div class="row">
+                                                        <div class="col-sm-8">
+                                                            <div class="d-flex flex-row">
+                                                                <div>
+                                                                    <img src="<?php if($info->ND_ANHDAIDIEN) echo $info->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>"
+                                                                        alt="" width="50" height="50" class="rounded-circle me-2">
+                                                                </div>
+                                                                <div class="pt-1">
+                                                                    <b>{{$info->ND_HOTEN}}</b>
+                                                                    @if($info->VT_MA != 3)
+                                                                        <span class="badge-sm bg-warning rounded-pill"><i>{{$info->VT_TEN}}</i></span>
+                                                                    @endif
+                                                                    <p>
+                                                                        @if($info->KT_MA != null)
+                                                                            <?php $c = $college->where('KT_MA', $info->KT_MA)->first(); echo $c->KT_TEN; ?>
+                                                                        @endif
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <a href="{{URL::to('/tai-khoan/'.$info->ND_MA)}}" class="btn btn-primary w-100" type="button"><i class="fas fa-user-circle"></i> Trang cá nhân</a>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            - Bài viết gửi: <b><?php if (isset($bv_nd_count[$info->ND_MA])) echo $bv_nd_count[$info->ND_MA]; else echo '0'; ?></b><br>
+                                                            - Bài viết duyệt: <b><?php if (isset($bvd_nd_count[$info->ND_MA])) echo $bvd_nd_count[$info->ND_MA]; else echo '0'; ?></b><br>
+                                                            - Bình luận: <b><?php if (isset($bl_nd_count[$info->ND_MA])) echo $bl_nd_count[$info->ND_MA]; else echo '0'; ?></b>
+                                                        </div>
+                                                    </div>
+                                                </div><hr>
+                                            @endforeach
+                                        @else
+                                            <div class="text-center mt-4 mb-2">Rất tiếc! Không có nội dung nổi bật để hiển thị :(</div>
+                                        @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h2 class="card-title fw-semibold text-center fs-5 pb-3">BỊ BÁO CÁO NỔI BẬT</h2>
+                                        <div class="h-100">
+                                        @if ($account_bc->count() > 0)
+                                                @foreach($account_bc as $key => $infobc)    
+                                                <div class="mb-3 mb-sm-0">
+                                                    <div class="row">
+                                                        <div class="col-sm-8">
+                                                            <div class="d-flex flex-row">
+                                                                <div>
+                                                                    <img src="<?php if($infobc->ND_ANHDAIDIEN) echo $infobc->ND_ANHDAIDIEN; else echo config('constants.default_avatar');?>"
+                                                                        alt="" width="50" height="50" class="rounded-circle me-2">
+                                                                </div>
+                                                                <div class="pt-1">
+                                                                    <b>{{$infobc->ND_HOTEN}}</b>
+                                                                    @if($infobc->VT_MA != 3)
+                                                                        <span class="badge-sm bg-warning rounded-pill"><i>{{$infobc->VT_TEN}}</i></span>
+                                                                    @endif
+                                                                    <p>
+                                                                        @if($infobc->KT_MA != null)
+                                                                            <?php $c = $college->where('KT_MA', $infobc->KT_MA)->first(); echo $c->KT_TEN; ?>
+                                                                        @endif
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="d-flex">
+                                                                <a href="{{URL::to('/tai-khoan/'.$infobc->ND_MA)}}" class="btn btn-primary w-50" type="button"><i class="fas fa-user-circle"></i></a>
+                                                                <form role="form" action="{{URL::to('/tai-khoan/'.$infobc->ND_MA)}}" method="post" class="delete-form w-100 ms-3">
+                                                                    @method('DELETE')
+                                                                    {{csrf_field()}}
+                                                                    <button type="submit" onclick="return confirm('Bạn có chắc chắn muốn xóa mục này không?')" class="btn btn-danger w-100" ui-toggle-class="">
+                                                                        <i class="fa fa-times text-white text"></i> Vô hiệu hoá tài khoản
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <?php if (isset($infobc->sl_baiviet) && $infobc->sl_baiviet != 0) { ?>
+                                                            - <b><?php if (isset($infobc->sl_baocaobaiviet)) echo $infobc->sl_baocaobaiviet; else echo '0'; ?></b> báo cáo /
+                                                                <b><?php if (isset($infobc->sl_baiviet)) echo $infobc->sl_baiviet; else echo '0'; ?></b> bài viết<br>
+                                                                - Xác nhận vi phạm 
+                                                                <b><?php if (isset($infobc->sl_baivietxl)) echo $infobc->sl_baivietxl; else echo '0'; ?></b> bài viết<br>
+                                                            <?php } 
+                                                            if (isset($infobc->sl_binhluan) && $infobc->sl_binhluan != 0) { ?>
+                                                            - <b><?php if (isset($infobc->sl_baocaobinhluan)) echo $infobc->sl_baocaobinhluan; else echo '0'; ?></b> báo cáo /
+                                                                <b><?php if (isset($infobc->sl_binhluan)) echo $infobc->sl_binhluan; else echo '0'; ?></b> bình luận<br>
+                                                                - Xác nhận vi phạm 
+                                                                <b><?php if (isset($infobc->sl_binhluanxl)) echo $infobc->sl_binhluanxl; else echo '0'; ?></b> bình luận
+                                                            <?php } ?>
+                                                        </div>
+                                                    </div>
+                                                </div><hr>
+                                            @endforeach
+                                        @else
+                                            <div class="text-center mt-4 mb-2">Rất tiếc! Không có nội dung nổi bật để hiển thị :(</div>
+                                        @endif
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -275,7 +541,7 @@
                         echo '"'.$item["hashtag"].'", ';
                         $i++;
                     }
-                    if($i >= 10){
+                    else{
                         $other += $item["Total_hashtag"];
                     }
                 }

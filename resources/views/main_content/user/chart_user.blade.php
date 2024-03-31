@@ -82,6 +82,86 @@
                             <h2 class="card-title fw-semibold text-center fs-6">THỐNG KÊ HOẠT ĐỘNG TƯƠNG TÁC CỦA BẠN</h2>
                             <div class="m-4 w-100 mx-auto">
                                 <canvas id="chartActivity"></canvas>
+                                <div class="row h-100 mt-5">
+                                    <div class="col-sm-6">
+                                        <h2 class="card-title fw-semibold text-center fs-5" style="color: rgb(0, 175, 239)">BÀI VIẾT</h2>
+                                        <div class="row h-100">
+                                            <div class="col-sm-6">
+                                                <h2 class="card-title fw-semibold text-center fs-4 pb-3">NỔI BẬT</h2>
+                                                @if ($bai_viet_hot->count() > 0)
+                                                    @foreach($bai_viet_hot as $key => $bvh)
+                                                    <a href="{{URL::to('/bai-dang/'.$bvh->BV_MA)}}" class="fs-4 d-block mb-1">
+                                                        <i class="fas fa-angle-double-right"></i> &ensp; {{ Str::limit($bvh->BV_TIEUDE, 50) }}
+                                                        <br>
+                                                        <div class="text-muted" style="text-align: end; font-size: 0.82rem !important;">
+                                                            <i class="fas fa-eye pe-1"></i> <b>{{ isset($bvh->BV_LUOTXEM) ? $bvh->BV_LUOTXEM : 0 }}</b> <span class="px-2">|</span> 
+                                                            <i class="fas fa-heart pe-1"></i> <b>{{ isset($bvh->SL_THICH) ? $bvh->SL_THICH : 0 }}</b> <span class="px-2">|</span>  
+                                                            <i class="fas fa-reply pe-1"></i> <b>{{ isset($bvh->SL_BINHLUAN) ? $bvh->SL_BINHLUAN : 0 }}</b>
+                                                        </div>
+                                                    </a><hr>
+                                                    @endforeach
+                                                @else
+                                                    <div class="text-center mt-4 mb-2">Rất tiếc! Không có nội dung nổi bật để hiển thị :(</div>
+                                                @endif
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <h2 class="card-title fw-semibold text-center fs-4 pb-3">BỊ BÁO CÁO NỔI BẬT</h2>
+                                                @if ($bai_viet_bc->count() > 0)
+                                                    @foreach($bai_viet_bc as $key => $bvbc)
+                                                    <a href="{{URL::to('/bai-dang/'.$bvbc->BV_MA)}}" class="fs-4 d-block mb-1">
+                                                        <i class="fas fa-angle-double-right"></i> &ensp; {{ Str::limit($bvbc->BV_TIEUDE, 50) }}
+                                                        <br>
+                                                        <div class="text-muted" style="text-align: end; font-size: 0.82rem !important;">
+                                                            <i class="fas fa-eye pe-1"></i> <b>{{ isset($bvbc->BV_LUOTXEM) ? $bvbc->BV_LUOTXEM : 0 }}</b> <span class="px-2">|</span> 
+                                                            <i class="fas fa-flag pe-1"></i> <b>{{ isset($bvbc->BV_BC) ? $bvbc->BV_BC : 0 }}</b>
+                                                        </div>
+                                                    </a><hr>
+                                                    @endforeach
+                                                @else
+                                                    <div class="text-center mt-4 mb-2">Tuyệt vời! Không có nội dung nào bị báo cáo :)</div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h2 class="card-title fw-semibold text-center fs-5" style="color: rgb(239, 64, 0)">BÌNH LUẬN</h2>
+                                        <div class="row h-100">
+                                            <div class="col-sm-6">
+                                                <h2 class="card-title fw-semibold text-center fs-4 pb-3">NỔI BẬT</h2>
+                                                @if ($binh_luan_hot->count() > 0)
+                                                    @foreach($binh_luan_hot as $key => $blh)
+                                                    <a href="{{URL::to('/bai-dang/'.$blh->BV_MA.'?binh-luan='.$blh->BL_MA)}}" class="fs-4 d-block mb-1">
+                                                        <i class="fas fa-angle-double-right"></i> &ensp; {{ Str::limit($blh->BL_NOIDUNG, 50) }}
+                                                        <br>
+                                                        <div class="text-muted" style="text-align: end; font-size: 0.82rem !important;">
+                                                            <i class="fas fa-heart pe-1"></i> <b>{{ isset($blh->SL_THICH) ? $blh->SL_THICH : 0 }}</b> <span class="px-2">|</span>  
+                                                            <i class="fas fa-reply pe-1"></i> <b>{{ isset($blh->SL_BINHLUAN) ? $blh->SL_BINHLUAN : 0 }}</b>
+                                                        </div>
+                                                    </a><hr>
+                                                    @endforeach
+                                                @else
+                                                    <div class="text-center mt-4 mb-2">Rất tiếc! Không có nội dung nổi bật để hiển thị :(</div>
+                                                @endif
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <h2 class="card-title fw-semibold text-center fs-4 pb-3">BỊ BÁO CÁO NỔI BẬT</h2>
+                                                @if ($binh_luan_bc->count() > 0)
+                                                    @foreach($binh_luan_bc as $key => $blbc)
+                                                    <a href="{{URL::to('/bai-dang/'.$blbc->BV_MA.'?binh-luan='.$blbc->BL_MA)}}" class="fs-4 d-block mb-1">
+                                                        <i class="fas fa-angle-double-right"></i> &ensp; {{ Str::limit($blbc->BL_NOIDUNG, 50) }}
+                                                        <br>
+                                                        <div class="text-muted" style="text-align: end; font-size: 0.82rem !important;">
+                                                            <i class="fas fa-flag pe-1"></i> <b>{{ isset($blbc->BL_BC) ? $blbc->BL_BC : 0 }}</b>
+                                                        </div>
+                                                    </a><hr>
+                                                    @endforeach
+                                                @else
+                                                    <div class="text-center mt-4 mb-2">Tuyệt vời! Không có nội dung nào bị báo cáo :)</div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

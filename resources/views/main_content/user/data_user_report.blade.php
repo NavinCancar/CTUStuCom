@@ -2,31 +2,12 @@
 @section('content')
 <?php $userLog= Session::get('userLog'); ?>
 
-<?php
-    $addTT = ''; $addVT = ''; $addTK = '';
-    if(request()->query('trang-thai')){
-        $addTT .= '&trang-thai='.request()->query('trang-thai');
-    }
-    if(request()->query('vai-tro')){
-        $addVT .= '&vai-tro='.request()->query('vai-tro');
-    }
-    if(request()->query('tu-khoa')){
-        $addTK .= '&tu-khoa='.request()->query('tu-khoa');
-    }
-?>
 <!-- Content Start -->
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
             <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
-                <h5 class="card-title fw-semibold">Quản lý tài khoản người dùng
-                    <?php if($addTT != '' || $addVT != '' || $addTK != '') { ?>
-                        <a href="{{URL::to('/tai-khoan')}}" class="ms-2 fs-4"><i class="fas fa-sync-alt"></i></a>
-                    <?php } ?>
-                </h5> 
-            <a class="btn btn-danger" href="{{URL::to('/tai-khoan-vi-pham')}}">
-                <i class="fas fa-user"></i> Tài khoản vi phạm cần xem xét
-            </a>
+                <h5 class="card-title fw-semibold">Tổng hợp tài khoản vi phạm đang hoạt động</h5> 
             </div>
             <hr>
             <?php
@@ -44,7 +25,7 @@
                 <div class="card-body p-4">
                     <div class="mb-3 mb-sm-0">
                         <div class="row my-2">
-                            <h2 class="card-title fw-semibold text-center fs-6">DANH SÁCH TÀI KHOẢN NGƯỜI DÙNG</h2>
+                            <h2 class="card-title fw-semibold text-center fs-6">DANH SÁCH TÀI KHOẢN NGƯỜI DÙNG VI PHẠM ĐANG HOẠT ĐỘNG</h2>
                             <!--Header-->
                             <div class="row">
                                 <div class="col-sm-9">
@@ -52,9 +33,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <div class="input-group">
-                                    <form class="d-flex input-group-sm w-100 mt-2 mb-3" role="form" action="{{URL::to('/tai-khoan')}}" method="GET">
-                                        <?php if(request()->query('trang-thai')) echo '<input name="trang-thai" hidden value="'.request()->query('trang-thai').'">'; ?>
-                                        <?php if(request()->query('vai-tro')) echo '<input name="vai-tro" hidden value="'.request()->query('vai-tro').'">'; ?>
+                                    <form class="d-flex input-group-sm w-100 mt-2 mb-3" role="form" action="{{URL::to('/tai-khoan-vi-pham')}}" method="GET">
                                         <input class="form-control me-2" type="text" name="tu-khoa" placeholder="Tìm kiếm">
                                         <button class="btn btn-outline-primary" type="submit"><i class="fa fa-search"></i></button>
                                     </form>
@@ -69,42 +48,23 @@
                                         <tr>
                                             <th scope="col">Mã</th>
                                             <th scope="col">Tên người dùng</th>
-                                            <th scope="col">
-                                                <div class="dropdown dropdown-sm" style ="position: static;">
-                                                    <span class="dropdown-toggle" data-bs-toggle="dropdown">Trạng thái</span>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a href="{{URL::to('/tai-khoan/?trang-thai=hoat-dong')}}" class="dropdown-item">Hoạt động</a></li>
-                                                        <li><a href="{{URL::to('/tai-khoan/?trang-thai=vo-hieu-hoa')}}" class="dropdown-item">Vô hiệu hoá</a></li>
-                                                    </ul>
-                                                </div>
-                                            </th>
-                                            <th scope="col">Ngày tham gia</th>
-                                            <th scope="col">
-                                                <div class="dropdown dropdown-sm" style ="position: static;">
-                                                    <span class="dropdown-toggle" data-bs-toggle="dropdown">Vai trò</span>
-                                                    <ul class="dropdown-menu">
-                                                        @foreach($all_vaitro as $key => $vt)
-                                                        <li><a href="{{URL::to('/tai-khoan/?vai-tro='.Str::slug($vt->VT_TEN))}}" class="dropdown-item">{{$vt->VT_TEN}}</a></li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            </th>
+                                            <th scope="col">Vai trò</th>
+                                            <th scope="col"><i class="fas fa-flag"></i> Bài viết</th>
+                                            <th scope="col"><i class="fas fa-flag"></i> Bình luận</th>
+                                            <th scope="col"><i class="fas fa-flag"></i> Người dùng</th>
                                             <th scope="col" width="100"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($all_user as $key => $item)
+                                        @if($item->BC_total!=0)
                                         <tr data-user-id-value="{{$item->ND_MA}}">
                                             <td class="check-highlight">{{$item->ND_MA}}</td>
                                             <td class="check-highlight">{{$item->ND_HOTEN}}</td>
-                                            <td>
-                                                <?php 
-                                                    if($item->ND_TRANGTHAI ==0) echo '<span class="badge-sm bg-danger rounded-pill fs-2"><i>Vô hiệu hoá</i></span>'; 
-                                                    else echo '<span class="badge-sm bg-success rounded-pill fs-2"><i>Hoạt động</i></span>'; 
-                                                ?>
-                                            </td>
-                                            <td class="check-highlight">{{date('d/m/Y', strtotime($item->ND_NGAYTHAMGIA))}}</td>
                                             <td>{{$item->VT_TEN}}</td>
+                                            <td>{{$item->BV_BC}}</td>
+                                            <td>{{$item->BL_BC}}</td>
+                                            <td>{{$item->ND_BC}}</td>
                                             <td>
                                                 <div class="d-flex justify-content-between">
                                                     <a href="{{URL::to('/tai-khoan/'.$item -> ND_MA)}}"><i class="fas fa-user text-primary"></i></a>
@@ -117,6 +77,7 @@
                                                 </div>
                                             </td>
                                         </tr>
+                                        @endif
                                         @endforeach
                                     </tbody>
                                 </table>

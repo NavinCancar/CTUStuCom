@@ -898,7 +898,7 @@ class HomeController extends Controller
             ->whereBetween('BL_THOIGIANTAO', [$TGBDau, $TGKThuc])
             ->whereNull('binh_luan.BL_TRALOI_MA')
             ->groupBy('cua_bai_viet.H_HASHTAG')
-            ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) * 3 AS Total_hashtag'))
+            ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) * 3 AS Total_hashtag, COUNT(*) AS sl_binhluan'))
             ->get();
             $Total_hashtag_BLTL = DB::table('binh_luan')
             ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'binh_luan.BV_MA')
@@ -906,7 +906,7 @@ class HomeController extends Controller
             ->whereBetween('BL_THOIGIANTAO', [$TGBDau, $TGKThuc])
             ->whereNotNull('binh_luan.BL_TRALOI_MA')
             ->groupBy('cua_bai_viet.H_HASHTAG')
-            ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) AS Total_hashtag'))
+            ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) AS Total_hashtag, COUNT(*) AS sl_binhluantl'))
             ->get();
 
 
@@ -915,46 +915,59 @@ class HomeController extends Controller
             ->where('bai_viet.BV_TRANGTHAI', 'Đã duyệt')
             ->whereBetween('BV_THOIGIANTAO', [$TGBDau, $TGKThuc])
             ->groupBy('cua_bai_viet.H_HASHTAG')
-            ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) * 6 AS Total_hashtag'))
+            ->select('cua_bai_viet.H_HASHTAG', DB::raw('COUNT(*) * 6 AS Total_hashtag, COUNT(*) AS sl_baiviet'))
             ->get();
 
             //Tổng kết quả
             $Total_hashtag_result = $Total_hashtag_BV->map(function ($item) {
                 return [
                     'hashtag' => $item->H_HASHTAG,
-                    'Total_hashtag' => $item->Total_hashtag
+                    'Total_hashtag' => $item->Total_hashtag,
+                    'sl_baiviet' => $item->sl_baiviet,
+                    'sl_binhluan' => 0,
+                    'sl_binhluantl' => 0,
                 ];
             })->toArray();
 
             foreach ($Total_hashtag_BL as $item) {
                 $hashtag = $item->H_HASHTAG;
                 $Total_hashtag_item = $item->Total_hashtag;
+                $Total_sl_binhluan = $item->sl_binhluan;
                 
                 // Kiểm tra xem hashtag đã tồn tại chưa
                 $index = array_search($hashtag, array_column($Total_hashtag_result, 'hashtag'));
             
                 if ($index !== false) { //Tồn tại
                     $Total_hashtag_result[$index]["Total_hashtag"] += $Total_hashtag_item;
+                    $Total_hashtag_result[$index]["sl_binhluan"] += $Total_sl_binhluan;
                 } else { //Không tồn tại
                     $Total_hashtag_result[] = [
                         'hashtag' => $hashtag,
-                        'Total_hashtag' => $Total_hashtag_item
+                        'Total_hashtag' => $Total_hashtag_item,
+                        'sl_baiviet' => 0,
+                        'sl_binhluan' => $item->sl_binhluan,
+                        'sl_binhluantl' => 0,
                     ];
                 }
             }
             foreach ($Total_hashtag_BLTL as $item) {
                 $hashtag = $item->H_HASHTAG;
                 $Total_hashtag_item = $item->Total_hashtag;
+                $Total_sl_binhluantl = $item->sl_binhluantl;
                 
                 // Kiểm tra xem hashtag đã tồn tại chưa
                 $index = array_search($hashtag, array_column($Total_hashtag_result, 'hashtag'));
             
                 if ($index !== false) { //Tồn tại
                     $Total_hashtag_result[$index]["Total_hashtag"] += $Total_hashtag_item;
+                    $Total_hashtag_result[$index]["sl_binhluantl"] += $Total_sl_binhluantl;
                 } else { //Không tồn tại
                     $Total_hashtag_result[] = [
                         'hashtag' => $hashtag,
-                        'Total_hashtag' => $Total_hashtag_item
+                        'Total_hashtag' => $Total_hashtag_item,
+                        'sl_baiviet' => 0,
+                        'sl_binhluantl' => 0,
+                        'sl_binhluantl' => $item->sl_binhluantl,
                     ];
                 }
             }
@@ -964,8 +977,239 @@ class HomeController extends Controller
             });
 
             //---------------------------------------------------------
+            //CHI TIẾT DỮ LIỆU TƯƠNG TÁC
             //---------------------------------------------------------
+            $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
 
+            $bai_viet_clone = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            //->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            //->whereBetween('BV_THOIGIANDANG', [$TGBDau, $TGKThuc])
+            //->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+
+            $bv_hot = DB::table('bai_viet')
+            ->leftJoin(DB::raw('(SELECT BV_MA, COUNT(*) AS SL_THICH FROM baiviet_thich GROUP BY BV_MA) AS tb_thich'), function ($join) {
+                $join->on('bai_viet.BV_MA', '=', 'tb_thich.BV_MA');
+            })
+            ->leftJoin(DB::raw('(SELECT BV_MA, COUNT(*) SL_BINHLUAN FROM binh_luan GROUP BY BV_MA) AS tb_binhluan'), function ($join) {
+                $join->on('bai_viet.BV_MA', '=', 'tb_binhluan.BV_MA');
+            })
+            ->groupBy('bai_viet.BV_MA')->groupBy('SL_THICH')->groupBy('SL_BINHLUAN')
+            ->select('bai_viet.BV_MA as BV_MA_connect', 'SL_THICH', 'SL_BINHLUAN')
+            ->selectRaw('SUM(IFNULL(SL_THICH, 0) * 3 + IFNULL(SL_BINHLUAN, 0) * 5 + IFNULL(BV_LUOTXEM, 0)) AS total_hot');
+
+            $bai_viet_hot = $bai_viet_clone->clone()
+            ->whereBetween('BV_THOIGIANDANG', [$TGBDau, $TGKThuc])
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->joinSub($bv_hot, 'bv_hot', function ($join) {
+                $join->on('bai_viet.BV_MA', '=', 'bv_hot.BV_MA_connect');
+            })->orderBy('total_hot', 'desc')->limit(5)->get();
+
+
+            $bv_bc = DB::table('baiviet_baocao')
+            ->whereBetween('BVBC_THOIDIEM', [$TGBDau, $TGKThuc])
+            ->groupBy('baiviet_baocao.BV_MA')
+            ->select('baiviet_baocao.BV_MA as BV_MA_connect')
+            ->selectRaw('COUNT(*) as BV_BC');
+
+            $bai_viet_bc = $bai_viet_clone->clone()
+            ->joinSub($bv_bc, 'bv_bc', function ($join) {
+                $join->on('bai_viet.BV_MA', '=', 'bv_bc.BV_MA_connect');
+            })
+            ->orderBy('BV_BC', 'desc')->limit(5)->get();
+
+
+
+            $binh_luan_clone = DB::table('binh_luan')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            //->where('binh_luan.BL_TRANGTHAI', '=', 'Đang hiển thị')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+
+            $bl_hot = DB::table('binh_luan')
+            ->leftJoin(DB::raw('(SELECT BL_MA, COUNT(*) AS SL_THICH FROM binhluan_thich GROUP BY BL_MA) AS tb_thich'), function ($join) {
+                $join->on('binh_luan.BL_MA', '=', 'tb_thich.BL_MA');
+            })
+            ->leftJoin(DB::raw('(SELECT BL_TRALOI_MA, COUNT(*) SL_BINHLUAN FROM binh_luan WHERE BL_TRALOI_MA IS NOT NULL GROUP BY BL_TRALOI_MA) AS tb_binhluan'), function ($join) {
+                $join->on('binh_luan.BL_MA', '=', 'tb_binhluan.BL_TRALOI_MA');
+            })
+            ->groupBy('binh_luan.BL_MA')->groupBy('SL_THICH')->groupBy('SL_BINHLUAN')
+            ->select('binh_luan.BL_MA as BL_MA_connect', 'SL_THICH', 'SL_BINHLUAN')
+            ->selectRaw('SUM(IFNULL(SL_THICH, 0) * 3 + IFNULL(SL_BINHLUAN, 0) * 5) AS total_hot');
+
+            $binh_luan_hot = $binh_luan_clone->clone()
+            ->whereBetween('BL_THOIGIANTAO', [$TGBDau, $TGKThuc])
+            ->where('binh_luan.BL_TRANGTHAI', '=', 'Đang hiển thị')
+            ->joinSub($bl_hot, 'bl_hot', function ($join) {
+                $join->on('binh_luan.BL_MA', '=', 'bl_hot.BL_MA_connect');
+            })->orderBy('total_hot', 'desc')->limit(5)->get();
+
+
+            $bl_bc = DB::table('binhluan_baocao')
+            ->whereBetween('BLBC_THOIDIEM', [$TGBDau, $TGKThuc])
+            ->groupBy('binhluan_baocao.BL_MA')
+            ->select('binhluan_baocao.BL_MA as BL_MA_connect')
+            ->selectRaw('COUNT(*) as BL_BC');
+
+            $binh_luan_bc = $binh_luan_clone->clone()
+            ->joinSub($bl_bc, 'bl_bc', function ($join) {
+                $join->on('binh_luan.BL_MA', '=', 'bl_bc.BL_MA_connect');
+            })
+            ->orderBy('BL_BC', 'desc')->limit(5)->get();
+
+            //---------------------------------------------------------
+            //CHI TIẾT DỮ LIỆU TƯƠNG TÁC HASHTAG
+            //---------------------------------------------------------
+            
+            $hashtagcount = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+            ->groupby('H_HASHTAG');
+
+            $bv_hashtag = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->whereBetween('BV_THOIGIANTAO', [$TGBDau, $TGKThuc])
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+            //->where('H_HASHTAG', $item["hashtag"])
+            //->groupby('bai_viet.BV_MA')->count('slthic')
+
+            $bl_hashtag = DB::table('binh_luan')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'binh_luan.BV_MA')
+            ->where('binh_luan.BL_TRANGTHAI', 'Đang hiển thị')
+            ->whereBetween('BL_THOIGIANTAO', [$TGBDau, $TGKThuc])
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+
+            //->select('H_HASHTAG as H_HASHTAG_connect')->selectRaw('COUNT(*) as sl_bv')
+
+            //---------------------------------------------------------
+            //CHI TIẾT NGƯỜI DÙNG
+            //---------------------------------------------------------
+            $college = DB::table('khoa_truong')->get();
+
+            $bvd_hashtag = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->whereBetween('BV_THOIGIANDANG', [$TGBDau, $TGKThuc])
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+
+            $bvd_nd = $bvd_hashtag->clone()
+            ->pluck('bai_viet.ND_MA')->toArray();
+
+            $bv_nd = $bv_hashtag->clone()
+            ->pluck('bai_viet.ND_MA')->toArray();
+
+            $bl_nd = $bl_hashtag->clone()
+            ->pluck('binh_luan.ND_MA')->toArray();
+
+
+            $bvd_nd_count = array_count_values($bvd_nd);
+            $bvd_nd_hot = [];
+            foreach ($bvd_nd_count as $nd_ma => $so_lan) {
+                $bvd_nd_hot[] = ['ND_MA' => $nd_ma, 'ND_GIATRI' => $so_lan];
+            }
+
+            $bv_nd_count = array_count_values($bv_nd);
+            $bv_nd_hot = [];
+            foreach ($bv_nd_count as $nd_ma => $so_lan) {
+                $bv_nd_hot[] = ['ND_MA' => $nd_ma, 'ND_GIATRI' => $so_lan];
+            }
+            
+            $bl_nd_count = array_count_values($bl_nd);
+            $bl_nd_hot = [];
+            foreach ($bl_nd_count as $nd_ma => $so_lan) {
+                $bl_nd_hot[] = ['ND_MA' => $nd_ma, 'ND_GIATRI' => $so_lan];
+            }
+
+            $nd_hot = $bv_nd_hot;
+
+            foreach ($bl_nd_hot as $item) {
+                $nd_ma = $item['ND_MA'];
+                $nd_giatri = $item['ND_GIATRI'];
+
+                $index = false;
+                $index = array_search($nd_ma, array_column($nd_hot, 'ND_MA'));
+            
+                if ($index !== false) {
+                    $nd_hot[$index]['ND_GIATRI'] += $nd_giatri;
+                } else {
+                    $nd_hot[] = ['ND_MA' => $nd_ma, 'ND_GIATRI' => $nd_giatri];
+                }
+            }
+
+            foreach ($bvd_nd_hot as $item) {
+                $nd_ma = $item['ND_MA'];
+                $nd_giatri = $item['ND_GIATRI'];
+
+                $index = false;
+                $index = array_search($nd_ma, array_column($nd_hot, 'ND_MA'));
+            
+                if ($index !== false) {
+                    $nd_hot[$index]['ND_GIATRI'] += $nd_giatri*2;
+                } else {
+                    $nd_hot[] = ['ND_MA' => $nd_ma, 'ND_GIATRI' => $nd_giatri*2];
+                }
+            }
+            
+            usort($nd_hot, function($a, $b) {
+                return $b['ND_GIATRI'] - $a['ND_GIATRI'];
+            });
+            $nd_hot = array_slice($nd_hot, 0, 5);
+            $nd_hot = array_column($nd_hot, 'ND_MA');
+
+            $account_hot = DB::table('nguoi_dung')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+            ->whereIn('ND_MA', $nd_hot)
+            ->orderBy(DB::raw("FIELD(ND_MA, " . implode(',', $nd_hot) . ")"))
+            ->limit(5)->get();
+            
+
+            $bcbv_nd = DB::table('baiviet_baocao')
+            ->join('bai_viet', 'baiviet_baocao.BV_MA', '=', 'bai_viet.BV_MA')
+            ->whereBetween('BVBC_THOIDIEM', [$TGBDau, $TGKThuc])
+            ->select('bai_viet.ND_MA', 
+                    DB::raw('COUNT(DISTINCT bai_viet.BV_MA) AS sl_baiviet'),
+                    DB::raw('COUNT(DISTINCT CASE WHEN bai_viet.BV_TRANGTHAI LIKE "Vi phạm tiêu chuẩn%" THEN bai_viet.BV_MA END) AS sl_baivietxl'),
+                    DB::raw('COUNT(*) AS sl_baocaobaiviet'))
+            ->groupBy('bai_viet.ND_MA');
+            //->get()->toArray();
+
+            $bcbl_nd = DB::table('binhluan_baocao')
+            ->join('binh_luan', 'binhluan_baocao.BL_MA', '=', 'binh_luan.BL_MA')
+            ->whereBetween('BLBC_THOIDIEM', [$TGBDau, $TGKThuc])
+            ->select('binh_luan.ND_MA', 
+                    DB::raw('COUNT(DISTINCT binh_luan.BL_MA) AS sl_binhluan'),
+                    DB::raw('COUNT(DISTINCT CASE WHEN binh_luan.BL_TRANGTHAI LIKE "Vi phạm tiêu chuẩn%" THEN binh_luan.BL_MA END) AS sl_binhluanxl'),
+                    DB::raw('COUNT(*) AS sl_baocaobinhluan'))
+            ->groupBy('binh_luan.ND_MA');
+            //->get()->toArray();
+
+            $account_bc = DB::table('nguoi_dung')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)
+            ->leftJoinSub($bcbv_nd, 'bcbv_nd', function ($join) {
+                $join->on('nguoi_dung.ND_MA', '=', 'bcbv_nd.ND_MA');
+            })
+            ->leftJoinSub($bcbl_nd, 'bcbl_nd', function ($join) {
+                $join->on('nguoi_dung.ND_MA', '=', 'bcbl_nd.ND_MA');
+            })
+            ->where(function($query) {
+                $query->whereNotNull('bcbv_nd.ND_MA')
+                      ->orWhereNotNull('bcbl_nd.ND_MA');
+            })
+            ->orderByRaw('COALESCE(sl_baivietxl, 0) + COALESCE(sl_binhluanxl, 0) DESC')
+            ->orderByRaw('COALESCE(sl_baocaobaiviet, 0) + COALESCE(sl_baocaobinhluan, 0) DESC')
+            ->orderByRaw('COALESCE(sl_baiviet, 0) + COALESCE(sl_binhluan, 0) DESC')
+            ->limit(5)->get();
+
+            //---------------------------------------------------------
+            //---------------------------------------------------------
 
             /*
                 //GIỜ NGÀY THÁNG NĂM (trong 1 ngày)
@@ -989,15 +1233,24 @@ class HomeController extends Controller
                 ->get();
             */
             /*echo '<pre>';
-            print_r ($allDates);
-            print_r ($minUnit);
+            print_r ($account_bc);
+            //print_r ($nguoi_dung_hot); 
+            //print_r ($bv_nd_hot);
+            //print_r ($bl_nd_hot);
             echo '</pre>';*/
             
             return view('main_content.chart')->with('now', $now)
             ->with('minUnit', $minUnit)->with('allDates', $allDates)
             ->with('TGBDau', $TGBDau)->with('TGKThuc', $TGKThuc)
             ->with('tt_bv', $tt_bv)->with('tt_bl', $tt_bl)
-            ->with('ndm', $ndm)->with('total_hashtag', $Total_hashtag_result);
+            ->with('ndm', $ndm)->with('total_hashtag', $Total_hashtag_result)
+            ->with('bai_viet_hot', $bai_viet_hot)->with('bai_viet_bc', $bai_viet_bc)
+            ->with('binh_luan_hot', $binh_luan_hot)->with('binh_luan_bc', $binh_luan_bc)
+            ->with('hashtagcount', $hashtagcount)
+            ->with('bv_hashtag', $bv_hashtag)->with('bl_hashtag', $bl_hashtag)
+            ->with('bvd_nd_count', $bvd_nd_count)->with('bv_nd_count', $bv_nd_count)->with('bl_nd_count', $bl_nd_count)
+            ->with('college', $college)
+            ->with('account_hot', $account_hot)->with('account_bc', $account_bc);
         }
             
         Session::put('alert', ['type' => 'danger', 'content' => 'Xin kiểm tra lại dữ liệu đầu vào!']);

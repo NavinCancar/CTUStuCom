@@ -129,6 +129,16 @@ class HashtagController extends Controller
         $hashtag_get = DB::table('hashtag')->where('H_HASHTAG', $hashtag->H_HASHTAG)->first();
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
 
+        $bv = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+            ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->where('cua_bai_viet.H_HASHTAG', '=', $hashtag->H_HASHTAG)
+            ->orderBy('bai_viet.BV_THOIGIANDANG', 'desc')
+            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+        $count_bai_viet = $bv->clone()->count();
+
         if($userLog){
             $bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
             $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
@@ -157,15 +167,7 @@ class HashtagController extends Controller
             ->where("H_HASHTAG", $hashtag->H_HASHTAG)->where("ND_MA", $userLog->ND_MA)->exists();
         }
         else{
-            $bai_viet = DB::table('bai_viet')
-            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
-            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-            ->join('cua_bai_viet', 'cua_bai_viet.BV_MA', '=', 'bai_viet.BV_MA')
-            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
-            ->where('cua_bai_viet.H_HASHTAG', '=', $hashtag->H_HASHTAG)
-            ->orderBy('bai_viet.BV_THOIGIANDANG', 'desc')
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3)->paginate(5);
-
+            $bai_viet = $bv->clone()->paginate(5);
             
             $bai_viet_not_in_suggest = DB::table('bai_viet')
             ->where('bai_viet.BV_TRANGTHAI', '!=', 'Đã duyệt')
@@ -223,7 +225,8 @@ class HashtagController extends Controller
         }
         //Bài viết End
 
-        return view('main_content.hashtag.show_hashtag')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
+        return view('main_content.hashtag.show_hashtag')->with('count_bai_viet', $count_bai_viet)
+        ->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
         ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
         ->with('thich_no_get', $thich_no_get)->with('hashtag_get', $hashtag_get)

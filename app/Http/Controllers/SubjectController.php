@@ -78,7 +78,16 @@ class SubjectController extends Controller
         $userLog = Session::get('userLog');
         $subject_get = DB::table('hoc_phan')->where('HP_MA', $hoc_phan->HP_MA)->first();
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
-                    
+
+        $bv = DB::table('bai_viet')
+        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+        ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+        ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+        ->where('bai_viet.HP_MA', '=', $hoc_phan->HP_MA)
+        ->orderBy('bai_viet.BV_THOIGIANDANG', 'desc')
+        ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+        $count_bai_viet = $bv->clone()->count();
+
         if($userLog){
             $bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
             $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
@@ -96,13 +105,7 @@ class SubjectController extends Controller
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
         }
         else{
-            $bai_viet_clone = DB::table('bai_viet')
-            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
-            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
-            ->where('bai_viet.HP_MA', '=', $hoc_phan->HP_MA)
-            ->orderBy('bai_viet.BV_THOIGIANDANG', 'desc')
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+            $bai_viet_clone = $bv;
         }
         
         $bai_viet = $bai_viet_clone->clone()->paginate(5);
@@ -136,7 +139,8 @@ class SubjectController extends Controller
         $bai_viet_luu= DB::table('danh_dau');
 
         if ($request->ajax()) {//Chạy nút load-more
-            $view = view('main_component.post_loadmore')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
+            $view = view('main_component.post_loadmore')->with('count_bai_viet', $count_bai_viet)
+            ->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
             ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
             ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
             ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get)
@@ -146,7 +150,8 @@ class SubjectController extends Controller
         }
         //Bài viết End
 
-        return view('main_content.subject.show_subject')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
+        return view('main_content.subject.show_subject')->with('count_bai_viet', $count_bai_viet)
+        ->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)
         ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
         ->with('thich_no_get', $thich_no_get)->with('subject_get', $subject_get)

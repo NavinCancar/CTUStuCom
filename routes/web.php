@@ -39,6 +39,9 @@ Route::post('/ket-qua-tim-kiem', 'App\Http\Controllers\HomeController@search_pos
 Route::get('/thong-ke','App\Http\Controllers\HomeController@chart');
 
 //UserSys: Người dùng hệ thống
+Route::resource('/tai-khoan', 'App\Http\Controllers\UserSysController')->except(['create', 'store']); ///ok: CUD_ND
+Route::post('/vai-tro-nguoi-dung', 'App\Http\Controllers\UserSysController@role_update');
+
 //--Đăng nhập
 Route::get('/dang-nhap', 'App\Http\Controllers\UserSysController@login'); ///ok
 Route::get('/dang-xuat', 'App\Http\Controllers\UserSysController@logout'); ///ok
@@ -58,8 +61,9 @@ Route::get('/danh-sach-theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysControlle
 Route::get('/danh-sach-nguoi-theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysController@list_followme'); ///ok
 Route::get('/danh-sach-chan', 'App\Http\Controllers\UserSysController@list_block'); ///ok
 Route::get('/nhin-lai-qua-trinh', 'App\Http\Controllers\UserSysController@chart');
-Route::resource('/tai-khoan', 'App\Http\Controllers\UserSysController')->except(['create', 'store']); ///ok: CUD_ND
-Route::post('/vai-tro-nguoi-dung', 'App\Http\Controllers\UserSysController@role_update');
+
+//--Tổng hợp
+Route::get('/tai-khoan-vi-pham', 'App\Http\Controllers\UserSysController@data_user_report'); ///ok
 
 //-- Theo dõi
 Route::get('/theo-doi/{ND_MA}', 'App\Http\Controllers\UserSysController@theodoi'); ///ok

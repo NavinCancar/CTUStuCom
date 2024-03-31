@@ -78,6 +78,15 @@ class CollegeController extends Controller
         $college = DB::table('khoa_truong')->where('KT_MA', $khoa_truong->KT_MA)->first();
         $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
 
+        $bv = DB::table('bai_viet')
+        ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+        ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+        ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+        ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+
+        $count_bai_viet = $bv->clone()
+        ->where('nguoi_dung.KT_MA', '=', $khoa_truong->KT_MA)->count();
+
         if($userLog){
             $bai_viet_not_in = DB::table('baiviet_baocao')->where('ND_MA', $userLog->ND_MA)->pluck('BV_MA')->toArray();
             $nguoi_dung_not_in = DB::table('chan')->where('ND_CHAN_MA', $userLog->ND_MA)->pluck('ND_BICHAN_MA')->toArray();
@@ -93,11 +102,7 @@ class CollegeController extends Controller
             ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
         }
         else{
-            $bai_viet_clone = DB::table('bai_viet')
-            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
-            ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
-            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
-            ->whereNotIn('nguoi_dung.ND_MA', $nguoi_dung_not_in3);
+            $bai_viet_clone = $bv;
         }
 
         $bai_viet = $bai_viet_clone->clone()
@@ -178,18 +183,19 @@ class CollegeController extends Controller
         //NỔI BẬT END
 
         if ($request->ajax()) {//Chạy nút load-more
-            $view = view('main_component.post_loadmore')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
+            $view = view('main_component.post_loadmore')->with('count_bai_viet', $count_bai_viet)
+            ->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
             ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)->with('hoc_phanKT', $hoc_phanKT)
             ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
-            ->with('thich_no_get', $thich_no_get)->with('college', $college)
-            ->with('bai_viet_luu', $bai_viet_luu)
+            ->with('thich_no_get', $thich_no_get)->with('college', $college)->with('bai_viet_luu', $bai_viet_luu)
             ->with('bai_viet_hot', $bai_viet_hot)->with('hashtag_hot', $hashtag_hot)->with('hoc_phan_hot', $hoc_phan_hot)->render();
   
             return response()->json(['html' => $view]);
         }
         //Bài viết End
 
-        return view('main_content.college.show_college')->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
+        return view('main_content.college.show_college')->with('count_bai_viet', $count_bai_viet)
+        ->with('bai_viet', $bai_viet)->with('hashtag', $hashtag_list)
         ->with('hashtag_bai_viet', $hashtag_bai_viet)->with('hoc_phan', $hoc_phan)->with('hoc_phanKT', $hoc_phanKT)
         ->with('count_thich', $count_thich)->with('count_binh_luan', $count_binh_luan)
         ->with('thich_no_get', $thich_no_get)->with('college', $college)->with('bai_viet_luu', $bai_viet_luu)

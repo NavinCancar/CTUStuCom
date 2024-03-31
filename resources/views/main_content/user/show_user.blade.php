@@ -117,9 +117,10 @@
                             <div class="mb-3 mb-sm-0">
                                 @if($bai_viet_count)
                                     @foreach($bai_viet as $key => $bv)
-                                        <a href="{{URL::to('/bai-dang/'.$bv->BV_MA)}}" class="fs-4">
+                                        <a href="{{URL::to('/bai-dang/'.$bv->BV_MA)}}" class="fs-4 d-block mb-1">
+                                            <i class="fas fa-angle-double-right"></i> &ensp; 
                                             {{$bv->BV_TIEUDE}}
-                                        </a><br>
+                                        </a>
                                     @endforeach
                                 @else
                                     <p class="text-center">Chưa có bài viết nào!</p>

@@ -21,7 +21,7 @@
             <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
             <h5 class="card-title fw-semibold">Danh sách bình luận
                 <?php if($addTT != '' || $addBC != '' || $addTK != '') { ?>
-                    <a href="{{URL::to('/bai-dang')}}" class="ms-2 fs-4"><i class="fas fa-sync-alt"></i></a>
+                    <a href="{{URL::to('/binh-luan')}}" class="ms-2 fs-4"><i class="fas fa-sync-alt"></i></a>
                 <?php } ?>
             </h5> 
             </div>

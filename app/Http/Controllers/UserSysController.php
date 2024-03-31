@@ -138,13 +138,38 @@ class UserSysController extends Controller
         echo '</pre>';*/
         
         if($userLog){
-            if($userLog->ND_TRANGTHAI==1){
+            $bcbv_nd = DB::table('bai_viet')
+            ->where('bai_viet.ND_MA', $userLog->ND_MA)
+            ->select(DB::raw('COUNT(DISTINCT CASE WHEN bai_viet.BV_TRANGTHAI LIKE "Vi phạm tiêu chuẩn%" THEN bai_viet.BV_MA END) AS sl_baivietxl'))
+            ->groupBy('bai_viet.ND_MA')->first();
+
+            $bcbl_nd = DB::table('binh_luan')
+            ->where('binh_luan.ND_MA', $userLog->ND_MA)
+            ->select(DB::raw('COUNT(DISTINCT CASE WHEN binh_luan.BL_TRANGTHAI LIKE "Vi phạm tiêu chuẩn%" THEN binh_luan.BL_MA END) AS sl_binhluanxl'))
+            ->groupBy('binh_luan.ND_MA')->first();
+
+            $sl_baivietxl = isset($bcbv_nd->sl_baivietxl) ? $bcbv_nd->sl_baivietxl : 0;
+            $sl_binhluanxl = isset($bcbl_nd->sl_binhluanxl) ? $bcbl_nd->sl_binhluanxl : 0;
+            //Session::put('alert', ['type' => 'warning', 'content' => 'Tài khoản đã có '.$sl_baivietxl .'-'. $sl_binhluanxl.' báo cáo được xác nhận, nếu quá 5 báo cáo được xác nhận tài khoản sẽ bị vô hiệu hoá!']);
+
+            if($userLog->ND_TRANGTHAI==1 && $sl_baivietxl + $sl_binhluanxl <= 5){
                 Session::put('userLog',$userLog);
 
                 $uSysAvatar = DB::table('nguoi_dung')->select('ND_MA', 'ND_HOTEN', 'ND_ANHDAIDIEN')->get();
                 Session::put('uSysAvatar',$uSysAvatar->toArray());
 
+                if($sl_baivietxl + $sl_binhluanxl >= 3) Session::put('alert', ['type' => 'warning', 'content' => 'Tài khoản đã có '.$sl_baivietxl + $sl_binhluanxl.' báo cáo được xác nhận, nếu quá 5 báo cáo được xác nhận tài khoản sẽ bị vô hiệu hoá!']);
                 return Redirect::to('/trang-chu');
+            }
+            else if($userLog->ND_TRANGTHAI==1 && $sl_baivietxl + $sl_binhluanxl > 5){
+                DB::table('nguoi_dung')
+                ->where('ND_MA', $userLog->ND_MA)
+                ->update([ 
+                    'ND_TRANGTHAI' => 0
+                ]);
+
+                Session::put('alert', ['type' => 'danger', 'content' => 'Tài khoản này của bạn đã bị khoá do xác nhận vi phạm tiêu chuẩn nhiều lần!']);
+                return Redirect::to('/dang-nhap');
             }
             else{
                 Session::put('alert', ['type' => 'danger', 'content' => 'Tài khoản này của bạn đã bị khoá!']);
@@ -621,6 +646,79 @@ class UserSysController extends Controller
                 )->get();
             }
             
+            //CHI TIẾT DỮ LIỆU TƯƠNG TÁC
+            $bai_viet_clone = DB::table('bai_viet')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'bai_viet.ND_MA')
+            ->where('bai_viet.ND_MA', $userLog->ND_MA);
+
+            $bv_hot = DB::table('bai_viet')
+            ->leftJoin(DB::raw('(SELECT BV_MA, COUNT(*) AS SL_THICH FROM baiviet_thich GROUP BY BV_MA) AS tb_thich'), function ($join) {
+                $join->on('bai_viet.BV_MA', '=', 'tb_thich.BV_MA');
+            })
+            ->leftJoin(DB::raw('(SELECT BV_MA, COUNT(*) SL_BINHLUAN FROM binh_luan GROUP BY BV_MA) AS tb_binhluan'), function ($join) {
+                $join->on('bai_viet.BV_MA', '=', 'tb_binhluan.BV_MA');
+            })
+            ->groupBy('bai_viet.BV_MA')->groupBy('SL_THICH')->groupBy('SL_BINHLUAN')
+            ->select('bai_viet.BV_MA as BV_MA_connect', 'SL_THICH', 'SL_BINHLUAN')
+            ->selectRaw('SUM(IFNULL(SL_THICH, 0) * 3 + IFNULL(SL_BINHLUAN, 0) * 5 + IFNULL(BV_LUOTXEM, 0)) AS total_hot');
+
+            $bai_viet_hot = $bai_viet_clone->clone()
+            ->whereBetween('BV_THOIGIANDANG', [$TGBDau, $TGKThuc])
+            ->where('bai_viet.BV_TRANGTHAI', '=', 'Đã duyệt')
+            ->joinSub($bv_hot, 'bv_hot', function ($join) {
+                $join->on('bai_viet.BV_MA', '=', 'bv_hot.BV_MA_connect');
+            })->orderBy('total_hot', 'desc')->limit(5)->get();
+
+
+            $bv_bc = DB::table('baiviet_baocao')
+            ->whereBetween('BVBC_THOIDIEM', [$TGBDau, $TGKThuc])
+            ->groupBy('baiviet_baocao.BV_MA')
+            ->select('baiviet_baocao.BV_MA as BV_MA_connect')
+            ->selectRaw('COUNT(*) as BV_BC');
+
+            $bai_viet_bc = $bai_viet_clone->clone()
+            ->joinSub($bv_bc, 'bv_bc', function ($join) {
+                $join->on('bai_viet.BV_MA', '=', 'bv_bc.BV_MA_connect');
+            })
+            ->orderBy('BV_BC', 'desc')->limit(5)->get();
+
+
+
+            $binh_luan_clone = DB::table('binh_luan')
+            ->join('nguoi_dung', 'nguoi_dung.ND_MA', '=', 'binh_luan.ND_MA')
+            //->where('binh_luan.BL_TRANGTHAI', '=', 'Đang hiển thị')
+            ->where('binh_luan.ND_MA', $userLog->ND_MA);
+
+            $bl_hot = DB::table('binh_luan')
+            ->leftJoin(DB::raw('(SELECT BL_MA, COUNT(*) AS SL_THICH FROM binhluan_thich GROUP BY BL_MA) AS tb_thich'), function ($join) {
+                $join->on('binh_luan.BL_MA', '=', 'tb_thich.BL_MA');
+            })
+            ->leftJoin(DB::raw('(SELECT BL_TRALOI_MA, COUNT(*) SL_BINHLUAN FROM binh_luan WHERE BL_TRALOI_MA IS NOT NULL GROUP BY BL_TRALOI_MA) AS tb_binhluan'), function ($join) {
+                $join->on('binh_luan.BL_MA', '=', 'tb_binhluan.BL_TRALOI_MA');
+            })
+            ->groupBy('binh_luan.BL_MA')->groupBy('SL_THICH')->groupBy('SL_BINHLUAN')
+            ->select('binh_luan.BL_MA as BL_MA_connect', 'SL_THICH', 'SL_BINHLUAN')
+            ->selectRaw('SUM(IFNULL(SL_THICH, 0) * 3 + IFNULL(SL_BINHLUAN, 0) * 5) AS total_hot');
+
+            $binh_luan_hot = $binh_luan_clone->clone()
+            ->whereBetween('BL_THOIGIANTAO', [$TGBDau, $TGKThuc])
+            ->where('binh_luan.BL_TRANGTHAI', '=', 'Đang hiển thị')
+            ->joinSub($bl_hot, 'bl_hot', function ($join) {
+                $join->on('binh_luan.BL_MA', '=', 'bl_hot.BL_MA_connect');
+            })->orderBy('total_hot', 'desc')->limit(5)->get();
+
+
+            $bl_bc = DB::table('binhluan_baocao')
+            ->whereBetween('BLBC_THOIDIEM', [$TGBDau, $TGKThuc])
+            ->groupBy('binhluan_baocao.BL_MA')
+            ->select('binhluan_baocao.BL_MA as BL_MA_connect')
+            ->selectRaw('COUNT(*) as BL_BC');
+
+            $binh_luan_bc = $binh_luan_clone->clone()
+            ->joinSub($bl_bc, 'bl_bc', function ($join) {
+                $join->on('binh_luan.BL_MA', '=', 'bl_bc.BL_MA_connect');
+            })
+            ->orderBy('BL_BC', 'desc')->limit(5)->get();
 
             //---------------------------------------------------------
             //---------------------------------------------------------
@@ -840,6 +938,8 @@ class UserSysController extends Controller
             ->with('minUnit', $minUnit)->with('allDates', $allDates)
             ->with('TGBDau', $TGBDau)->with('TGKThuc', $TGKThuc)
             ->with('tt_bv', $tt_bv)->with('tt_bl', $tt_bl)
+            ->with('bai_viet_hot', $bai_viet_hot)->with('bai_viet_bc', $bai_viet_bc)
+            ->with('binh_luan_hot', $binh_luan_hot)->with('binh_luan_bc', $binh_luan_bc)
             ->with('total_hashtag', $Total_hashtag_result_user)->with('result_suggest', $result_suggest)
             ->with('hashtag_theodoi_noget', $hashtag_theodoi_noget)->with('hashtag_should_fl', $hashtag_should_fl)
             ->with('total_user', $Total_user)->with('account_info', $account_info)->with('college', $college);
@@ -1133,5 +1233,72 @@ class UserSysController extends Controller
         ]);
         Session::put('alert', ['type' => 'success', 'content' => 'Cập nhật vai trò thành công!']);
         return Redirect::to('tai-khoan?nguoi-dung='.$request->ND_MA);
+    }
+
+    /**
+     * Tổng hợp dữ liệu
+     */
+    public function data_user_report(){ ///
+        $this->AuthLogin_QTV();
+        //FOCUS: http://localhost/ctustucom/bai-dang?bai-dang={bai_viet}
+        $nguoiDungMa = request()->query('nguoi-dung');
+        if($nguoiDungMa) Session::put('ND_MA_Focus', $nguoiDungMa);
+        $nguoiDungMa = null;
+
+        $nguoi_dung_not_in3 = DB::table('nguoi_dung')->where('ND_TRANGTHAI', 0)->pluck('ND_MA')->toArray();
+        
+        $bcbvcount = DB::table('bai_viet')
+        ->join('baiviet_baocao', 'baiviet_baocao.BV_MA', '=', 'bai_viet.BV_MA')
+        ->whereNotIn('bai_viet.ND_MA', $nguoi_dung_not_in3)
+        ->groupby('bai_viet.ND_MA')
+        ->select('bai_viet.ND_MA as ND_MA_connect')->selectRaw('COUNT(*) as BV_BC');
+
+        $bcblcount = DB::table('binh_luan')
+        ->join('binhluan_baocao', 'binhluan_baocao.BL_MA', '=', 'binh_luan.BL_MA')
+        ->whereNotIn('binh_luan.ND_MA', $nguoi_dung_not_in3)
+        ->groupby('binh_luan.ND_MA')
+        ->select('binh_luan.ND_MA as ND_MA_connect')->selectRaw('COUNT(*) as BL_BC');
+
+        $bcndcount = DB::table('chan')
+        ->whereNotIn('ND_BICHAN_MA', $nguoi_dung_not_in3)
+        ->groupby('ND_BICHAN_MA')
+        ->select('ND_BICHAN_MA as ND_MA_connect')->selectRaw('COUNT(*) as ND_BC');
+
+        $all_user = DB::table('nguoi_dung')
+        ->join('vai_tro', 'nguoi_dung.VT_MA', '=', 'vai_tro.VT_MA')
+        ->leftJoinSub($bcbvcount, 'bcbvcount', function ($join) {
+            $join->on('nguoi_dung.ND_MA', '=', 'bcbvcount.ND_MA_connect');
+        })
+        ->leftJoinSub($bcblcount, 'bcblcount', function ($join) {
+            $join->on('nguoi_dung.ND_MA', '=', 'bcblcount.ND_MA_connect');
+        })
+        ->leftJoinSub($bcndcount, 'bcndcount', function ($join) {
+            $join->on('nguoi_dung.ND_MA', '=', 'bcndcount.ND_MA_connect');
+        })
+        ->where('nguoi_dung.ND_TRANGTHAI', 1)
+        ->selectRaw('*, COALESCE(BV_BC, 0) + COALESCE(BL_BC, 0) + COALESCE(ND_BC, 0) as BC_total')
+        ->orderby('BC_total', 'desc');
+
+        $all_vaitro = DB::table('vai_tro')->get();
+
+        //-----------------------------------------------------------------
+        //SEARCH: http://localhost/ctustucom/bai-dang?tu-khoa=18%2F03%2F2024
+        $keywordSearch = request()->query('tu-khoa');
+        if($keywordSearch){
+            $all_user = $all_user->where(function ($query) use ($keywordSearch) {
+                $query->where('nguoi_dung.ND_MA', 'like', '%'.$keywordSearch.'%')
+                      ->orWhere('nguoi_dung.ND_HOTEN', 'like', '%'.$keywordSearch.'%');
+
+                $datePattern = '/^\d{2}\/\d{2}\/\d{4}$/';
+                if (preg_match($datePattern, $keywordSearch)) {
+                    $query->orWhereDate('nguoi_dung.ND_NGAYTHAMGIA', Carbon::createFromFormat('d/m/Y', $keywordSearch)->format('Y-m-d'));
+                }
+            });
+        }
+        
+        $all_user = $all_user->paginate(10);
+
+        return view('main_content.user.data_user_report')
+        ->with('all_user', $all_user)->with('all_vaitro', $all_vaitro);
     }
 }
