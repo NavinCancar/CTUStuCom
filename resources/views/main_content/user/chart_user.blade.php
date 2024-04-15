@@ -177,7 +177,7 @@
                             <div class="col-sm-7 ps-5" id="detailHashtag">
                                 <div class="row pt-5 mt-5">
                                     @if(!(empty($result_suggest)))
-                                        <h6 class="mt-3 mb-3">Gợi ý các hashtag có thể xem thêm dành cho bạn</h6>
+                                        <h6 class="mt-3 mb-3"><b class="text-decoration-underline">Gợi ý</b> các hashtag có thể xem thêm dành cho bạn</h6>
                                         @foreach($result_suggest as $tag)
                                             <div class="col-lg-4 col-md-4 col-sm-6">
                                                 <a href="{{URL::to('/hashtag/'.$tag['hashtag'])}}"><span class="badge bg-primary rounded-3 fw-semibold me-1 mb-4 p-2 long-hashtag">#{{$tag['hashtag']}}</span></a>

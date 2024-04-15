@@ -50,8 +50,11 @@ class MessageController_FB extends Controller
 
     public function index(){ ///
         $this->AuthLogin_ND();
+        $isBlocked = 0;
+        $isBlock = 0;
         return view('main_content.message')
-        ->with('isInactive', 0)->with('isBlock', 0);
+        ->with('isInactive', 0)->with('isBlock', 0)
+        ->with('isBlocked', $isBlocked)->with('isBlock', $isBlock);
     }
 
     public function show(string $id){ ///

@@ -824,7 +824,7 @@
                     form.find('.temp-notice').remove();
                     document.getElementById('thembaiviet').classList.remove("show");
 
-                    $('#alert-success span').html('Thêm bài viết thành công');
+                    $('#alert-success span').html('Thêm bài viết thành công và đang chờ xét duyệt');
                     $('html, body').animate({
                         scrollTop: $('#alert-success').offset().top
                     });
