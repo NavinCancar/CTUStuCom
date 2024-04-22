@@ -136,6 +136,7 @@ Route::get('/danh-sach-hoc-phan', 'App\Http\Controllers\SubjectController@list')
 Route::resource('/hoc-phan', 'App\Http\Controllers\SubjectController'); ///ok
 
 
+
 /*
 |--------------------------------------------------------------------------
 | FIREBASE
@@ -168,3 +169,12 @@ Route::get('/thong-bao-theo-doi/{ND_MA}', 'App\Http\Controllers\NotificatonContr
 //-- Cập nhật thông báo trạng thái
 Route::get('/thong-bao-trang-thai-bai-dang/{BV_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_StatePost'); ///
 Route::get('/thong-bao-trang-thai-binh-luan/{BL_MA}', 'App\Http\Controllers\NotificatonController_FB@UpdateNotification_StateComment'); ///
+
+
+
+/*
+|--------------------------------------------------------------------------
+| CẬP NHẬT CƠ SỞ DỮ LIỆU
+|--------------------------------------------------------------------------
+*/
+Route::get('/csdl', 'App\Http\Controllers\FileofUserController_FB@database'); ///ok
