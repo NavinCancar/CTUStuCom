@@ -423,7 +423,7 @@ class CommentController extends Controller
             $binh_luan = DB::table('binh_luan')
             ->where('BL_TRANGTHAI', 'LIKE', $state.'%')
             ->orderBy('BL_THOIGIANTAO', 'desc')
-            ->whereNotIn('ND_MA', $nguoi_dung_not_in3);
+            ->whereNotIn('binh_luan.ND_MA', $nguoi_dung_not_in3);
         }
         $filterState = null;
 
@@ -441,7 +441,13 @@ class CommentController extends Controller
             });
         }
         
-        $binh_luan = $binh_luan->paginate(10);
+        $binh_luan = $binh_luan
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                  ->from('binhluan_baocao')
+                  ->whereColumn('binhluan_baocao.BL_MA', 'binh_luan.BL_MA');
+        })
+        ->paginate(10);
 
         return view('main_content.comment.all_comment')
         ->with('binh_luan', $binh_luan)->with('binhluan_baocao_noget', $binhluan_baocao_noget);

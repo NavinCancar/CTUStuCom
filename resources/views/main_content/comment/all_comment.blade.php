@@ -19,7 +19,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="mb-3 mb-sm-0 d-sm-flex d-block align-items-center justify-content-between">
-            <h5 class="card-title fw-semibold">Danh sách bình luận
+            <h5 class="card-title fw-semibold">Danh sách bình luận bị báo cáo
                 <?php if($addTT != '' || $addBC != '' || $addTK != '') { ?>
                     <a href="{{URL::to('/binh-luan')}}" class="ms-2 fs-4"><i class="fas fa-sync-alt"></i></a>
                 <?php } ?>
@@ -75,7 +75,7 @@
                 <div class="card-body p-4">
                     <div class="mb-3 mb-sm-0">
                         <div class="row my-2">
-                            <h2 class="card-title fw-semibold text-center fs-6">DANH SÁCH BÌNH LUẬN</h2>
+                            <h2 class="card-title fw-semibold text-center fs-6">DANH SÁCH BÌNH LUẬN BỊ BÁO CÁO</h2>
                             <!--Header-->
                             <div class="row">
                                 <div class="col-sm-9">
