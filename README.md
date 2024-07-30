@@ -1,66 +1,55 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# English
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Welcome to the Project!
 
-## About Laravel
+## To view project-related information, please navigate to the database > data folder.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The `data` folder contains essential information related to the project, including the database, Use Case diagrams, ERD models, and related project report. The report is a comprehensive document that includes all project information, as well as interface images and descriptions of how the interfaces work. Below is a detailed description of each subfolder in `data`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. `db` Folder
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The `db` folder contains the database file required to run the project.
 
-## Learning Laravel
+### 2. `diagrams` Folder
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+The `diagrams` folder contains files and images of the project's diagrams and models. These diagrams include:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- ERD (Entity-Relationship Diagram) illustrating the database structure.
+- Use Case diagrams describing the functions, users, and interaction processes.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. `report` Folder
 
-## Laravel Sponsors
+The `report` folder contains the project-related report. This report includes:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Detailed descriptions of the project.
+- Images of Use Case diagrams and ERD models with detailed explanations of these diagrams and models.
+- Interface images, detailed descriptions of the interfaces, and explanations of how they work.
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
 
-## Contributing
+# Tiếng Việt
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Chào mừng bạn đến với dự án!
 
-## Code of Conduct
+## Để xem các thông tin liên quan đến dự án, vui lòng truy cập thư mục database > data
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Thư mục `data` chứa các thông tin liên quan của dự án, bao gồm: Cơ sở dữ liệu, các sơ đồ Use Case, các mô hình ERD và bài báo cáo liên quan của dự án. Trong đó, bài báo cáo là nơi tổng hợp tất cả thông tin về dự án, cũng như là hình ảnh các giao diện hiển thị và mô tả cách thức hoạt động của các giao diện. Dưới đây là mô tả chi tiết về từng thư mục con trong `data`.
 
-## Security Vulnerabilities
+### 1. Thư mục `db`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Thư mục `db` chứa tệp cơ sở dữ liệu để chạy dự án.
 
-## License
+### 2. Thư mục `diagrams`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Thư mục `diagrams` chứa các file và hình ảnh về sơ đồ và mô hình liên quan của dự án. Các sơ đồ này bao gồm:
+
+- Sơ đồ ERD (Entity-Relationship Diagram) mô tả cấu trúc cơ sở dữ liệu.
+- Sơ đồ Use case mô tả các chức năng, người dùng, và quy trình tương tác.
+
+### 3. Thư mục `report`
+
+Thư mục `report` chứa bài báo cáo liên quan đến dự án. Trong bài báo cáo này bao gồm:
+
+- Mô tả chi tiết về dự án.
+- Hình ảnh các sơ đồ Use case và mô hình ERD và mô tả chi tiết về các sơ đồ và mô hình đó.
+- Hình ảnh các giao diện, mô tả chi tiết về các giao diện và cách chúng hoạt động.
